@@ -22,7 +22,7 @@ namespace DataAccess.UnitOfWorks
         {
             Context = context;
             HosBuilding = new GenericRepository<HosBuilding>(Context);
-            Hospitals = new HospitalRepository(Context);
+            //Hospitals = new HospitalRepository(Context);
         }
         public int Complete()
         {

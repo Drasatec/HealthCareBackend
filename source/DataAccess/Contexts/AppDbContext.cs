@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Contexts;
 
-public  class AppDbContext : DbContext
+public class AppDbContext : DbContext
 {
 
     public AppDbContext()
@@ -556,9 +556,10 @@ public  class AppDbContext : DbContext
 
         modelBuilder.Entity<HospitalTranslation>(entity =>
         {
-            entity.HasKey(e => new { e.HospitalId, e.LangCode });
+            entity.HasKey(e => e.Id).HasName("PK_HospitalTranslations");
 
             entity.HasIndex(e => e.Name, "IX_HospitalTranslations_Name");
+            entity.HasIndex(e => new {e.LangCode, e.HospitalId}, "UK_HospitalTranslations_LangCode_HospitalId").IsUnique();
 
             entity.Property(e => e.LangCode)
                 .HasMaxLength(6)

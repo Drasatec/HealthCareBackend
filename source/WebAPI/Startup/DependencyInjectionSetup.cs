@@ -1,12 +1,9 @@
-﻿using DataAccess;
-using DataAccess.Contexts;
+﻿using DataAccess.Contexts;
 using DataAccess.Repositories;
 using DataAccess.UnitOfWorks;
-using Microsoft.AspNetCore.Mvc.Filters;
+using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
-using WebAPI.Contracts;
 
 namespace WebAPI.Startup;
 public static class DependencyInjectionSetup
@@ -25,15 +22,17 @@ public static class DependencyInjectionSetup
             c.SwaggerDoc("v2", new OpenApiInfo { Title = "DrasatHeathApi", Version = "v2" });
         });
         Services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
-        Services.AddTransient(typeof(IHospitalRepository), typeof(HospitalRepository));
+       // Services.AddTransient(typeof(IHospitalRepository), typeof(HospitalRepository));
+        Services.AddTransient(typeof(IBaseRepository<HospitalDto>), typeof(HospitalRepository));
 
         return Services;
     }
 
     public static IServiceCollection RegisterDbContext(this IServiceCollection Services, IConfiguration Configuration)
     {
-        Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(Configuration.GetConnectionString("LocalDb")));
+        Services.AddDbContext<AppDbContext>(options => options
+        .UseSqlServer(Configuration.GetConnectionString("SomeeDb"))
+        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
         return Services;
     }
 }

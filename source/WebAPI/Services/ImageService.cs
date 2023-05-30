@@ -1,9 +1,10 @@
-﻿using DomainModel.Helpers;
-using DomainModel.Models;
+﻿using DomainModel.Models;
 using SixLabors.ImageSharp.Formats.Jpeg;
-namespace DataAccess;
+using System.IO;
 
-public static class DataAccessImageService
+namespace WebAPI.ServicesAPI;
+
+public static class ImageService
 {
     private const int mediumSize = 1000;
     private const int smallSize = 300;
@@ -14,27 +15,24 @@ public static class DataAccessImageService
     //private const string large = "large";
     private static string path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot\\Images\\");
 
-    public static async Task<string> SaveSingleImage(Stream image, string? name = null)
+    public static async Task<string> SaveSingleImage(IFormFile image, string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        await Task.Run(async () =>
         {
-            name = Helper.GenerateImageName();
-        }
-
-            using var imageResult = Image.Load(image);
+            using var imageResult = Image.Load(image.OpenReadStream());
             CreateDirectories(path);
 
             await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
             await SaveImageInFileSystem(imageResult, name, path + medium, mediumSize);
             await SaveImageInFileSystem(imageResult, name, path + small, smallSize);
-
+        });
         return await Task.FromResult(name);
     }
 
-    public static async Task<string> UpdateSingleImage(Stream image, string name)
+    public static async Task<string> UpdateSingleImage(IFormFile image, string name)
     {
         RemoveImage(name);
-        using var imageResult = Image.Load(image);
+        using var imageResult = Image.Load(image.OpenReadStream());
 
         await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
         await SaveImageInFileSystem(imageResult, name, path + medium, mediumSize);

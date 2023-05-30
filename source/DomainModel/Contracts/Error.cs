@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-namespace WebAPI.Contracts;
+namespace DomainModel.Contracts;
 public class Error
 {
     public string? StatusCode { get; set; }
