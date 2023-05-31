@@ -23,13 +23,14 @@ public static class DependencyInjectionSetup
         });
         Services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
        // Services.AddTransient(typeof(IHospitalRepository), typeof(HospitalRepository));
-        Services.AddTransient(typeof(IBaseRepository<HospitalDto>), typeof(HospitalRepository));
+        //Services.AddTransient(typeof(IBaseRepository<HospitalDto>), typeof(HospitalRepository));
 
         return Services;
     }
 
     public static IServiceCollection RegisterDbContext(this IServiceCollection Services, IConfiguration Configuration)
     {
+        // LocalDb ||| SomeeDb
         Services.AddDbContext<AppDbContext>(options => options
         .UseSqlServer(Configuration.GetConnectionString("SomeeDb"))
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));

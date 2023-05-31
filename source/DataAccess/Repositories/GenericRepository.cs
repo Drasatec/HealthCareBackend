@@ -17,9 +17,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public async Task<T> Create(T entity)
     {
         var rowData = await Context.Set<T>().AddAsync(entity);
-        var isRowEffected = await Context.SaveChangesAsync();
-        //if (isRowEffected > 0)
-        //    return null;
+        await Context.SaveChangesAsync();
         return rowData.Entity;
     }
 

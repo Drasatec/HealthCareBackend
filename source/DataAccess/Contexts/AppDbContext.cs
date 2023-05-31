@@ -51,7 +51,7 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<HospitalTranslation> HospitalTranslations { get; set; }
 
-    public virtual DbSet<HospitalsContactDatum> HospitalsContactData { get; set; }
+    public virtual DbSet<HospitalPhoneNumber> HospitalPhoneNumbers { get; set; }
 
     public virtual DbSet<Language> Languages { get; set; }
 
@@ -552,6 +552,13 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Photo)
                 .HasMaxLength(55)
                 .IsUnicode(false);
+
+            entity.Property(e => e.Email)
+                .HasMaxLength(40)
+                .IsUnicode(false);
+            entity.Property(e => e.WhatsAppNumber)
+                .HasMaxLength(15)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<HospitalTranslation>(entity =>
@@ -578,17 +585,11 @@ public class AppDbContext : DbContext
                 .HasConstraintName("FK_HospitalTranslations_LangCode");
         });
 
-        modelBuilder.Entity<HospitalsContactDatum>(entity =>
+        modelBuilder.Entity<HospitalPhoneNumber>(entity =>
         {
             entity.HasIndex(e => e.HospitalId, "IX_HospitalsContactData_HospitalId");
 
-            entity.Property(e => e.Email)
-                .HasMaxLength(40)
-                .IsUnicode(false);
             entity.Property(e => e.TelephoneNumber)
-                .HasMaxLength(15)
-                .IsUnicode(false);
-            entity.Property(e => e.WhatsAppNumber)
                 .HasMaxLength(15)
                 .IsUnicode(false);
 

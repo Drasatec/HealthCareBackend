@@ -9,11 +9,18 @@ public partial class Hospital
 
     public string? Photo { get; set; }
 
-    public string? CodeNumber { get; set; }
+    public string CodeNumber { get; set; } = string.Empty;
 
-    public DateTime? CreateOn { get; set; }
+    public string? Email { get; set; }
+
+    public string? WhatsAppNumber { get; set; }
+
+    public DateTime? CreateOn { get; }
 
     public bool IsDeleted { get; set; }
+    public virtual ICollection<HospitalTranslation> HospitalTranslations { get; set; } = new List<HospitalTranslation>();
+    public virtual ICollection<HospitalPhoneNumber> HospitalPhoneNumbers { get; set; } = new List<HospitalPhoneNumber>();
+
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
@@ -26,11 +33,6 @@ public partial class Hospital
     public virtual ICollection<HosFloor> HosFloors { get; set; } = new List<HosFloor>();
 
     public virtual ICollection<HosRoom> HosRooms { get; set; } = new List<HosRoom>();
-
-    public virtual ICollection<HospitalTranslation> HospitalTranslations { get; set; } = new List<HospitalTranslation>();
-
-    public virtual ICollection<HospitalsContactDatum> HospitalsContactData { get; set; } = new List<HospitalsContactDatum>();
-
     public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
 
     public virtual ICollection<MedicalSpecialty> Specialties { get; set; } = new List<MedicalSpecialty>();

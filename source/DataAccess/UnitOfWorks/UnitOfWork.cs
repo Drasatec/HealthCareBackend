@@ -18,12 +18,15 @@ namespace DataAccess.UnitOfWorks
 
         public IGenericRepository<HosBuilding> HosBuilding { get; private set; }
 
-        public UnitOfWork(AppDbContext context)
+
+        public UnitOfWork(AppDbContext context )
         {
             Context = context;
             HosBuilding = new GenericRepository<HosBuilding>(Context);
-            //Hospitals = new HospitalRepository(Context);
+            Hospitals = new HospitalRepository(Context);
         }
+
+
         public int Complete()
         {
             return Context.SaveChangesAsync().Result;
