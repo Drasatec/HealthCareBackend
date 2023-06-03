@@ -14,9 +14,9 @@ public interface IHospitalRepository : IGenericRepository<HospitalDto>
     Task<Response<string?>> UpdateAnImage(Stream image, int id);
     Task<AllHospitalsDto?> ReadAllHospitals(string isActive, string? lang, int page = 1, int pageSize = 10);
     Task<Response> DeleteHospitalById(int id, bool isDeleted);
-    Task<Response<List<HospitalTranslation>>> SearchByName(string name);
-    Task<Response<List<HospitalDto>>> SearchByCodeNumber(string codeNumber, string lang);
     Task<Response<HospitalDto?>> AddPhoneNumbers(List<HospitalPhoneNumber> dto, int id);
     Task<Response> DeleteTranslat(int[] id);
     Task<Response> DeletePhons(int[] ids);
+    Task<List<HospitalDto>> SearchByNameOrCode(string searchTerm, string lang = "ar");
+    Task<List<HospitalTranslation>> SearchByName(string name);
 }

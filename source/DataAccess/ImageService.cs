@@ -24,7 +24,7 @@ public static class DataAccessImageService
             using var imageResult = Image.Load(image);
             CreateDirectories(path);
 
-            await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
+           // await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
             await SaveImageInFileSystem(imageResult, name, path + medium, mediumSize);
             await SaveImageInFileSystem(imageResult, name, path + small, smallSize);
 
@@ -36,7 +36,7 @@ public static class DataAccessImageService
         RemoveImage(name);
         using var imageResult = Image.Load(image);
 
-        await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
+        //await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
         await SaveImageInFileSystem(imageResult, name, path + medium, mediumSize);
         await SaveImageInFileSystem(imageResult, name, path + small, smallSize);
         return await Task.FromResult(name);

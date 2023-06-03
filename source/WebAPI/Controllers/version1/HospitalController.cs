@@ -1,4 +1,5 @@
 ﻿using DomainModel.Contracts;
+using DomainModel.Entities;
 using DomainModel.Models;
 using DomainModel.Models.Hospitals;
 
@@ -125,7 +126,18 @@ public class HospitalController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string? name, [FromQuery] string? codeNumber, [FromQuery] string? lang)
+    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang)
+    {
+        if (!string.IsNullOrEmpty(name))
+            return Ok(await Data.Hospitals.SearchByName(name));
+        else if (!string.IsNullOrEmpty(searchTerm)&& lang!= null)
+            return Ok(await Data.Hospitals.SearchByNameOrCode(searchTerm,lang));
+
+        return BadRequest(new Error("400", "name or searchTerm with lang is required"));
+    }
+
+    [HttpGet("search_all-data")]
+    public async Task<IActionResult> SearchByNameOrCode([FromQuery] string? name, [FromQuery] string? codeNumber, [FromQuery] string? lang)
     {
         //Response<List<HospitalTranslation>> response;
 
@@ -133,12 +145,22 @@ public class HospitalController : ControllerBase
             return Ok(await Data.Hospitals.SearchByName(name));
 
         if (!string.IsNullOrEmpty(codeNumber) && !string.IsNullOrEmpty(lang))
-            return Ok(await Data.Hospitals.SearchByCodeNumber(codeNumber, lang));
+            return Ok(await Data.Hospitals.SearchByNameOrCode(codeNumber));
 
         return BadRequest(new Error("400", "name or code number and lang is required"));
         //return Ok(response);
     }
 
+    ////Response<List<HospitalTranslation>> response;
+
+    //    if (!string.IsNullOrEmpty(name))
+    //        return Ok(await Data.Hospitals.SearchByName(name));
+
+    //    if (!string.IsNullOrEmpty(codeNumber) && !string.IsNullOrEmpty(lang))
+    //        return Ok(await Data.Hospitals.SearchByCodeNumber(codeNumber, lang));
+
+    //    return BadRequest(new Error("400", "name or code number and lang is required"));
+    //    //return Ok(response);
 
 
     // delete ====================

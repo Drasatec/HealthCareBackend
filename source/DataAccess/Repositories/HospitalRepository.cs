@@ -21,6 +21,8 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
             _ = DataAccessImageService.SaveSingleImage(image, imageName);
             entity.Photo = imageName;
         }
+        else
+            entity.Photo = null;
 
         var result = await Context.Hospitals.AddAsync(entity);
 
@@ -28,10 +30,11 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
         {
             if (entity.HospitalPhoneNumbers.Count < 1)
             {
-                entity.HospitalPhoneNumbers.Add(new() { Id = result.Entity.Id, TelephoneNumber = "0" });
+                entity.HospitalPhoneNumbers.Add(new() { Id = result.Entity.Id, TelephoneNumber = "20-0000" });
             }
         }
-
+        if (string.IsNullOrEmpty(entity.CodeNumber))
+            entity.CodeNumber = "hos-" +  Context.Hospitals.Count().ToString();
         await Context.SaveChangesAsync();
 
         return await ReadHospitalById(result.Entity.Id); //(HospitalDto) result.Entity;
@@ -125,7 +128,7 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
         }
         catch (Exception ex)
         {
-            return respons = new(false, "can not duplicate langCode with the same hosId or ....."+ ex.Message, null); ;
+            return respons = new(false, "can not duplicate langCode with the same hosId or ....." + ex.Message, null); ;
         }
     }
 
@@ -152,7 +155,7 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
             Context.Entry(current).Property(p => p.CreateOn).IsModified = false;
             Context.Entry(current).Property(p => p.WhatsAppNumber).IsModified = false;
             Context.Entry(current).Property(p => p.Email).IsModified = false;
-            
+
 
             await Context.SaveChangesAsync();
         }
@@ -262,7 +265,7 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
         return all;
     }
 
-    public async Task<Response<List<HospitalTranslation>>> SearchByName(string name)
+    public async Task<List<HospitalTranslation>> SearchByName(string name)
     {
         IQueryable<HospitalTranslation> query = Context.HospitalTranslations;
 
@@ -272,32 +275,31 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
         }
 
         List<HospitalTranslation> results = await query.ToListAsync();
-
-        return new Response<List<HospitalTranslation>>
-        {
-            Success = true,
-            Value = results
-        };
+        return results;
     }
 
-    public async Task<Response<List<HospitalDto>>> SearchByCodeNumber(string codeNumber, string lang)
+    public async Task<List<HospitalDto>> SearchByNameOrCode(string searchTerm , string lang="ar")
     {
-        IQueryable<Hospital> query = Context.Hospitals;
-
-        if (!string.IsNullOrEmpty(codeNumber))
-        {
-            query = query.Where(t => t.CodeNumber.Contains(codeNumber));
-        }
-        query = query.Include(t => t.HospitalTranslations.Where(l => l.LangCode == lang));
-
-        List<HospitalDto> results = HospitalDto.ToList(await query.ToListAsync());
-
-        return new Response<List<HospitalDto>>
-        {
-            Success = true,
-            Value = results
-        };
+        var hospitals = await Context.Hospitals
+           .Join(Context.HospitalTranslations,
+               h => h.Id,
+               t => t.HospitalId,
+               (h, t) => new { Hospital = h, Translation = t })
+           .Where(x => (x.Hospital.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == "ar")
+           .Select(x => new HospitalDto
+           {
+               Id = x.Hospital.Id,
+               Photo = x.Hospital.Photo,
+               CodeNumber = x.Hospital.CodeNumber,
+               Email = x.Hospital.Email,
+               WhatsAppNumber = x.Hospital.WhatsAppNumber,
+               IsDeleted = x.Hospital.IsDeleted,
+               HospitalTrasnlations = new List<HospitalTranslation> { x.Translation }
+           })
+           .ToListAsync();
+        return hospitals;
     }
+
 
     #endregion
 
@@ -353,6 +355,85 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
 
 
 
+    public async Task<List<HospitalDto>> SearchByName2(string searchTerm)
+    {
+        // is deleted
+        var hospitals = await Context.Hospitals
+            .Join(Context.HospitalTranslations,
+                h => h.Id,
+                t => t.HospitalId,
+                (h, t) => new { Hospital = h, Translation = t })
+            .Where(x => x.Hospital.CodeNumber.Contains(searchTerm) || x.Translation.Name.Contains(searchTerm))
+            .Select(x => new HospitalDto
+            {
+                Id = x.Hospital.Id,
+                Photo = x.Hospital.Photo,
+                CodeNumber = x.Hospital.CodeNumber,
+                Email = x.Hospital.Email,
+                WhatsAppNumber = x.Hospital.WhatsAppNumber,
+                IsDeleted = x.Hospital.IsDeleted,
+                HospitalTrasnlations = new List<HospitalTranslation> { x.Translation }
+            })
+            .ToListAsync();
+
+        //var hospitals = await Context.Hospitals
+        //    .Join(Context.HospitalTranslations.Where(t => t.Name.Contains(name)),
+        //    h => h.Id,
+        //    t => t.HospitalId,
+        //    (h, t) => new HospitalDto
+        //    {
+        //        Id = h.Id,
+        //        Photo = h.Photo,
+        //        CodeNumber = h.CodeNumber,
+        //        Email = h.Email,
+        //        WhatsAppNumber = h.WhatsAppNumber,
+        //        IsDeleted = h.IsDeleted,
+        //        HospitalTrasnlations = new List<HospitalTranslation> { t }
+        //    })
+        //    .ToListAsync();
+
+        //var hospitals =  await Context.Hospitals
+        //    .Join(Context.HospitalTranslations,
+        //        h => h.Id,
+        //        ht => ht.HospitalId,
+        //        (h, ht) => new { Hospital = h, Translation = ht })
+        //    .Where(x => x.Translation.Name.Contains(name))
+        //    .Select(x => new HospitalDto
+        //    {
+        //        Id = x.Hospital.Id,
+        //        Photo = x.Hospital.Photo,
+        //        CodeNumber = x.Hospital.CodeNumber,
+        //        Email = x.Hospital.Email,
+        //        WhatsAppNumber = x.Hospital.WhatsAppNumber,
+        //        IsDeleted = x.Hospital.IsDeleted,
+        //        PhoneNumbers =null,
+        //        HospitalTrasnlations = new List<HospitalTranslation>
+        //        {
+        //           x.Translation
+        //        }
+        //    })
+        //    .ToListAsync();
+        return hospitals;
+    }
+
+    public async Task<Response<List<HospitalDto>>> SearchByCodeNumber(string codeNumber, string lang)
+    {
+        IQueryable<Hospital> query = Context.Hospitals;
+
+        if (!string.IsNullOrEmpty(codeNumber))
+        {
+            query = query.Where(t => t.CodeNumber.Contains(codeNumber));
+        }
+        query = query.Include(t => t.HospitalTranslations.Where(l => l.LangCode == lang));
+
+        List<HospitalDto> results = HospitalDto.ToList(await query.ToListAsync());
+
+        return new Response<List<HospitalDto>>
+        {
+            Success = true,
+            Value = results
+        };
+    }
     //public async Task<Hospital> CreateWithImage(Hospital entity, ImageInputModel image)
     //{
     //    //var imageName = await imageService.SaveSingleImage(image);
