@@ -16,10 +16,12 @@
     </PackageReference>
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\version2\" />
+    <Folder Include="Attributes\" />
+    <Folder Include="Filter s\" />
     <Folder Include="wwwroot\Images\" />
     <Folder Include="wwwroot\Images\medium\" />
     <Folder Include="wwwroot\Images\original\" />

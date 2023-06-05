@@ -34,7 +34,7 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
             }
         }
         if (string.IsNullOrEmpty(entity.CodeNumber))
-            entity.CodeNumber = "hos-" +  Context.Hospitals.Count().ToString();
+            entity.CodeNumber = "hos-" + Context.Hospitals.Count().ToString();
         await Context.SaveChangesAsync();
 
         return await ReadHospitalById(result.Entity.Id); //(HospitalDto) result.Entity;
@@ -194,7 +194,7 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
 
     #region Read
 
-    public async Task<HospitalDto?> ReadHospitalById(int Id, string? lang = null)
+    public async Task<HospitalDto?> ReadHospitalById(int? Id, string? lang = null)
     {
         var _context = Context.Hospitals.Where(x => x.Id == Id);
         if (lang == null)
@@ -278,14 +278,18 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
         return results;
     }
 
-    public async Task<List<HospitalDto>> SearchByNameOrCode(string searchTerm , string lang="ar")
+    public async Task<AllHospitalsDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1,int pageSize = 10)
     {
+        int skip = Helper.SkipValue(page, pageSize);
+        IQueryable<Hospital> query = Context.Hospitals;
+
         var hospitals = await Context.Hospitals
            .Join(Context.HospitalTranslations,
                h => h.Id,
                t => t.HospitalId,
                (h, t) => new { Hospital = h, Translation = t })
            .Where(x => (x.Hospital.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == "ar")
+           .Skip(skip).Take(pageSize)
            .Select(x => new HospitalDto
            {
                Id = x.Hospital.Id,
@@ -297,64 +301,17 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
                HospitalTrasnlations = new List<HospitalTranslation> { x.Translation }
            })
            .ToListAsync();
-        return hospitals;
+
+        var all = new AllHospitalsDto();
+        all.Total = hospitals.Count;
+        all.Page = page;
+        all.PageSize = pageSize;
+        all.Hospitals = hospitals;
+        return all;
     }
 
 
     #endregion
-
-    #region Delete
-    public async Task<Response> DeleteTranslat(int[] ids)
-    {
-        try
-        {
-            foreach (var item in ids)
-            {
-                var current = await Context.HospitalTranslations.Where(t => t.Id == item).FirstOrDefaultAsync();
-                if (current != null)
-                {
-                    Context.Remove(current);
-                    ids[0] = current.HospitalId;
-                }
-            }
-            var rowEffict = await Context.SaveChangesAsync();
-            if (rowEffict > 0) return new Response(true, $"delete translate: ids of hosId: {ids[0]} ");
-
-            return new Response(false, $"Id : {ids[0]} is not found  "); ;
-        }
-        catch (Exception ex)
-        {
-            return new Response(false, ex.Message);
-        }
-    }
-
-    public async Task<Response> DeletePhons(int[] ids)
-    {
-        try
-        {
-            foreach (var item in ids)
-            {
-                var current = await Context.HospitalPhoneNumbers.Where(t => t.Id == item).FirstOrDefaultAsync();
-                if (current != null)
-                {
-                    Context.Remove(current);
-                    ids[0] = current.HospitalId;
-                }
-            }
-            var rowEffict = await Context.SaveChangesAsync();
-            if (rowEffict > 0) return new Response(true, $"delete phons: ids of hosId: {ids[0]} ");
-
-            return new Response(false, $"Id : {ids[0]} is not found  "); ;
-        }
-        catch (Exception ex)
-        {
-            return new Response(false, ex.Message);
-        }
-    }
-    #endregion
-
-
-
     public async Task<List<HospitalDto>> SearchByName2(string searchTerm)
     {
         // is deleted

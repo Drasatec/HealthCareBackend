@@ -573,6 +573,7 @@ public class AppDbContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Address).HasMaxLength(50);
             entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(300);
 
             //entity.HasOne(d => d.Hospital).WithMany(p => p.HospitalTranslations)
             //    .HasForeignKey(d => d.HospitalId)

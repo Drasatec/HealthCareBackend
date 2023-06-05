@@ -4,7 +4,7 @@ using DomainModel.Models;
 using DomainModel.Models.Hospitals;
 
 namespace WebAPI.Controllers.version1;
-[Route("api/[controller]")]
+[Route("api/[controller]", Order = 01)]
 [ApiController]
 [ApiVersion("1.0")]
 public class HospitalController : ControllerBase
@@ -15,8 +15,11 @@ public class HospitalController : ControllerBase
     {
         this.Data = data;
     }
+    // ================================================================
+    // ============================= post =============================
+    // ================================================================ 0-20
 
-    [HttpPost("add")]
+    [HttpPost("add", Order = 0100)]
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] HospitalDto model)
     {
         HospitalDto? response;
@@ -35,15 +38,20 @@ public class HospitalController : ControllerBase
         return Created("fawzy", response);
     }
 
-    [HttpPut("add-translations/{id}")]
-    public async Task<IActionResult> AddTranslations([FromBody] List<HospitalTranslation> model, int id)
+    [HttpPost("add-translations-form/{hosid?}", Order = 0101)]
+    public async Task<IActionResult> AddTranslations([FromForm] List<HospitalTranslation> translations, int? hosid)
     {
-        var response = await Data.Hospitals.AddTranslations(model, id);
+        Response<HospitalDto?> response;
+
+        response = await Data.Hospitals.GAddTranslations(translations);
+        if (response.Success)
+            if (hosid.HasValue)
+                response.Value = await Data.Hospitals.ReadHospitalById(hosid);
 
         return Created("fawzy", response);
     }
 
-    [HttpPut("add-phons/{id}")]
+    [HttpPost("add-phons/{id}", Order = 0102)]
     public async Task<IActionResult> AddPhons([FromBody] List<HospitalPhoneNumber> model, int id)
     {
         var response = await Data.Hospitals.AddPhoneNumbers(model, id);
@@ -51,7 +59,9 @@ public class HospitalController : ControllerBase
         return Created("https", response);
     }
 
-    [HttpGet()]
+    // ============================= get ============================= 21-40
+
+    [HttpGet(Order = 0111)]
     public async Task<IActionResult> GetById([FromQuery] int id, [FromQuery] string? lang)
     {
         if (id < 1)
@@ -61,7 +71,41 @@ public class HospitalController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPut("edit/{id}")]
+    [HttpGet("all", Order = 0112)]
+    public async Task<IActionResult> GetAll([FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        var hospitals = await Data.Hospitals.ReadAllHospitals(status, lang, page, pageSize);
+        return Ok(hospitals);
+    }
+
+    [HttpGet("search", Order = 0114)]
+    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        if (!string.IsNullOrEmpty(name))
+            return Ok(await Data.Hospitals.SearchByName(name));
+        else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
+            return Ok(await Data.Hospitals.SearchByNameOrCode(searchTerm, lang));
+
+        return BadRequest(new Error("400", "name or searchTerm with lang is required"));
+    }
+
+    // ============================= put ============================= 41-60
+
+    [HttpPut("edit-translations-form/{hosid?}", Order = 0121)]
+    public async Task<IActionResult> EditTranslations([FromForm] List<HospitalTranslation> translations, int? hosid)
+    {
+        Response<HospitalDto?> response;
+
+        response = await Data.Hospitals.GAddTranslations(translations);
+        if (response.Success)
+            if (hosid.HasValue)
+                response.Value = await Data.Hospitals.ReadHospitalById(hosid);
+
+        return Created("fawzy", response);
+    }
+
+
+    [HttpPut("edit/{id}", Order = 0123)]
     public async Task<IActionResult> UpdateSingleWithImage([FromForm] IFormFile? file, [FromForm] HospitalDto model, int id)
     {
         Response<HospitalDto?> response;
@@ -79,26 +123,7 @@ public class HospitalController : ControllerBase
         return Created("https//fawzy", response);
     }
 
-    [HttpPut("edit-body/{id}")]
-    public async Task<IActionResult> UpdateSingle([FromBody] HospitalDto model, int id)
-    {
-        Response<HospitalDto?> response;
-        response = await Data.Hospitals.UpdateHospital(model, id, null);
-        if (!response.Success)
-            return BadRequest(response);
-
-        return Created("https//fawzy", response);
-    }
-
-    [HttpGet("all")]
-    public async Task<IActionResult> GetAll([FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-    {
-        var hospitals = await Data.Hospitals.ReadAllHospitals(status, lang, page, pageSize);
-        return Ok(hospitals);
-    }
-
-
-    [HttpPut("delete")]
+    [HttpPut("deactivate", Order = 0124)]
     public async Task<IActionResult> DeleteSingle([FromQuery] int id, [FromQuery] string status)
     {
         bool isDeleted;
@@ -114,7 +139,7 @@ public class HospitalController : ControllerBase
         return Ok(await Data.Hospitals.DeleteHospitalById(id, isDeleted));
     }
 
-    [HttpPut("edit-image/{hosId}")]
+    [HttpPut("edit-image/{hosId}", Order = 0125)]
     public async Task<IActionResult> UpdateTrans([FromForm] IFormFile file, int hosId)
     {
 
@@ -125,60 +150,67 @@ public class HospitalController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang)
+    [HttpPut("edit-body/{id}", Order = 0126)]
+    public async Task<IActionResult> UpdateSingle([FromBody] HospitalDto model, int id)
     {
-        if (!string.IsNullOrEmpty(name))
-            return Ok(await Data.Hospitals.SearchByName(name));
-        else if (!string.IsNullOrEmpty(searchTerm)&& lang!= null)
-            return Ok(await Data.Hospitals.SearchByNameOrCode(searchTerm,lang));
+        Response<HospitalDto?> response;
+        response = await Data.Hospitals.UpdateHospital(model, id, null);
+        if (!response.Success)
+            return BadRequest(response);
 
-        return BadRequest(new Error("400", "name or searchTerm with lang is required"));
+        return Created("https//fawzy", response);
     }
 
-    [HttpGet("search_all-data")]
-    public async Task<IActionResult> SearchByNameOrCode([FromQuery] string? name, [FromQuery] string? codeNumber, [FromQuery] string? lang)
-    {
-        //Response<List<HospitalTranslation>> response;
+    // ============================= delete ============================= 61-80
 
-        if (!string.IsNullOrEmpty(name))
-            return Ok(await Data.Hospitals.SearchByName(name));
-
-        if (!string.IsNullOrEmpty(codeNumber) && !string.IsNullOrEmpty(lang))
-            return Ok(await Data.Hospitals.SearchByNameOrCode(codeNumber));
-
-        return BadRequest(new Error("400", "name or code number and lang is required"));
-        //return Ok(response);
-    }
-
-    ////Response<List<HospitalTranslation>> response;
-
-    //    if (!string.IsNullOrEmpty(name))
-    //        return Ok(await Data.Hospitals.SearchByName(name));
-
-    //    if (!string.IsNullOrEmpty(codeNumber) && !string.IsNullOrEmpty(lang))
-    //        return Ok(await Data.Hospitals.SearchByCodeNumber(codeNumber, lang));
-
-    //    return BadRequest(new Error("400", "name or code number and lang is required"));
-    //    //return Ok(response);
-
-
-    // delete ====================
-    [HttpDelete("delete-translat")]
+    [HttpDelete("delete-translat", Order = 0130)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)
     {
-        var res = await Data.Hospitals.DeleteTranslat(translteId);
-            if(res.Success)
-        return Ok(res);
-            return BadRequest(res);
+        HospitalTranslation entity = new();
+        var res = new Response();
+        res = await Data.Hospitals.GenericDelete(entity, t => translteId.Contains(t.Id), translteId);
+        // res = await Data.Hospitals.DeleteTranslat(translteId);
+        if (res.Success)
+            return Ok(res);
+        return BadRequest(res);
     }
 
-    [HttpDelete("delete-phone")]
+    [HttpDelete("delete-phone", Order = 0131)]
     public async Task<IActionResult> DeletePhones([FromQuery] params int[] phoneId)
     {
-        var res = await Data.Hospitals.DeletePhons(phoneId);
-            if(res.Success)
-        return Ok(res);
-            return BadRequest(res);
+        HospitalPhoneNumber entity = new();
+        var res = new Response();
+        res = await Data.Hospitals.GenericDelete(entity, t => phoneId.Contains(t.Id), phoneId);
+        //var res = await Data.Hospitals.DeletePhons(phoneId);
+        if (res.Success)
+            return Ok(res);
+        return BadRequest(res);
     }
 }
+
+/*
+[HttpPut("add-translations/{id}")]
+public async Task<IActionResult> AddTranslationsV1([FromBody] List<HospitalTranslation> model, int id)
+{
+    Response<HospitalDto?> response;
+
+    foreach (var translation in model)
+    {
+        translation.HospitalId = id;
+    }
+
+    response = await Data.Hospitals.GAddTranslations(model);
+    if (response.Success)
+        response.Value = await Data.Hospitals.ReadHospitalById(id);
+
+    return Created("fawzy", response);
+}
+
+[HttpPut("add-translations-v1/{id}")]
+public async Task<IActionResult> AddTranslations([FromBody] List<HospitalTranslation> model, int id)
+{
+    var response = await Data.Hospitals.AddTranslations(model, id);
+
+    return Created("fawzy", response);
+}
+*/

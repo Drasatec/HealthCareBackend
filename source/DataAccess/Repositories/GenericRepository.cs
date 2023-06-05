@@ -1,5 +1,8 @@
 ﻿using DataAccess.Contexts;
+using DomainModel.Entities;
 using DomainModel.Interfaces;
+using DomainModel.Models;
+using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -9,10 +12,64 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
     protected AppDbContext Context { get; set; }
 
-    public GenericRepository(AppDbContext context)
+    public GenericRepository(AppDbContext context) => Context = context;
+
+
+    public async Task<Response<HospitalDto?>> GAddTranslations<TEntity>(List<TEntity> entity) where TEntity : class
     {
-        Context = context;
+        var res = new Response<HospitalDto?>();
+        try
+        {
+            await Context.Set<TEntity>().AddRangeAsync(entity);
+            await Context.SaveChangesAsync();
+            res.Success = true;
+            return res;
+        }
+        catch (Exception ex)
+        {
+            res.Success = false;
+            res.Message = "can not duplicate langCode with same hosId ......." + ex.Message;
+            return res;
+        }
     }
+
+    public async Task<Response> GenericDelete<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> expression, params int[] ids) where TEntity : class
+    {
+        var arrayIds = string.Join(" ", ids);
+        try
+        {
+            var current = await Context.Set<TEntity>().Where(expression).ToListAsync();
+            if (current != null)
+            {
+                Context.RemoveRange(current);
+            }
+            var rowEffict = await Context.SaveChangesAsync();
+            if (rowEffict > 0) return new Response(true, $"delete translate: ids of hosId: {arrayIds} ");
+
+            return new Response(false, $"Id : {arrayIds} is not found  "); ;
+        }
+        catch (Exception ex)
+        {
+            return new Response(false, ex.Message);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public async Task<T> Create(T entity)
     {
@@ -101,7 +158,6 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         return await Context.Set<T>().FindAsync(id);
     }
-
 
 
     public Task<IEnumerable<T>> Finde(Expression<Func<T, bool>> expression, int? take, int? skip)

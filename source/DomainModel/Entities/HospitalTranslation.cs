@@ -11,7 +11,7 @@ public partial class HospitalTranslation
     public string Name { get; set; } = null!;
 
     public string? Address { get; set; }
-
+    public string? Description { get; set; }
     public int HospitalId { get; set; }
 
     public string LangCode { get; set; } = null!;

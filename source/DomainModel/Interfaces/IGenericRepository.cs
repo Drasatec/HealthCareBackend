@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using DomainModel.Models;
+using DomainModel.Models.Hospitals;
+using System.Linq.Expressions;
 
 namespace DomainModel.Interfaces
 {
@@ -11,5 +13,7 @@ namespace DomainModel.Interfaces
         Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> expression, string[] include = null!);
         Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
         Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy, int? page, int? pageSize, params Expression<Func<T, object>>[] includes);
+        Task<Response> GenericDelete<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> expression, params int[] ids) where TEntity : class;
+        Task<Response<HospitalDto?>> GAddTranslations<TEntity>(List<TEntity> dto) where TEntity : class;
     }
 }

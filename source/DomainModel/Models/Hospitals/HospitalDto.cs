@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 namespace DomainModel.Models.Hospitals;
 public class HospitalDto
 {
-
     public int Id { get; set; }
     public string? Photo { get; set; }
     public string? CodeNumber { get; set; }
@@ -45,8 +44,9 @@ public class HospitalDto
             foreach (var item in dto.HospitalTrasnlations)
             {
                 item.HospitalId = dto.Id;
-                item.Address = item.Address;
-                item.Name = item.Name;
+                //item.Address = item.Address;
+                //item.Name = item.Name;
+                //item.Description = item.Description;
                 listTranc.Add(item);
             }
 

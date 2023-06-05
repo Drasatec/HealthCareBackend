@@ -1,8 +1,7 @@
 ﻿using DataAccess.Contexts;
-using DataAccess.Repositories;
 using DataAccess.UnitOfWorks;
-using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 namespace WebAPI.Startup;
@@ -18,6 +17,9 @@ public static class DependencyInjectionSetup
         Services.AddEndpointsApiExplorer();
         Services.AddSwaggerGen(c =>
         {
+            //c.EnableAnnotations(); //[SwaggerOperation(Tags = new[] { "Update" })]
+            c.OrderActionsBy((apiDesc) => $"{apiDesc.ActionDescriptor.AttributeRouteInfo?.Order}");
+           // c.OrderActionsBy((apiDesc) => $"{apiDesc.ActionDescriptor.AttributeRouteInfo?.Order}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Name}");
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "DrasatHeathApi", Version = "v1" });
             c.SwaggerDoc("v2", new OpenApiInfo { Title = "DrasatHeathApi", Version = "v2" });
         });
@@ -32,7 +34,7 @@ public static class DependencyInjectionSetup
     {
         // LocalDb ||| SomeeDb
         Services.AddDbContext<AppDbContext>(options => options
-        .UseSqlServer(Configuration.GetConnectionString("SomeeDb"))
+        .UseSqlServer(Configuration.GetConnectionString("LocalDb"))
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
         return Services;
     }
