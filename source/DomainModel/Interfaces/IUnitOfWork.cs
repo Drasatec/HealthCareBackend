@@ -10,7 +10,7 @@ namespace DomainModel.Interfaces
     public interface IUnitOfWork : IDisposable
     {
         IHospitalRepository Hospitals { get; }
-        IGenericRepository<HosBuilding> HosBuilding { get; }
+        IGenericRepository HosBuilding { get; }
         int Complete();
     }
 }

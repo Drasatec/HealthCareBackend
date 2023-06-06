@@ -6,7 +6,7 @@ using DomainModel.Models;
 using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
 namespace DataAccess.Repositories;
-public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepository
+public class HospitalRepository : GenericRepository, IHospitalRepository
 {
     public HospitalRepository(AppDbContext context) : base(context) { }
 
@@ -39,56 +39,9 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
 
         return await ReadHospitalById(result.Entity.Id); //(HospitalDto) result.Entity;
     }
-
-    public async Task<Response<HospitalDto?>> AddTranslations(List<HospitalTranslation> dto, int id)
-    {
-        var res = new Response<HospitalDto?>();
-        try
-        {
-            foreach (var translation in dto)
-            {
-                translation.HospitalId = id;
-            }
-            await Context.HospitalTranslations.AddRangeAsync(dto);
-            await Context.SaveChangesAsync();
-            res.Value = await ReadHospitalById(id);
-            res.Success = true;
-            return res;
-        }
-        catch (Exception ex)
-        {
-            res.Success = false;
-            res.Message = "can not duplicate langCode with same hosId ......." + ex.Message;
-            return res;
-        }
-    }
-
-    public async Task<Response<HospitalDto?>> AddPhoneNumbers(List<HospitalPhoneNumber> dto, int id)
-    {
-        var res = new Response<HospitalDto?>();
-        try
-        {
-            foreach (var translation in dto)
-            {
-                translation.HospitalId = id;
-            }
-            await Context.HospitalPhoneNumbers.AddRangeAsync(dto);
-            await Context.SaveChangesAsync();
-            res.Value = await ReadHospitalById(id);
-            res.Success = true;
-            return res;
-        }
-        catch (Exception ex)
-        {
-            res.Success = false;
-            res.Message = ex.Message;
-            return res;
-        }
-    }
     #endregion
 
     #region Update
-
     public async Task<Response<HospitalDto?>> UpdateHospital(HospitalDto dto, int id, Stream? image = null)
     {
         Response<HospitalDto?> respons;
@@ -131,7 +84,126 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
             return respons = new(false, "can not duplicate langCode with the same hosId or ....." + ex.Message, null); ;
         }
     }
+    #endregion
 
+    #region Read
+    public async Task<HospitalDto?> ReadHospitalById(int? Id, string? lang = null)
+    {
+        var _context = Context.Hospitals.Where(x => x.Id == Id);
+        if (lang == null)
+        {
+            _context = _context.Include(tranc => tranc.HospitalTranslations);
+        }
+        else
+        {
+            _context = _context.Include(tranc => tranc.HospitalTranslations.Where(la => la.LangCode == lang));
+        }
+        try
+        {
+            var entity = await _context
+                .Include(contact => contact.HospitalPhoneNumbers)
+                .SingleOrDefaultAsync();
+            return entity!;
+        }
+        catch (ArgumentNullException)
+        {
+            return null;
+        }
+    }
+
+    public async Task<AllHospitalsDto?> ReadAllHospitals(string isActive, string? lang, int page = 1, int pageSize = 10)
+    {
+        int skip = Helper.SkipValue(page, pageSize);
+        IQueryable<Hospital> query = Context.Hospitals;
+
+        var total = 0;
+
+        if (isActive == "inactive")
+        {
+            query = query.Where(h => h.IsDeleted == true);
+            total = Context.Hospitals.Count(h => h.IsDeleted == true);
+        }
+
+        else if (isActive == "active")
+        {
+            query = query.Where(h => h.IsDeleted == false);
+            total = Context.Hospitals.Count(h => h.IsDeleted == false);
+        }
+
+        if (total < 1) return null;
+        query = query.Skip(skip).Take(pageSize);
+
+        if (lang != null)
+        {
+            query = query.Include(tranc1 => tranc1.HospitalTranslations
+                         .Where(post => post.LangCode == lang)
+                         .OrderBy(post => post.Name));
+        }
+        else
+        {
+            query = query
+                .Include(tranc2 => tranc2.HospitalTranslations)
+                .Include(y => y.HospitalPhoneNumbers);
+        }
+        query = query.OrderByDescending(o => o.CreateOn);
+        await query.ToListAsync();
+
+        var all = new AllHospitalsDto();
+        var result = HospitalDto.ToList(query);
+        all.Total = total;
+        all.Page = page;
+        all.PageSize = pageSize;
+        all.Hospitals = result.ToList();
+        return all;
+    }
+
+    public async Task<List<HospitalTranslation>> SearchByHospitalName(string name)
+    {
+        IQueryable<HospitalTranslation> query = Context.HospitalTranslations;
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            query = query.Where(t => t.Name.Contains(name));
+        }
+
+        List<HospitalTranslation> results = await query.ToListAsync();
+        return results;
+    }
+
+    public async Task<AllHospitalsDto?> SearchByHospitalNameOrCode(string searchTerm, string lang = "ar", int page = 1,int pageSize = 10)
+    {
+        int skip = Helper.SkipValue(page, pageSize);
+        IQueryable<Hospital> query = Context.Hospitals;
+
+        var hospitals = await Context.Hospitals
+           .Join(Context.HospitalTranslations,
+               h => h.Id,
+               t => t.HospitalId,
+               (h, t) => new { Hospital = h, Translation = t })
+           .Where(x => (x.Hospital.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == "ar")
+           .Skip(skip).Take(pageSize)
+           .Select(x => new HospitalDto
+           {
+               Id = x.Hospital.Id,
+               Photo = x.Hospital.Photo,
+               CodeNumber = x.Hospital.CodeNumber,
+               Email = x.Hospital.Email,
+               WhatsAppNumber = x.Hospital.WhatsAppNumber,
+               IsDeleted = x.Hospital.IsDeleted,
+               HospitalTrasnlations = new List<HospitalTranslation> { x.Translation }
+           })
+           .ToListAsync();
+
+        var all = new AllHospitalsDto();
+        all.Total = hospitals.Count;
+        all.Page = page;
+        all.PageSize = pageSize;
+        all.Hospitals = hospitals;
+        return all;
+    }
+    #endregion
+
+    // not used
     public async Task<Response<string?>> UpdateAnImage(Stream image, int id)
     {
         Response<string?> res;
@@ -168,151 +240,32 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
         return res = new(true, "", imageName);
     }
 
-    public async Task<Response> DeleteHospitalById(int id, bool isDeleted)
+
+    /* deleted
+    ========================================================================================================================
+     
+        public async Task<Response<List<HospitalDto>>> SearchByCodeNumber(string codeNumber, string lang)
     {
-        try
-        {
-            var current = await Context.Hospitals.Where(hos => hos.Id == id).SingleOrDefaultAsync();
-            if (current != null)
-            {
-                current.IsDeleted = isDeleted;
-                Context.Update(current);
-                Context.Entry(current).Property(p => p.Photo).IsModified = false;
-                Context.Entry(current).Property(p => p.CodeNumber).IsModified = false;
-                var rowEffict = await Context.SaveChangesAsync();
-                if (rowEffict > 0) return new Response(true, $"updte on hosId: {id} ");
-            }
-            return new Response(false, $"Id : {id} is not found  "); ;
-        }
-        catch (Exception)
-        {
-            return new Response(false, $"No changes on hosId: {id} ");
-        }
-    }
-
-    #endregion
-
-    #region Read
-
-    public async Task<HospitalDto?> ReadHospitalById(int? Id, string? lang = null)
-    {
-        var _context = Context.Hospitals.Where(x => x.Id == Id);
-        if (lang == null)
-        {
-            _context = _context.Include(tranc => tranc.HospitalTranslations);
-        }
-        else
-        {
-            _context = _context.Include(tranc => tranc.HospitalTranslations.Where(la => la.LangCode == lang));
-        }
-        try
-        {
-            var entity = await _context
-                .Include(contact => contact.HospitalPhoneNumbers)
-                .SingleOrDefaultAsync();
-            return entity!;
-        }
-        catch (ArgumentNullException)
-        {
-            return null;
-        }
-    }
-
-
-    public async Task<AllHospitalsDto?> ReadAllHospitals(string isActive, string? lang, int page = 1, int pageSize = 10)
-    {
-        int skip = Helper.SkipValue(page, pageSize);
         IQueryable<Hospital> query = Context.Hospitals;
 
-        var total = 0;
-
-        if (isActive == "inactive")
+        if (!string.IsNullOrEmpty(codeNumber))
         {
-            query = query.Where(h => h.IsDeleted == true);
-            total = Context.Hospitals.Count(h => h.IsDeleted == true);
+            query = query.Where(t => t.CodeNumber.Contains(codeNumber));
         }
+        query = query.Include(t => t.HospitalTranslations.Where(l => l.LangCode == lang));
 
-        else if (isActive == "active")
+        List<HospitalDto> results = HospitalDto.ToList(await query.ToListAsync());
+
+        return new Response<List<HospitalDto>>
         {
-            query = query.Where(h => h.IsDeleted == false);
-            total = Context.Hospitals.Count(h => h.IsDeleted == false);
-        }
-
-        if (total < 1) return null;
-        query = query.Skip(skip).Take(pageSize);
-
-        if (lang != null)
-        {
-            query = query.Include(tranc1 => tranc1.HospitalTranslations
-                         .Where(post => post.LangCode == lang)
-                         .OrderBy(post => post.Name));
-        }
-        else
-        {
-            query = query
-                .Include(tranc2 => tranc2.HospitalTranslations)
-                .Include(y => y.HospitalPhoneNumbers);
-        }
-
-        await query.ToListAsync();
-
-        var all = new AllHospitalsDto();
-        var result = HospitalDto.ToList(query);
-        all.Total = total;
-        all.Page = page;
-        all.PageSize = pageSize;
-        all.Hospitals = result.ToList();
-        return all;
+            Success = true,
+            Value = results
+        };
     }
 
-    public async Task<List<HospitalTranslation>> SearchByName(string name)
-    {
-        IQueryable<HospitalTranslation> query = Context.HospitalTranslations;
+    ========================================================================================================================
 
-        if (!string.IsNullOrEmpty(name))
-        {
-            query = query.Where(t => t.Name.Contains(name));
-        }
-
-        List<HospitalTranslation> results = await query.ToListAsync();
-        return results;
-    }
-
-    public async Task<AllHospitalsDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1,int pageSize = 10)
-    {
-        int skip = Helper.SkipValue(page, pageSize);
-        IQueryable<Hospital> query = Context.Hospitals;
-
-        var hospitals = await Context.Hospitals
-           .Join(Context.HospitalTranslations,
-               h => h.Id,
-               t => t.HospitalId,
-               (h, t) => new { Hospital = h, Translation = t })
-           .Where(x => (x.Hospital.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == "ar")
-           .Skip(skip).Take(pageSize)
-           .Select(x => new HospitalDto
-           {
-               Id = x.Hospital.Id,
-               Photo = x.Hospital.Photo,
-               CodeNumber = x.Hospital.CodeNumber,
-               Email = x.Hospital.Email,
-               WhatsAppNumber = x.Hospital.WhatsAppNumber,
-               IsDeleted = x.Hospital.IsDeleted,
-               HospitalTrasnlations = new List<HospitalTranslation> { x.Translation }
-           })
-           .ToListAsync();
-
-        var all = new AllHospitalsDto();
-        all.Total = hospitals.Count;
-        all.Page = page;
-        all.PageSize = pageSize;
-        all.Hospitals = hospitals;
-        return all;
-    }
-
-
-    #endregion
-    public async Task<List<HospitalDto>> SearchByName2(string searchTerm)
+        public async Task<List<HospitalDto>> SearchByName2(string searchTerm)
     {
         // is deleted
         var hospitals = await Context.Hospitals
@@ -373,24 +326,78 @@ public class HospitalRepository : GenericRepository<HospitalDto>, IHospitalRepos
         return hospitals;
     }
 
-    public async Task<Response<List<HospitalDto>>> SearchByCodeNumber(string codeNumber, string lang)
+    ========================================================================================================================
+
+    public async Task<Response<HospitalDto?>> AddTranslations(List<HospitalTranslation> dto, int id)
     {
-        IQueryable<Hospital> query = Context.Hospitals;
-
-        if (!string.IsNullOrEmpty(codeNumber))
+        var res = new Response<HospitalDto?>();
+        try
         {
-            query = query.Where(t => t.CodeNumber.Contains(codeNumber));
+            foreach (var translation in dto)
+            {
+                translation.HospitalId = id;
+            }
+            await Context.HospitalTranslations.AddRangeAsync(dto);
+            await Context.SaveChangesAsync();
+            res.Value = await ReadHospitalById(id);
+            res.Success = true;
+            return res;
         }
-        query = query.Include(t => t.HospitalTranslations.Where(l => l.LangCode == lang));
-
-        List<HospitalDto> results = HospitalDto.ToList(await query.ToListAsync());
-
-        return new Response<List<HospitalDto>>
+        catch (Exception ex)
         {
-            Success = true,
-            Value = results
-        };
+            res.Success = false;
+            res.Message = "can not duplicate langCode with same hosId ......." + ex.Message;
+            return res;
+        }
     }
+    ========================================================================================================================
+    public async Task<Response<HospitalDto?>> AddPhoneNumbers(List<HospitalPhoneNumber> dto, int id)
+    {
+        var res = new Response<HospitalDto?>();
+        try
+        {
+            foreach (var translation in dto)
+            {
+                translation.HospitalId = id;
+            }
+            Context.HospitalPhoneNumbers.UpdateRange(dto);
+            await Context.SaveChangesAsync();
+            res.Value = await ReadHospitalById(id);
+            res.Success = true;
+            return res;
+        }
+        catch (Exception ex)
+        {
+            res.Success = false;
+            res.Message = ex.Message;
+            return res;
+        }
+    }
+
+     ========================================================================================================================
+    
+    public async Task<Response> DeleteHospitalById(int id, bool isDeleted)
+    {
+        try
+        {
+            var current = await Context.Hospitals.Where(hos => hos.Id == id).SingleOrDefaultAsync();
+            if (current != null)
+            {
+                current.IsDeleted = isDeleted;
+                Context.Attach(current);
+                Context.Entry(current).Property(e => e.IsDeleted).IsModified = true;
+                var rowEffict = await Context.SaveChangesAsync();
+                if (rowEffict > 0) return new Response(true, $"updte on hosId: {id} ");
+            }
+            return new Response(false, $"Id : {id} is not found  ");
+        }
+        catch (Exception)
+        {
+            return new Response(false, $"No changes on hosId: {id} ");
+        }
+    }
+     */
+
     //public async Task<Hospital> CreateWithImage(Hospital entity, ImageInputModel image)
     //{
     //    //var imageName = await imageService.SaveSingleImage(image);
