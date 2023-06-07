@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities;
 
@@ -9,5 +10,5 @@ public partial class Nationality
 
     public virtual ICollection<NationalitiesTranslation> NationalitiesTranslations { get; set; } = new List<NationalitiesTranslation>();
 
-    public virtual ICollection<PatientTranslation> PatientTranslations { get; set; } = new List<PatientTranslation>();
+    public virtual ICollection<Patient> Patients { get; set; } = new List<Patient>();
 }

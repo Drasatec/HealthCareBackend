@@ -20,8 +20,8 @@ public static class DependencyInjectionSetup
             //c.EnableAnnotations(); //[SwaggerOperation(Tags = new[] { "Update" })]
             c.OrderActionsBy((apiDesc) => $"{apiDesc.ActionDescriptor.AttributeRouteInfo?.Order}");
            // c.OrderActionsBy((apiDesc) => $"{apiDesc.ActionDescriptor.AttributeRouteInfo?.Order}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Name}");
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "DrasatHeathApi", Version = "v1" });
             c.SwaggerDoc("v2", new OpenApiInfo { Title = "DrasatHeathApi", Version = "v2" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "DrasatHeathApi", Version = "v1" });
         });
         Services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
        // Services.AddTransient(typeof(IHospitalRepository), typeof(HospitalRepository));

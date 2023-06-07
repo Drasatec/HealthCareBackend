@@ -16,13 +16,13 @@ namespace DataAccess.UnitOfWorks
 
         public IHospitalRepository Hospitals { get; private set; }
 
-        public IGenericRepository HosBuilding { get; private set; }
+        public IBuildingRepository Buildings { get; private set; }
 
 
         public UnitOfWork(AppDbContext context )
         {
             Context = context;
-            HosBuilding = new GenericRepository(Context);
+            Buildings = new BuildingRepository(Context);
             Hospitals = new HospitalRepository(Context);
         }
 

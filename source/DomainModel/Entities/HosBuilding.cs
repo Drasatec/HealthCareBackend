@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities;
 
@@ -7,13 +8,13 @@ public partial class HosBuilding
 {
     public int Id { get; set; }
 
-    public string? CodeNumber { get; set; }
+    public string CodeNumber { get; set; } = string.Empty;
 
     public string? Photo { get; set; }
 
     public DateTime? CreateOn { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     public int HospitalId { get; set; }
 

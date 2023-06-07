@@ -1,4 +1,5 @@
 ﻿using DomainModel.Contracts;
+using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using DomainModel.Models.Hospitals;
 using System.Linq.Expressions;
@@ -45,7 +46,7 @@ public class HospitalController : ControllerBase
         if (id < 1)
             return BadRequest(new Error("400", "can not assign 0"));
 
-        var result = await Data.Hospitals.ReadHospitalById(id, "ar");
+        var result = await Data.Hospitals.ReadHospitalById(id, lang);
         return Ok(result);
     }
 
@@ -114,32 +115,33 @@ public class HospitalController : ControllerBase
     [HttpPut("edit-translations/{hosid?}", Order = 0122)]
     public async Task<IActionResult> Add_EditTranslations([FromForm] List<HospitalTranslation> translations, int? hosid)
     {
-        Response<HospitalDto?> response;
+        Response response;
 
         response = await Data.Hospitals.GenericUpdate(translations);
         if (response.Success)
-            if (hosid.HasValue)
-                response.Value = await Data.Hospitals.ReadHospitalById(hosid);
+            return Created("fawzy", response);
+        return BadRequest(response);
 
-        return Created("fawzy", response);
     }
 
     [HttpPut("edit-phons/{hosid?}", Order = 0123)]
     public async Task<IActionResult> Add_EditPhons([FromBody] List<HospitalPhoneNumber> phons, int? hosid)
     {
-        Response<HospitalDto?> response;
+        Response response;
 
         response = await Data.Hospitals.GenericUpdate(phons);
         if (response.Success)
-            if (hosid.HasValue)
-                response.Value = await Data.Hospitals.ReadHospitalById(hosid);
-
-        return Created("fawzy", response);
+            return Created("fawzy", response);
+        return BadRequest(response);
     }
 
     [HttpPut("deactivate", Order = 0125)]
-    public async Task<IActionResult> EditSingleProp([FromQuery] int id, [FromQuery] string status)
+    public async Task<IActionResult> EditSingleProp([FromQuery] int? id, [FromQuery] string status)
     {
+        if (!id.HasValue)
+        {
+            return BadRequest(new Response(false, "id field is requerd"));
+        }
         bool isDeleted;
         if (status == "active")
             isDeleted = false;
@@ -149,8 +151,8 @@ public class HospitalController : ControllerBase
         {
             return BadRequest(new Response(false, "The status field in this context allows the values 'active' or 'inactive' "));
         }
-        Hospital hospital = new() { Id = id, IsDeleted = isDeleted };
-        return Ok(await Data.Hospitals.GenericUpdateSinglePropertyById(id, hospital, p => p.IsDeleted));
+        Hospital hospital = new() { Id = id.Value, IsDeleted = isDeleted };
+        return Ok(await Data.Hospitals.GenericUpdateSinglePropertyById(id.Value, hospital, p => p.IsDeleted));
     }
 
     // ============================= delete ============================= 2

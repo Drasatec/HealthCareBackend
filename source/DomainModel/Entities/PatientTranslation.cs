@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities;
 
 public partial class PatientTranslation
 {
+    public int Id { get; set; }
+
     public string? FullName { get; set; }
 
     public string? Religion { get; set; }
@@ -15,15 +18,11 @@ public partial class PatientTranslation
 
     public byte? RelationshipClient { get; set; }
 
-    public int? NationalityId { get; set; }
+    public int? PatientId { get; set; }
 
-    public int PatientId { get; set; }
+    public string? LangCode { get; set; }
 
-    public string LangCode { get; set; } = null!;
-
-    public virtual Language LangCodeNavigation { get; set; } = null!;
-
-    public virtual Nationality? Nationality { get; set; }
-
-    public virtual Patient Patient { get; set; } = null!;
+    //public virtual Language? LangCodeNavigation { get; set; }
+    [JsonIgnore]
+    public virtual Patient? Patient { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using DomainModel.Entities;
+﻿using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using DomainModel.Models.Hospitals;
 

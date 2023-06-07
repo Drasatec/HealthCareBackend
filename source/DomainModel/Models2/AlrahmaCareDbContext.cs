@@ -49,9 +49,9 @@
 
 //    public virtual DbSet<Hospital> Hospitals { get; set; }
 
-//    public virtual DbSet<HospitalTranslation> HospitalTranslations { get; set; }
+//    public virtual DbSet<HospitalPhoneNumber> HospitalPhoneNumbers { get; set; }
 
-//    public virtual DbSet<HospitalsContactDatum> HospitalsContactData { get; set; }
+//    public virtual DbSet<HospitalTranslation> HospitalTranslations { get; set; }
 
 //    public virtual DbSet<Language> Languages { get; set; }
 
@@ -103,7 +103,7 @@
 
 //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-//        => optionsBuilder.UseSqlServer("Data Source=DESKTOP-JT9VS5J\\SQLEXPRESS;Initial Catalog=alrahma_care_db;Trusted_Connection=true; TrustServerCertificate=true;");
+//        => optionsBuilder.UseSqlServer("Data Source=DESKTOP-JT9VS5J\\SQLEXPRESS; Initial Catalog=alrahma_care_db;Trusted_Connection=true; TrustServerCertificate=true;");
 
 //    protected override void OnModelCreating(ModelBuilder modelBuilder)
 //    {
@@ -145,24 +145,22 @@
 
 //        modelBuilder.Entity<BuildingTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.BuildeingId, e.LangCode });
-
 //            entity.HasIndex(e => e.BuildeingId, "IX_BuildeingTranslations_BuildeingId");
 
+//            entity.HasIndex(e => new { e.BuildeingId, e.LangCode }, "UK_BuildingTranslations_LangCode_BuildeingId").IsUnique();
+
+//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
 //                .IsUnicode(false);
-//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.Name).HasMaxLength(30);
 
 //            entity.HasOne(d => d.Buildeing).WithMany(p => p.BuildingTranslations)
 //                .HasForeignKey(d => d.BuildeingId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_BuildeingTranslations_BuildeingId");
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.BuildingTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_BuildeingTranslations_LangCode");
 //        });
 
@@ -264,24 +262,22 @@
 
 //        modelBuilder.Entity<ClinicTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.ClinicId, e.LangCode });
-
 //            entity.HasIndex(e => e.Name, "IX_ClinicTranslations_Name");
 
+//            entity.HasIndex(e => new { e.ClinicId, e.LangCode }, "UK_ClinicTranslations_LangCode_ClinicId").IsUnique();
+
+//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
 //                .IsUnicode(false);
-//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.Name).HasMaxLength(30);
 
 //            entity.HasOne(d => d.Clinic).WithMany(p => p.ClinicTranslations)
 //                .HasForeignKey(d => d.ClinicId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_ClinicTranslations_ClinicId");
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.ClinicTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_ClinicTranslations_LangCode");
 //        });
 
@@ -329,25 +325,23 @@
 
 //        modelBuilder.Entity<DoctorTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.DoctorId, e.LangCode });
-
 //            entity.HasIndex(e => e.FullName, "IX_DoctorTranslations_FullName");
 
-//            entity.Property(e => e.LangCode)
-//                .HasMaxLength(6)
-//                .IsUnicode(false);
+//            entity.HasIndex(e => new { e.DoctorId, e.LangCode }, "UK_DoctorTranslations_LangCode_DoctorId").IsUnique();
+
 //            entity.Property(e => e.About).HasMaxLength(300);
 //            entity.Property(e => e.FullName).HasMaxLength(100);
 //            entity.Property(e => e.Headline).HasMaxLength(100);
+//            entity.Property(e => e.LangCode)
+//                .HasMaxLength(6)
+//                .IsUnicode(false);
 
 //            entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorTranslations)
 //                .HasForeignKey(d => d.DoctorId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_DoctorTranslations_DoctorId");
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.DoctorTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_DoctorTranslations_LangCode");
 //        });
 
@@ -358,23 +352,21 @@
 
 //        modelBuilder.Entity<DoctorsDegreesTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.DoctorDegreeId, e.LangCode });
-
 //            entity.HasIndex(e => e.DegreeName, "IX_DoctorsDegreesTranslations_DegreeName");
 
+//            entity.HasIndex(e => new { e.DoctorDegreeId, e.LangCode }, "UK_DoctorsDegreesTranslations_LangCode_DoctorDegreeId").IsUnique();
+
+//            entity.Property(e => e.DegreeName).HasMaxLength(20);
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
 //                .IsUnicode(false);
-//            entity.Property(e => e.DegreeName).HasMaxLength(20);
 
 //            entity.HasOne(d => d.DoctorDegree).WithMany(p => p.DoctorsDegreesTranslations)
 //                .HasForeignKey(d => d.DoctorDegreeId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_DoctorsDegreesTranslations_DoctorDegreeId");
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.DoctorsDegreesTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_DoctorsDegreesTranslations_LangCode");
 //        });
 
@@ -405,22 +397,20 @@
 
 //        modelBuilder.Entity<FloorTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.FloorId, e.LangCode });
+//            entity.HasIndex(e => new { e.FloorId, e.LangCode }, "UK_FloorTranslations_LangCode_FloorId").IsUnique();
 
+//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
 //                .IsUnicode(false);
-//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.Name).HasMaxLength(30);
 
 //            entity.HasOne(d => d.Floor).WithMany(p => p.FloorTranslations)
 //                .HasForeignKey(d => d.FloorId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_FloorTranslations_FloorId");
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.FloorTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_FloorTranslations_LangCode");
 //        });
 
@@ -549,51 +539,52 @@
 //            entity.Property(e => e.CreateOn)
 //                .HasDefaultValueSql("(getdate())")
 //                .HasColumnType("datetime");
-//            entity.Property(e => e.Photo)
-//                .HasMaxLength(55)
-//                .IsUnicode(false);
-//        });
-
-//        modelBuilder.Entity<HospitalTranslation>(entity =>
-//        {
-//            entity.HasKey(e => new { e.HospitalId, e.LangCode });
-
-//            entity.HasIndex(e => e.Name, "IX_HospitalTranslations_Name");
-
-//            entity.Property(e => e.LangCode)
-//                .HasMaxLength(6)
-//                .IsUnicode(false);
-//            entity.Property(e => e.Address).HasMaxLength(50);
-//            entity.Property(e => e.Name).HasMaxLength(50);
-
-//            entity.HasOne(d => d.Hospital).WithMany(p => p.HospitalTranslations)
-//                .HasForeignKey(d => d.HospitalId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
-//                .HasConstraintName("FK_HospitalTranslations_HospitalId");
-
-//            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.HospitalTranslations)
-//                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
-//                .HasConstraintName("FK_HospitalTranslations_LangCode");
-//        });
-
-//        modelBuilder.Entity<HospitalsContactDatum>(entity =>
-//        {
-//            entity.HasIndex(e => e.HospitalId, "IX_HospitalsContactData_HospitalId");
-
 //            entity.Property(e => e.Email)
 //                .HasMaxLength(40)
 //                .IsUnicode(false);
-//            entity.Property(e => e.TelephoneNumber)
-//                .HasMaxLength(15)
+//            entity.Property(e => e.Photo)
+//                .HasMaxLength(55)
 //                .IsUnicode(false);
 //            entity.Property(e => e.WhatsAppNumber)
 //                .HasMaxLength(15)
 //                .IsUnicode(false);
+//        });
 
-//            entity.HasOne(d => d.Hospital).WithMany(p => p.HospitalsContactData)
+//        modelBuilder.Entity<HospitalPhoneNumber>(entity =>
+//        {
+//            entity.HasKey(e => e.Id).HasName("PK_HospitalsPhoneNumbers");
+
+//            entity.HasIndex(e => e.HospitalId, "IX_HospitalsContactData_HospitalId");
+
+//            entity.Property(e => e.TelephoneNumber)
+//                .HasMaxLength(15)
+//                .IsUnicode(false);
+
+//            entity.HasOne(d => d.Hospital).WithMany(p => p.HospitalPhoneNumbers)
 //                .HasForeignKey(d => d.HospitalId)
-//                .HasConstraintName("FK_HospitalsContactData_HospitalId");
+//                .HasConstraintName("FK_HospitalsPhoneNumbers_HospitalId");
+//        });
+
+//        modelBuilder.Entity<HospitalTranslation>(entity =>
+//        {
+//            entity.HasIndex(e => e.Name, "IX_HospitalTranslations_Name");
+
+//            entity.HasIndex(e => new { e.HospitalId, e.LangCode }, "UK_HospitalTranslations_LangCode_HospitalId").IsUnique();
+
+//            entity.Property(e => e.Address).HasMaxLength(50);
+//            entity.Property(e => e.Description).HasMaxLength(300);
+//            entity.Property(e => e.LangCode)
+//                .HasMaxLength(6)
+//                .IsUnicode(false);
+//            entity.Property(e => e.Name).HasMaxLength(50);
+
+//            entity.HasOne(d => d.Hospital).WithMany(p => p.HospitalTranslations)
+//                .HasForeignKey(d => d.HospitalId)
+//                .HasConstraintName("FK_HospitalTranslations_HospitalId");
+
+//            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.HospitalTranslations)
+//                .HasForeignKey(d => d.LangCode)
+//                .HasConstraintName("FK_HospitalTranslations_LangCode");
 //        });
 
 //        modelBuilder.Entity<Language>(entity =>
@@ -615,7 +606,7 @@
 
 //        modelBuilder.Entity<MainServiceTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.MainServiceId, e.LangCode });
+//            entity.HasIndex(e => new { e.MainServiceId, e.LangCode }, "UK_MainServiceTranslations_LangCode_MainServiceId").IsUnique();
 
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
@@ -624,12 +615,10 @@
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.MainServiceTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_MainServiceTranslations_LangCode");
 
 //            entity.HasOne(d => d.MainService).WithMany(p => p.MainServiceTranslations)
 //                .HasForeignKey(d => d.MainServiceId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_MainServiceTranslations_MainServiceId");
 //        });
 
@@ -668,30 +657,28 @@
 
 //        modelBuilder.Entity<MedicalSpecialtyTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.MedicalSpecialtyId, e.LangCode });
-
 //            entity.HasIndex(e => e.Name, "IX_MedicalSpecialtyTranslations_Name");
 
+//            entity.HasIndex(e => new { e.MedicalSpecialtyId, e.LangCode }, "UK_MedicalSpecialtyTranslations_LangCode_MedicalSpecialtyId").IsUnique();
+
+//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
 //                .IsUnicode(false);
-//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.Name).HasMaxLength(30);
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.MedicalSpecialtyTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_MedicalSpecialtyTranslations_LangCode");
 
 //            entity.HasOne(d => d.MedicalSpecialty).WithMany(p => p.MedicalSpecialtyTranslations)
 //                .HasForeignKey(d => d.MedicalSpecialtyId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_MedicalSpecialtyTranslations_RoomTypeId");
 //        });
 
 //        modelBuilder.Entity<NationalitiesTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.NationalityId, e.LangCode });
+//            entity.HasIndex(e => new { e.NationalityId, e.LangCode }, "UK_NationalitiesTranslations_LangCode_NationalityId").IsUnique();
 
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
@@ -700,12 +687,10 @@
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.NationalitiesTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_NationalitiesTranslations_LangCode");
 
 //            entity.HasOne(d => d.Nationality).WithMany(p => p.NationalitiesTranslations)
 //                .HasForeignKey(d => d.NationalityId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_NationalitiesTranslations_NationalityId");
 //        });
 
@@ -724,7 +709,7 @@
 
 //            entity.HasIndex(e => e.PhoneNumber, "IX_Patients_PhoneNumber");
 
-//            entity.HasIndex(e => e.MedicalFileNumber, "UQ__Patients__31851D95F5E26727").IsUnique();
+//            entity.HasIndex(e => e.MedicalFileNumber, "UQ__Patients__31851D959784584E").IsUnique();
 
 //            entity.Property(e => e.Address).HasMaxLength(50);
 //            entity.Property(e => e.BirthDate).HasColumnType("date");
@@ -753,6 +738,10 @@
 //                .HasForeignKey(d => d.ClientId)
 //                .HasConstraintName("FK_Patients_ClientId");
 
+//            entity.HasOne(d => d.Nationality).WithMany(p => p.Patients)
+//                .HasForeignKey(d => d.NationalityId)
+//                .HasConstraintName("FK_Patients_NationalityId");
+
 //            entity.HasOne(d => d.Ssntype).WithMany(p => p.Patients)
 //                .HasForeignKey(d => d.SsntypeId)
 //                .HasConstraintName("FK_Patients_SSNTypeId");
@@ -760,30 +749,24 @@
 
 //        modelBuilder.Entity<PatientTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.PatientId, e.LangCode });
-
 //            entity.HasIndex(e => e.FullName, "IX_PatientTranslations_FullName");
 
+//            entity.HasIndex(e => new { e.PatientId, e.LangCode }, "UK_PatientTranslations_LangCode_PatientId").IsUnique();
+
+//            entity.Property(e => e.Employer).HasMaxLength(50);
+//            entity.Property(e => e.FullName).HasMaxLength(60);
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
 //                .IsUnicode(false);
-//            entity.Property(e => e.Employer).HasMaxLength(50);
-//            entity.Property(e => e.FullName).HasMaxLength(60);
 //            entity.Property(e => e.Occupation).HasMaxLength(50);
 //            entity.Property(e => e.Religion).HasMaxLength(50);
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.PatientTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_PatientTranslations_LangCode");
-
-//            entity.HasOne(d => d.Nationality).WithMany(p => p.PatientTranslations)
-//                .HasForeignKey(d => d.NationalityId)
-//                .HasConstraintName("FK_PatientTranslations_NationalityId");
 
 //            entity.HasOne(d => d.Patient).WithMany(p => p.PatientTranslations)
 //                .HasForeignKey(d => d.PatientId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_PatientTranslations_PatientId");
 //        });
 
@@ -843,43 +826,39 @@
 
 //        modelBuilder.Entity<PriceCategoryTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.PriceCategoryId, e.LangCode });
+//            entity.HasIndex(e => new { e.PriceCategoryId, e.LangCode }, "UK_PriceCategoryTranslations_LangCode_PriceCategoryId").IsUnique();
 
+//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
 //                .IsUnicode(false);
-//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.Name).HasMaxLength(30);
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.PriceCategoryTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_PriceCategoryTranslations_LangCode");
 
 //            entity.HasOne(d => d.PriceCategory).WithMany(p => p.PriceCategoryTranslations)
 //                .HasForeignKey(d => d.PriceCategoryId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_PriceCategoryTranslations_PriceCategoryId");
 //        });
 
 //        modelBuilder.Entity<RoomTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.RoomId, e.LangCode });
+//            entity.HasIndex(e => new { e.RoomId, e.LangCode }, "UK_RoomTranslations_LangCode_RoomId").IsUnique();
 
+//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
 //                .IsUnicode(false);
-//            entity.Property(e => e.Description).HasMaxLength(100);
 //            entity.Property(e => e.Name).HasMaxLength(30);
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.RoomTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_RoomTranslations_LangCode");
 
 //            entity.HasOne(d => d.Room).WithMany(p => p.RoomTranslations)
 //                .HasForeignKey(d => d.RoomId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_RoomTranslations_RoomId");
 //        });
 
@@ -895,7 +874,7 @@
 
 //        modelBuilder.Entity<RoomTypeTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.RoomTypeId, e.LangCode });
+//            entity.HasIndex(e => new { e.RoomTypeId, e.LangCode }, "UK_RoomTypeTranslations_LangCode_RoomTypeId").IsUnique();
 
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
@@ -904,12 +883,10 @@
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.RoomTypeTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_RoomTypeTranslations_LangCode");
 
 //            entity.HasOne(d => d.RoomType).WithMany(p => p.RoomTypeTranslations)
 //                .HasForeignKey(d => d.RoomTypeId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_RoomTypeTranslations_RoomTypeId");
 //        });
 
@@ -926,7 +903,7 @@
 
 //        modelBuilder.Entity<SecondaryServiceTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.SecondaryServiceId, e.LangCode });
+//            entity.HasIndex(e => new { e.SecondaryServiceId, e.LangCode }, "UK_SecondaryServiceTranslations_LangCode_SecondaryServiceId").IsUnique();
 
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
@@ -935,12 +912,10 @@
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.SecondaryServiceTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_SecondaryServiceTranslations_LangCode");
 
 //            entity.HasOne(d => d.SecondaryService).WithMany(p => p.SecondaryServiceTranslations)
 //                .HasForeignKey(d => d.SecondaryServiceId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_SecondaryServiceTranslations_SecondaryServiceId");
 //        });
 
@@ -986,7 +961,7 @@
 
 //        modelBuilder.Entity<ServiceTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.ServiceId, e.LangCode });
+//            entity.HasIndex(e => new { e.ServiceId, e.LangCode }, "UK_ServiceTranslations_LangCode_ServiceId").IsUnique();
 
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
@@ -995,12 +970,10 @@
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.ServiceTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_ServiceTranslations_LangCode");
 
 //            entity.HasOne(d => d.Service).WithMany(p => p.ServiceTranslations)
 //                .HasForeignKey(d => d.ServiceId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_ServiceTranslations_ServiceId");
 //        });
 
@@ -1026,7 +999,7 @@
 
 //        modelBuilder.Entity<TypesVisitTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.TypeVisitId, e.LangCode });
+//            entity.HasIndex(e => new { e.TypeVisitId, e.LangCode }, "UK_TypesVisitTranslations_LangCode_TypeVisitId").IsUnique();
 
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
@@ -1035,12 +1008,10 @@
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.TypesVisitTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_TypesVisitTrans_LangCode");
 
 //            entity.HasOne(d => d.TypeVisit).WithMany(p => p.TypesVisitTranslations)
 //                .HasForeignKey(d => d.TypeVisitId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_TypesVisit_TypeVisitId");
 //        });
 
@@ -1057,7 +1028,7 @@
 
 //        modelBuilder.Entity<WorkingPeriodTranslation>(entity =>
 //        {
-//            entity.HasKey(e => new { e.WorkingPeriodId, e.LangCode });
+//            entity.HasIndex(e => new { e.WorkingPeriodId, e.LangCode }, "UK_WorkingPeriodTranslations_LangCode_WorkingPeriodId").IsUnique();
 
 //            entity.Property(e => e.LangCode)
 //                .HasMaxLength(6)
@@ -1066,12 +1037,10 @@
 
 //            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.WorkingPeriodTranslations)
 //                .HasForeignKey(d => d.LangCode)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_WorkingPeriodTranslations_LangCode");
 
 //            entity.HasOne(d => d.WorkingPeriod).WithMany(p => p.WorkingPeriodTranslations)
 //                .HasForeignKey(d => d.WorkingPeriodId)
-//                .OnDelete(DeleteBehavior.ClientSetNull)
 //                .HasConstraintName("FK_WorkingPeriodTranslations_WorkingPeriodId");
 //        });
 

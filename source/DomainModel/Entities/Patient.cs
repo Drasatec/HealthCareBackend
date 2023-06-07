@@ -37,11 +37,15 @@ public partial class Patient
 
     public int? ClientGroupId { get; set; }
 
+    public int? NationalityId { get; set; }
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual HosClient? Client { get; set; }
 
     public virtual ClientGroup? ClientGroup { get; set; }
+
+    public virtual Nationality? Nationality { get; set; }
 
     public virtual ICollection<PatientTranslation> PatientTranslations { get; set; } = new List<PatientTranslation>();
 

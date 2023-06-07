@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities;
 

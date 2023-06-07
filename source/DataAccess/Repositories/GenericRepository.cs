@@ -14,9 +14,9 @@ public class GenericRepository : IGenericRepository// where T : class
 
 
 
-    public async Task<Response<HospitalDto?>> GenericUpdate<TEntity>(List<TEntity> entity) where TEntity : class
+    public async Task<Response> GenericUpdate<TEntity>(List<TEntity> entity) where TEntity : class
     {
-        var res = new Response<HospitalDto?>();
+        var res = new Response();
         try
         {
             Context.Set<TEntity>().UpdateRange(entity);
