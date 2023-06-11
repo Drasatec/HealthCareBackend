@@ -1,7 +1,7 @@
 ﻿using DataAccess.Contexts;
+using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
-using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -13,6 +13,46 @@ public class GenericRepository : IGenericRepository// where T : class
     public GenericRepository(AppDbContext context) => Context = context;
 
 
+
+
+    public async Task<Response> GenericCreateWithImage<TEntity>(TEntity tEntity, Stream? image = null) where TEntity : class
+    {
+        var entity = (dynamic)tEntity;
+
+        try
+        {
+            if (image != null)
+            {
+                var imageName = Helper.GenerateImageName();
+                _ = DataAccessImageService.SaveSingleImage(image, imageName);
+                entity.Photo = imageName;
+            }
+            else
+            {
+                entity.Photo = null;
+            }
+
+            var result = await Context.Set<TEntity>().AddAsync(entity);
+
+            if (string.IsNullOrEmpty(entity.CodeNumber))
+            {
+                entity.CodeNumber = "generi- " + Context.Set<TEntity>().Count().ToString();
+            }
+
+            var row = await Context.SaveChangesAsync();
+
+            if (row > 0)
+            {
+                return new Response(true, "id: " + result.Entity.Id);
+            }
+
+            return new Response(false, "No rows affected");
+        }
+        catch (Exception ex)
+        {
+            return new Response(false, ex.Message);
+        }
+    }
 
     public async Task<Response> GenericUpdate<TEntity>(List<TEntity> entity) where TEntity : class
     {
@@ -70,12 +110,7 @@ public class GenericRepository : IGenericRepository// where T : class
         }
     }
 
-    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(
-                                       Expression<Func<TEntity, bool>> filter,
-                                       Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy,
-                                       int? page, int? pageSize,
-                                       Expression<Func<TEntity, TEntity>> selectExpression,
-                                       params Expression<Func<TEntity, object>>[]? includes) where TEntity : class
+    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter,int? page, int? pageSize, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy, params Expression<Func<TEntity, object>>[]? includes) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
@@ -83,11 +118,11 @@ public class GenericRepository : IGenericRepository// where T : class
         {
             query = query.Where(filter);
         }
-        if(includes != null)
-        foreach (var include in includes)
-        {
-            query = query.Include(include);
-        }
+        if (includes != null)
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
 
         if (orderBy != null)
         {
@@ -100,10 +135,11 @@ public class GenericRepository : IGenericRepository// where T : class
             query = query.Skip(skip).Take(pageSize.Value);
         }
 
-        return await query.Select(selectExpression).ToListAsync();
+        return await query.ToListAsync();
     }
-    // filter and select
-    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter,Expression<Func<TEntity, TEntity>> selectExpression) where TEntity : class
+
+    // filter and select used in get names
+    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> selectExpression, int? page, int? pageSize) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
@@ -112,8 +148,65 @@ public class GenericRepository : IGenericRepository// where T : class
             query = query.Where(filter);
         }
 
-        return await query.Select(selectExpression).ToListAsync();
+        if (page.HasValue && pageSize.HasValue)
+        {
+            int skip = (page.Value - 1) * pageSize.Value;
+            query = query.Skip(skip).Take(pageSize.Value);
+        }
+
+        if (selectExpression != null)
+            return await query.Select(selectExpression).ToListAsync();
+        else
+            return await query.ToListAsync();
     }
+    public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> selectExpression, int? page, int? pageSize) where TEntity : class
+    {
+        try
+        {
+            IQueryable<TEntity> query = Context.Set<TEntity>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (page.HasValue && pageSize.HasValue)
+            {
+                int skip = (page.Value - 1) * pageSize.Value;
+                query = query.Skip(skip).Take(pageSize.Value);
+            }
+
+            List<TEntity> results = await query.ToListAsync();
+            return results;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // this func writed by chat
@@ -143,6 +236,8 @@ public class GenericRepository : IGenericRepository// where T : class
         //        return new Response(false, $"No changes on entity with Id: {id}");
         //    }
     }
+
+
 
 
 

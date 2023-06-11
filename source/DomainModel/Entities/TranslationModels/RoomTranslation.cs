@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.TranslationModels;
 
 public partial class RoomTranslation
 {

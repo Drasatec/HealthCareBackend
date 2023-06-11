@@ -12,8 +12,8 @@ public partial class BuildingTranslation
 
     public string? Description { get; set; }
 
-
     public int? BuildeingId { get; set; }
+
     public string LangCode { get; set; } = null!;
 
     [JsonIgnore]

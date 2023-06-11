@@ -1,7 +1,9 @@
 ﻿using DomainModel.Contracts;
 using DomainModel.Entities.TranslationModels;
+using DomainModel.Helpers;
 using DomainModel.Models;
 using DomainModel.Models.Hospitals;
+using System;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
@@ -51,43 +53,70 @@ public class HospitalController : ControllerBase
     }
 
     [HttpGet("names", Order = 0111)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] bool? active, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
-        //if (id < 1)
-        //return BadRequest(new Error("400", "can not assign 0"));
 
-        Expression<Func<HospitalTranslation, HospitalTranslation>> selectExpression = hos => new HospitalTranslation
+        Expression<Func<HospitalTranslation, bool>> filterExpression;
+        if (active.HasValue)
         {
-            Id = hos.Id,
-            Name = hos.Name,
-            HospitalId = hos.HospitalId,
-            LangCode = hos.LangCode,
-        };
-        var result = await Data.Hospitals.GenericReadAll<HospitalTranslation>(f => f.LangCode == lang, (hos) =>
+            if (active.Value)
+                filterExpression = f => f.LangCode == lang && f.Hospital != null && !f.Hospital.IsDeleted;
+            else
+                filterExpression = f => f.LangCode == lang && f.Hospital != null && f.Hospital.IsDeleted;
+        }
+        else
+            filterExpression = f => f.LangCode == lang;
+
+        var result = await Data.Hospitals.GenericReadAll(filterExpression, (hos) =>
         new HospitalTranslation
         {
-            Id = hos.Id,
-            Name = hos.Name,
+            Id = hos.Id, LangCode = hos.LangCode,Name = hos.Name,
             HospitalId = hos.HospitalId,
-            LangCode = hos.LangCode,
-        });
+        },page,pageSize);
         return Ok(result);
     }
 
     [HttpGet("all", Order = 0112)]
-    public async Task<IActionResult> GetAll([FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetAll([FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
-        var hospitals = await Data.Hospitals.ReadAllHospitals(status, lang, page, pageSize);
-        return Ok(hospitals);
+        var resutl = await Data.Hospitals.ReadAllHospitals(status, lang, page, pageSize);
+        if (resutl == null)
+        {
+            return Ok(new Response(true, "no content"));
+        }
+        return Ok(resutl);
     }
 
     [HttpGet("search", Order = 0114)]
-    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> Search([FromQuery] string? name,bool? active, [FromQuery] string? searchTerm, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
         if (!string.IsNullOrEmpty(name))
-            return Ok(await Data.Hospitals.SearchByHospitalName(name));
+        {
+            Expression<Func<HospitalTranslation, bool>> filterExpression;
+            if (active.HasValue)
+            {
+                if (active.Value)
+                    filterExpression = f => f.Name.Contains(name) && f.Hospital != null && !f.Hospital.IsDeleted;
+                else
+                    filterExpression = f => f.Name.Contains(name) && f.Hospital != null && f.Hospital.IsDeleted;
+            }
+            else
+                filterExpression = f => f.Name.Contains(name);
+
+            var result = await Data.Hospitals.GenericSearchByText(filterExpression, (hos) =>
+            new HospitalTranslation
+            {
+                Id = hos.Id,
+                LangCode = hos.LangCode,
+                Name = hos.Name,
+                HospitalId = hos.HospitalId,
+            },page,pageSize);
+
+
+            return Ok(result);
+        }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.Hospitals.SearchByHospitalNameOrCode(searchTerm, lang));
+            return Ok(await Data.Hospitals.SearchByHospitalNameOrCode(searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }

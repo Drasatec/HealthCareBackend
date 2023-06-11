@@ -33,7 +33,6 @@ public static class DependencyInjectionSetup
     public static IServiceCollection RegisterDbContext(this IServiceCollection Services, IConfiguration Configuration)
     {
         // LocalDb ||| SomeeDb
-        
         Services.AddDbContext<AppDbContext>(options => options
         .UseSqlServer(Configuration.GetConnectionString("LocalDb"))
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));

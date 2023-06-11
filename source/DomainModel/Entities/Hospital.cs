@@ -10,7 +10,7 @@ public partial class Hospital
 
     public string? Photo { get; set; }
 
-    public string? CodeNumber { get; set; } =string.Empty;
+    public string CodeNumber { get; set; } = string.Empty;
 
     public string? Email { get; set; }
 

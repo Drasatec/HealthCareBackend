@@ -4,19 +4,20 @@ using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
-using DomainModel.Models.Buildings;
+using DomainModel.Models.Floors;
 using Microsoft.EntityFrameworkCore;
+
 namespace DataAccess.Repositories;
 
-public class BuildingRepository : GenericRepository, IBuildingRepository
+public class FloorRepository : GenericRepository, IFloorRepository
 {
-    public BuildingRepository(AppDbContext context) : base(context) { }
+    public FloorRepository(AppDbContext context) : base(context) { }
 
 
     #region Add
-    public async Task<Response> CreateWithImage(BuildingDto dto, Stream? image = null)
+    public async Task<Response> CreateWithImage(FloorDto dto, Stream? image = null)
     {
-        var entity = (HosBuilding)dto;
+        var entity = (HosFloor)dto;
 
         try
         {
@@ -29,34 +30,32 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
             else
                 entity.Photo = null;
 
-            var result = await Context.HosBuildings.AddAsync(entity);
+            var result = await Context.HosFloors.AddAsync(entity);
 
             if (string.IsNullOrEmpty(entity.CodeNumber))
-                entity.CodeNumber = "bui-" + Context.HosBuildings.Count().ToString();
+                entity.CodeNumber = "bui-" + Context.HosFloors.Count().ToString();
             var row = await Context.SaveChangesAsync();
             if (row > 0)
             {
                 return new Response(true, "id: " + result.Entity.Id);
             }
-            return new Response(false, "No row effected "); //(BuildingDto) result.Entity;
+            return new Response(false, "No row effected "); //(FloorDto) result.Entity;
         }
         catch (Exception ex)
         {
             return new Response(false, ex.Message);
         }
-
-        
     }
     #endregion
 
 
     #region Update
-    public async Task<Response<BuildingDto?>> Update(BuildingDto dto, int id, Stream? image = null)
+    public async Task<Response<FloorDto?>> Update(FloorDto dto, int id, Stream? image = null)
     {
-        Response<BuildingDto?> respons;
+        Response<FloorDto?> respons;
         try
         {
-            var current = Context.HosBuildings.Find(id);
+            var current = Context.HosFloors.Find(id);
             if (current == null)
                 return respons = new(false, $"id: {id} is not found");
             dto.Id = id;
@@ -96,16 +95,16 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
 
 
     #region Read
-    public async Task<BuildingDto?> ReadById(int? Id, string? lang = null)
+    public async Task<FloorDto?> ReadById(int? Id, string? lang = null)
     {
-        var _context = Context.HosBuildings.Where(x => x.Id == Id);
+        var _context = Context.HosFloors.Where(x => x.Id == Id);
         if (lang == null)
         {
-            _context = _context.Include(tranc => tranc.BuildingTranslations);
+            _context = _context.Include(tranc => tranc.FloorTranslations);
         }
         else
         {
-            _context = _context.Include(tranc => tranc.BuildingTranslations.Where(la => la.LangCode == lang));
+            _context = _context.Include(tranc => tranc.FloorTranslations.Where(la => la.LangCode == lang));
         }
         try
         {
@@ -119,101 +118,101 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
         }
     }
 
-    public async Task<AllBuildingDto?> ReadAll(bool? isHosActive ,string isActive, string? lang, int page = 1, int pageSize = Constants.PageSize)
+    public async Task<AllFloorDto?> ReadAll(bool? isBuildActive, string isActive, string? lang, int page = 1, int pageSize = Constants.PageSize)
     {
         int skip = Helper.SkipValue(page, pageSize);
-        IQueryable<HosBuilding> query = Context.HosBuildings;
+        IQueryable<HosFloor> query = Context.HosFloors;
 
         var total = 0;
 
         if (isActive == "inactive")
         {
             query = query.Where(h => h.IsDeleted == true);
-            total = Context.HosBuildings.Count(h => h.IsDeleted == true);
+            total = Context.HosFloors.Count(h => h.IsDeleted == true);
         }
         else if (isActive == "active")
         {
             query = query.Where(h => h.IsDeleted == false);
-            total = Context.HosBuildings.Count(h => h.IsDeleted == false);
+            total = Context.HosFloors.Count(h => h.IsDeleted == false);
         }
 
 
-        if (isHosActive != null)
+        if (isBuildActive != null)
         {
-            if(isHosActive.Value)
-                query = query.Where(h => h.Hospital.IsDeleted == false);
+            if (isBuildActive.Value)
+                query = query.Where(h => h.Build.IsDeleted == false);
             else
-                query = query.Where(h => h.Hospital.IsDeleted == true);
+                query = query.Where(h => h.Build.IsDeleted == true);
         }
-        
-        
+
+
 
         if (total < 1) return null;
         query = query.Skip(skip).Take(pageSize);
 
         if (lang != null)
         {
-            query = query.Include(tranc1 => tranc1.BuildingTranslations
+            query = query.Include(tranc1 => tranc1.FloorTranslations
                          .Where(post => post.LangCode == lang)
                          .OrderBy(post => post.Name));
         }
         else
         {
             query = query
-                .Include(tranc2 => tranc2.BuildingTranslations);
+                .Include(tranc2 => tranc2.FloorTranslations);
         }
         query = query.OrderByDescending(o => o.CreateOn);
         await query.ToListAsync();
 
-        var all = new AllBuildingDto();
-        var result = BuildingDto.ToList(query);
+        var all = new AllFloorDto();
+        var result = FloorDto.ToList(query);
         all.Total = total;
         all.Page = page;
         all.PageSize = pageSize;
-        all.Buildings = result.ToList();
+        all.Floors = result.ToList();
         return all;
     }
 
-    public async Task<List<BuildingTranslation>> SearchByName(string name)
+    public async Task<List<FloorTranslation>> SearchByName(string name)
     {
-        IQueryable<BuildingTranslation> query = Context.BuildingTranslations;
+        IQueryable<FloorTranslation> query = Context.FloorTranslations;
 
         if (!string.IsNullOrEmpty(name))
         {
-            query = query.Where(t => t.Name.Contains(name)&& t.Buildeing.IsDeleted == false);
+            query = query.Where(t => t.Name.Contains(name) && t.Floor.IsDeleted == false);
         }
 
-        List<BuildingTranslation> results = await query.ToListAsync();
+        List<FloorTranslation> results = await query.ToListAsync();
         return results;
     }
 
-    public async Task<AllBuildingDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = Constants.PageSize)
+    public async Task<AllFloorDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = Constants.PageSize)
     {
         int skip = Helper.SkipValue(page, pageSize);
-        IQueryable<HosBuilding> query = Context.HosBuildings;
+        IQueryable<HosFloor> query = Context.HosFloors;
 
-        var hospitals = await Context.HosBuildings
-           .Join(Context.BuildingTranslations,
+        var hospitals = await Context.HosFloors
+           .Join(Context.FloorTranslations,
                h => h.Id,
-               t => t.BuildeingId,
-               (h, t) => new { HosBuilding = h, Translation = t })
-           .Where(x => (x.HosBuilding.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == "ar")
+               t => t.FloorId,
+               (h, t) => new { HosFloor = h, Translation = t })
+           .Where(x => (x.HosFloor.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
            .Skip(skip).Take(pageSize)
-           .Select(x => new BuildingDto
+           .Select(x => new FloorDto
            {
-               Id = x.HosBuilding.Id,
-               Photo = x.HosBuilding.Photo,
-               CodeNumber = x.HosBuilding.CodeNumber,
-               BuildingTranslation = new List<BuildingTranslation> { x.Translation }
+               Id = x.HosFloor.Id,
+               Photo = x.HosFloor.Photo,
+               CodeNumber = x.HosFloor.CodeNumber,
+               FloorTranslations = new List<FloorTranslation> { x.Translation }
            })
            .ToListAsync();
 
-        var all = new AllBuildingDto
+        var all = new AllFloorDto
         {
             Total = hospitals.Count,
             Page = page,
             PageSize = pageSize,
-            Buildings = hospitals
+            Floors = hospitals
         };
         return all;
     }

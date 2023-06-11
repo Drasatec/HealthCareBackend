@@ -131,7 +131,9 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
             total = Context.Hospitals.Count(h => h.IsDeleted == false);
         }
 
-        if (total < 1) return null;
+        if (total < 1) 
+            return null;
+
         query = query.Skip(skip).Take(pageSize);
 
         if (lang != null)
@@ -160,15 +162,23 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
 
     public async Task<List<HospitalTranslation>> SearchByHospitalName(string name)
     {
-        IQueryable<HospitalTranslation> query = Context.HospitalTranslations;
+        try
+        {
+            IQueryable<HospitalTranslation> query = Context.HospitalTranslations;
 
         if (!string.IsNullOrEmpty(name))
         {
-            query = query.Where(t => t.Name.Contains(name));
+            query = query.Where(t => t.Name.Contains(name) && t.Hospital.IsDeleted == false);
         }
 
         List<HospitalTranslation> results = await query.ToListAsync();
         return results;
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
     }
 
     public async Task<AllHospitalsDto?> SearchByHospitalNameOrCode(string searchTerm, string lang = "ar", int page = 1,int pageSize = 10)
@@ -195,11 +205,13 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
            })
            .ToListAsync();
 
-        var all = new AllHospitalsDto();
-        all.Total = hospitals.Count;
-        all.Page = page;
-        all.PageSize = pageSize;
-        all.Hospitals = hospitals;
+        var all = new AllHospitalsDto
+        {
+            Total = hospitals.Count,
+            Page = page,
+            PageSize = pageSize,
+            Hospitals = hospitals
+        };
         return all;
     }
     #endregion

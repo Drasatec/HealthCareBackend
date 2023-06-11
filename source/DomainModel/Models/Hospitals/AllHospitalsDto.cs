@@ -1,12 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using DomainModel.Helpers;
+using System.Text.Json.Serialization;
 
 namespace DomainModel.Models.Hospitals;
 
 public  class AllHospitalsDto
 {
-   //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int Total { get; set; } = 0;
+    public int Total { get; set; } 
     public int Page { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
+    public int PageSize { get; set; } = Constants.PageSize;
     public List<HospitalDto>? Hospitals { get; set; } = new List<HospitalDto>();
 }

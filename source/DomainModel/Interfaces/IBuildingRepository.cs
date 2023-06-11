@@ -16,5 +16,5 @@ public interface IBuildingRepository : IGenericRepository
 
     Task<List<BuildingTranslation>> SearchByName(string name);
     Task<AllBuildingDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = 10);
-    Task<Response<BuildingDto?>> UpdateHospital(BuildingDto dto, int id, Stream? image = null);
+    Task<Response<BuildingDto?>> Update(BuildingDto dto, int id, Stream? image = null);
 }
