@@ -1,7 +1,6 @@
 ﻿using DataAccess.Contexts;
 using DataAccess.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 namespace WebAPI.Startup;

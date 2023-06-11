@@ -10,13 +10,13 @@ public partial class HosRoom
 
     public string? Photo { get; set; }
 
-    public string? CodeNumber { get; set; }
+    public string CodeNumber { get; set; } =string.Empty;
 
     public string? Kind { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     public int HospitalId { get; set; }
 

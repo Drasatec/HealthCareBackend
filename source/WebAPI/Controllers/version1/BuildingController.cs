@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
 
-[Route("api",Order =02)]
+[Route("api", Order = 02)]
 [ApiController]
 [ApiVersion("1.0")]
 public class BuildingController : ControllerBase
@@ -55,21 +55,18 @@ public class BuildingController : ControllerBase
     }
 
     [HttpGet("building/names", Order = 0211)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] bool? active, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? hosId, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
 
         Expression<Func<BuildingTranslation, bool>> filterExpression;
-        if (active.HasValue)
+        if (hosId.HasValue)
         {
-            if (active.Value)
-                filterExpression = f => f.LangCode == lang && f.Buildeing != null && !f.Buildeing.IsDeleted;
-            else
-                filterExpression = f => f.LangCode == lang && f.Buildeing != null && f.Buildeing.IsDeleted;
+            filterExpression = f => f.LangCode == lang && f.Buildeing != null && f.Buildeing.HospitalId.Equals(hosId);
         }
         else
             filterExpression = f => f.LangCode == lang;
 
-        var result = await Data.Hospitals.GenericReadAll(filterExpression, (hos) =>
+        var result = await Data.Buildings.GenericReadAll(filterExpression, (hos) =>
         new BuildingTranslation
         {
             Id = hos.Id,
@@ -81,9 +78,9 @@ public class BuildingController : ControllerBase
     }
 
     [HttpGet("buildings/all", Order = 0212)]
-    public async Task<IActionResult> GetAll([FromQuery] bool? isHosActive,[FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize =Constants.PageSize)
+    public async Task<IActionResult> GetAll([FromQuery] bool? isHosActive, [FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
-        var resutl = await Data.Buildings.ReadAll(isHosActive,status, lang, page, pageSize);
+        var resutl = await Data.Buildings.ReadAll(isHosActive, status, lang, page, pageSize);
         if (resutl == null)
         {
             return Ok(new Response(true, "no content"));
@@ -97,7 +94,7 @@ public class BuildingController : ControllerBase
         if (!string.IsNullOrEmpty(name))
             return Ok(await Data.Buildings.SearchByName(name));
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.Buildings.SearchByNameOrCode(searchTerm, lang,page,pageSize));
+            return Ok(await Data.Buildings.SearchByNameOrCode(searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }

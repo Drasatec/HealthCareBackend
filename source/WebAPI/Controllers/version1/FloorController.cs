@@ -54,21 +54,25 @@ public class FloorController : ControllerBase
     }
 
     [HttpGet("names", Order = 0311)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] bool? active, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? buildId, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
 
         Expression<Func<FloorTranslation, bool>> filterExpression;
-        if (active.HasValue)
+        if (buildId.HasValue)
         {
-            if (active.Value)
-                filterExpression = f => f.LangCode == lang && f.Floor != null && !f.Floor.IsDeleted;
-            else
-                filterExpression = f => f.LangCode == lang && f.Floor != null && f.Floor.IsDeleted;
+            filterExpression = f => f.LangCode == lang && f.Floor != null && f.Floor.BuildId.Equals(buildId);
         }
         else
             filterExpression = f => f.LangCode == lang;
 
-        var result = await Data.Hospitals.GenericReadAll(filterExpression,null, page, pageSize);
+        var result = await Data.Floors.GenericReadAll(filterExpression, (hos) =>
+        new FloorTranslation
+        {
+            Id = hos.Id,
+            LangCode = hos.LangCode,
+            Name = hos.Name,
+            FloorId = hos.FloorId,
+        }, page, pageSize);
         return Ok(result);
     }
 

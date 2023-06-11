@@ -12,6 +12,7 @@ namespace DomainModel.Interfaces
         IHospitalRepository Hospitals { get; }
         IBuildingRepository Buildings { get; }
         IFloorRepository Floors { get; }
+        IRoomRepository Rooms { get; }
 
         int Complete();
     }
