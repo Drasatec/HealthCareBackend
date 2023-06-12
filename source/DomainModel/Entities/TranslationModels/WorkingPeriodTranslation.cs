@@ -12,7 +12,7 @@ public partial class WorkingPeriodTranslation
 
     public int? WorkingPeriodId { get; set; }
 
-    public string? LangCode { get; set; }
+    public string LangCode { get; set; } = null!;
 
     //public virtual Language? LangCodeNavigation { get; set; }
     [JsonIgnore]

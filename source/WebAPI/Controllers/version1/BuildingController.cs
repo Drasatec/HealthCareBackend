@@ -3,6 +3,7 @@ using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Models;
 using DomainModel.Models.Buildings;
+using System.Buffers.Text;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
@@ -26,7 +27,7 @@ public class BuildingController : ControllerBase
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] BuildingDto model)
     {
 
-        Response response;
+        ResponseId response;
 
         if (model == null)
         {
@@ -78,9 +79,9 @@ public class BuildingController : ControllerBase
     }
 
     [HttpGet("buildings/all", Order = 0212)]
-    public async Task<IActionResult> GetAll([FromQuery] bool? isHosActive, [FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAll([FromQuery]int? hosId, [FromQuery] bool? isHosActive, [FromQuery] string? status, [FromQuery] int ? pageSize , [FromQuery] int page = 1, [FromQuery] string? lang = null)
     {
-        var resutl = await Data.Buildings.ReadAll(isHosActive, status, lang, page, pageSize);
+        var resutl = await Data.Buildings.ReadAll(hosId, isHosActive, status, lang, pageSize, page);
         if (resutl == null)
         {
             return Ok(new Response(true, "no content"));
@@ -88,13 +89,21 @@ public class BuildingController : ControllerBase
         return Ok(resutl);
     }
 
+
     [HttpGet("buildings/search", Order = 0214)]
-    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> Search([FromQuery(Name = "hosId")] int? baseId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
         if (!string.IsNullOrEmpty(name))
-            return Ok(await Data.Buildings.SearchByName(name));
+        {
+            return Ok(await Data.Buildings.GenericSearchByText<BuildingTranslation>(
+                baseId,
+                t => t.Name.Contains(name),
+                ho => ho.Buildeing != null && ho.Buildeing.HospitalId.Equals(baseId),
+                page, pageSize));
+
+        }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.Buildings.SearchByNameOrCode(searchTerm, lang, page, pageSize));
+            return Ok(await Data.Floors.SearchByNameOrCode(searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }

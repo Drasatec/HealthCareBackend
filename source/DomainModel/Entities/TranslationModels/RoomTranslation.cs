@@ -14,7 +14,7 @@ public partial class RoomTranslation
 
     public int? RoomId { get; set; }
 
-    public string? LangCode { get; set; }
+    public string LangCode { get; set; } = null!;
 
     //public virtual Language? LangCodeNavigation { get; set; }
     [JsonIgnore]

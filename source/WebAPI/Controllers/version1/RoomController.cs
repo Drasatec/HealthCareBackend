@@ -26,7 +26,7 @@ public class RoomController : ControllerBase
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] RoomDto model)
     {
 
-        Response response;
+        ResponseId response;
 
         if (model == null)
         {
@@ -89,12 +89,19 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("search", Order = 0414)]
-    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> Search([FromQuery(Name = "floorId")] int? baseId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
         if (!string.IsNullOrEmpty(name))
-            return Ok(await Data.Rooms.SearchByName(name));
+        {
+            return Ok(await Data.Floors.GenericSearchByText<RoomTranslation>(
+                baseId,
+                t => t.Name.Contains(name),
+                en => en.Room != null && en.Room.FloorId.Equals(baseId),
+                page, pageSize));
+
+        }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.Rooms.SearchByNameOrCode(searchTerm, lang, page, pageSize));
+            return Ok(await Data.Floors.SearchByNameOrCode(searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }

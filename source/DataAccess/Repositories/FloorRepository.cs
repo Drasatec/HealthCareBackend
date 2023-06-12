@@ -4,6 +4,7 @@ using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
+using DomainModel.Models.Buildings;
 using DomainModel.Models.Floors;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,7 @@ public class FloorRepository : GenericRepository, IFloorRepository
 
 
     #region Add
-    public async Task<Response> CreateWithImage(FloorDto dto, Stream? image = null)
+    public async Task<ResponseId> CreateWithImage(FloorDto dto, Stream? image = null)
     {
         var entity = (HosFloor)dto;
 
@@ -37,13 +38,13 @@ public class FloorRepository : GenericRepository, IFloorRepository
             var row = await Context.SaveChangesAsync();
             if (row > 0)
             {
-                return new Response(true, "id: " + result.Entity.Id);
+                return new ResponseId(true, "created ", result.Entity.Id);
             }
-            return new Response(false, "No row effected "); //(FloorDto) result.Entity;
+            return new ResponseId(false, "No row effected ", 0); 
         }
         catch (Exception ex)
         {
-            return new Response(false, ex.Message);
+            return new ResponseId(false, ex.Message, 0);
         }
     }
     #endregion
@@ -118,72 +119,89 @@ public class FloorRepository : GenericRepository, IFloorRepository
         }
     }
 
-    public async Task<AllFloorDto?> ReadAll(bool? isBuildActive, string isActive, string? lang, int page = 1, int pageSize = Constants.PageSize)
+    public async Task<AllFloorDto?> ReadAll(int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int page = 1)
     {
-        int skip = Helper.SkipValue(page, pageSize);
         IQueryable<HosFloor> query = Context.HosFloors;
 
         var total = 0;
-
-        if (isActive == "inactive")
+        if (status is not null)
         {
-            query = query.Where(h => h.IsDeleted == true);
-            total = Context.HosFloors.Count(h => h.IsDeleted == true);
+
+            if (status.Equals("inactive"))
+            {
+                query = query.Where(h => h.IsDeleted);
+            }
+            else if (status.Equals("active"))
+            {
+                query = query.Where(h => !h.IsDeleted);
+            }
         }
-        else if (isActive == "active")
-        {
-            query = query.Where(h => h.IsDeleted == false);
-            total = Context.HosFloors.Count(h => h.IsDeleted == false);
-        }
 
-
-        if (isBuildActive != null)
+        if (isBaseActive is not null)
         {
-            if (isBuildActive.Value)
-                query = query.Where(h => h.Build.IsDeleted == false);
+            if (isBaseActive.Value)
+                query = query.Where(h => !h.Build.IsDeleted);
             else
-                query = query.Where(h => h.Build.IsDeleted == true);
+                query = query.Where(h => h.Build.IsDeleted);
         }
 
-
-
-        if (total < 1) return null;
-        query = query.Skip(skip).Take(pageSize);
-
-        if (lang != null)
+        if (baseid.HasValue)
         {
-            query = query.Include(tranc1 => tranc1.FloorTranslations
-                         .Where(post => post.LangCode == lang)
-                         .OrderBy(post => post.Name));
+            query = query.Where(ho => ho.BuildId.Equals(baseid));
+        }
+
+        query = query.OrderByDescending(o => o.Id);
+
+        total = query.Count();
+        if (total < 0)
+            return null;
+
+
+        // page size
+        if (pageSize.HasValue)
+        {
+            int skip = Helper.SkipValue(page, pageSize.Value);
+            query = query.Skip(skip).Take(pageSize.Value);
+        }
+        else pageSize = total;
+
+        // lang
+        if (lang is not null)
+        {
+            query = query.Include(tranc1 => tranc1.FloorTranslations.Where(post => post.LangCode == lang));
         }
         else
         {
-            query = query
-                .Include(tranc2 => tranc2.FloorTranslations);
+            query = query.Include(tranc2 => tranc2.FloorTranslations);
         }
-        query = query.OrderByDescending(o => o.CreateOn);
+
         await query.ToListAsync();
 
         var all = new AllFloorDto();
         var result = FloorDto.ToList(query);
         all.Total = total;
         all.Page = page;
-        all.PageSize = pageSize;
+        all.PageSize = pageSize!.Value;
         all.Floors = result.ToList();
         return all;
     }
 
-    public async Task<List<FloorTranslation>> SearchByName(string name)
+
+    public async Task<List<FloorTranslation>> SearchByName(string name, int? buildId)
     {
         IQueryable<FloorTranslation> query = Context.FloorTranslations;
 
         if (!string.IsNullOrEmpty(name))
         {
-            query = query.Where(t => t.Name.Contains(name) && t.Floor.IsDeleted == false);
+            query = query.Where(t => t.Name.Contains(name));
         }
 
-        List<FloorTranslation> results = await query.ToListAsync();
-        return results;
+        if (buildId.HasValue)
+        {
+            query = query.Where(ho => ho.Floor != null && ho.Floor.BuildId.Equals(buildId));
+        }
+
+        return  await query.ToListAsync();
     }
 
     public async Task<AllFloorDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = Constants.PageSize)
@@ -216,5 +234,6 @@ public class FloorRepository : GenericRepository, IFloorRepository
         };
         return all;
     }
+
     #endregion
 }

@@ -24,7 +24,7 @@ public class HospitalController : ControllerBase
     [HttpPost("add", Order = 0101)]
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] HospitalDto model)
     {
-        HospitalDto? response;
+        ResponseId? response;
 
         if (model == null)
         {
@@ -77,9 +77,9 @@ public class HospitalController : ControllerBase
     }
 
     [HttpGet("all", Order = 0112)]
-    public async Task<IActionResult> GetAll([FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAll([FromQuery] string? status, [FromQuery] int? pageSize=null, [FromQuery] int page = 1, [FromQuery] string? lang = null)
     {
-        var resutl = await Data.Hospitals.ReadAllHospitals(status, lang, page, pageSize);
+        var resutl = await Data.Hospitals.ReadAllHospitals(status, lang, pageSize, page);
         if (resutl == null)
         {
             return Ok(new Response(true, "no content"));

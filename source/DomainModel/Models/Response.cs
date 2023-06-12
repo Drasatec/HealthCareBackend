@@ -25,3 +25,17 @@ public class Response
         Message = message;
     }
 }
+
+public class ResponseId
+{
+    public bool Success { get; set; }
+    public string? Message { get; set; } = null;
+    public int? Id { get; set; }
+    public ResponseId() { }
+    public ResponseId(bool success, string? message, int id)
+    {
+        Success = success;
+        Message = message;
+        Id = id;
+    }
+}

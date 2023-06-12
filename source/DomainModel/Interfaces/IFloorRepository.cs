@@ -11,10 +11,10 @@ namespace DomainModel.Interfaces;
 
 public interface IFloorRepository : IGenericRepository
 {
-    Task<Response> CreateWithImage(FloorDto dto, Stream? image = null);
-    Task<AllFloorDto?> ReadAll(bool? isHosActive, string isActive, string? lang, int page = 1, int pageSize = 10);
+    Task<ResponseId> CreateWithImage(FloorDto dto, Stream? image = null);
+    Task<AllFloorDto?> ReadAll(int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int page = 1);
     Task<FloorDto?> ReadById(int? Id, string? lang = null);
-    Task<List<FloorTranslation>> SearchByName(string name);
+    Task<List<FloorTranslation>> SearchByName(string name, int? hosId);
     Task<AllFloorDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = 10);
     Task<Response<FloorDto?>> Update(FloorDto dto, int id, Stream? image = null);
 }

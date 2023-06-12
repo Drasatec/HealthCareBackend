@@ -25,7 +25,7 @@ public class FloorController : ControllerBase
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] FloorDto model)
     {
 
-        Response response;
+        ResponseId response;
 
         if (model == null)
         {
@@ -77,9 +77,9 @@ public class FloorController : ControllerBase
     }
 
     [HttpGet("all", Order = 0312)]
-    public async Task<IActionResult> GetAll([FromQuery] bool? isBuildActive, [FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAll([FromQuery(Name = "buildId")] int? baseId, [FromQuery(Name = "isBuildActive")] bool? isBaseActive, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int page = 1, [FromQuery] string? lang = null)
     {
-        var resutl = await Data.Floors.ReadAll(isBuildActive,status, lang, page, pageSize);
+        var resutl = await Data.Floors.ReadAll(baseId, isBaseActive, status, lang, pageSize, page);
         if (resutl == null)
         {
             return Ok(new Response(true, "no content"));
@@ -88,10 +88,17 @@ public class FloorController : ControllerBase
     }
 
     [HttpGet("search", Order = 0314)]
-    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> Search([FromQuery(Name = "buildId")] int? baseId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
         if (!string.IsNullOrEmpty(name))
-            return Ok(await Data.Floors.SearchByName(name));
+        {
+            //return Ok(await Data.Floors.SearchByName(name));
+            return Ok(await Data.Floors.GenericSearchByText<FloorTranslation>(baseId,
+                t => t.Name.Contains(name),
+                ho => ho.Floor != null && ho.Floor.BuildId.Equals(baseId),
+                page,pageSize));
+
+        }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
             return Ok(await Data.Floors.SearchByNameOrCode(searchTerm, lang, page,pageSize));
 

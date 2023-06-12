@@ -7,7 +7,7 @@ namespace DomainModel.Interfaces;
 
 public interface IRoomRepository : IGenericRepository
 {
-    Task<Response> CreateWithImage(RoomDto dto, Stream? image = null);
+    Task<ResponseId> CreateWithImage(RoomDto dto, Stream? image = null);
     Task<AllRoomDto?> ReadAll(bool? isHosActive, string isActive, string? lang, int page = 1, int pageSize = 10);
     Task<RoomDto?> ReadById(int? Id, string? lang = null);
     Task<List<RoomTranslation>> SearchByName(string name);

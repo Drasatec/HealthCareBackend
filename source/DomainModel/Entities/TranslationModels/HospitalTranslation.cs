@@ -16,8 +16,8 @@ public partial class HospitalTranslation
 
     public int? HospitalId { get; set; }
 
-    public string? LangCode { get; set; }
-    
+    public string LangCode { get; set; } = null!;
+
     [JsonIgnore]
     public virtual Hospital? Hospital { get; set; }
 

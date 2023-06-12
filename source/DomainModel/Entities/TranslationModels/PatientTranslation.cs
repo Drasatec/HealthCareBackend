@@ -20,7 +20,7 @@ public partial class PatientTranslation
 
     public int? PatientId { get; set; }
 
-    public string? LangCode { get; set; }
+    public string LangCode { get; set; } = null!;
 
     //public virtual Language? LangCodeNavigation { get; set; }
     [JsonIgnore]

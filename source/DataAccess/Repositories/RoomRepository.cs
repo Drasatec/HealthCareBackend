@@ -15,7 +15,7 @@ public class RoomRepository : GenericRepository, IRoomRepository
 
 
     #region Add
-    public async Task<Response> CreateWithImage(RoomDto dto, Stream? image = null)
+    public async Task<ResponseId> CreateWithImage(RoomDto dto, Stream? image = null)
     {
         var entity = (HosRoom)dto;
 
@@ -37,13 +37,13 @@ public class RoomRepository : GenericRepository, IRoomRepository
             var row = await Context.SaveChangesAsync();
             if (row > 0)
             {
-                return new Response(true, "id: " + result.Entity.Id);
+                return new ResponseId(true, "created ", result.Entity.Id);
             }
-            return new Response(false, "No row effected "); //(RoomDto) result.Entity;
+            return new ResponseId(false, "No row effected ", 0); 
         }
         catch (Exception ex)
         {
-            return new Response(false, ex.Message);
+            return new ResponseId(false, ex.Message, 0);
         }
     }
     #endregion
@@ -179,7 +179,7 @@ public class RoomRepository : GenericRepository, IRoomRepository
 
         if (!string.IsNullOrEmpty(name))
         {
-            query = query.Where(t => t.Name.Contains(name) && t.Room.IsDeleted == false);
+            query = query.Where(t => t.Name.Contains(name) && t.Room!= null && t.Room.IsDeleted == false);
         }
 
         List<RoomTranslation> results = await query.ToListAsync();

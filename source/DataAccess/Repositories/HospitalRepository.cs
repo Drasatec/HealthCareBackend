@@ -4,6 +4,7 @@ using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
+using DomainModel.Models.Buildings;
 using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
 namespace DataAccess.Repositories;
@@ -12,33 +13,43 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
     public HospitalRepository(AppDbContext context) : base(context) { }
 
     #region Add
-    public async Task<HospitalDto?> CreateWithImage(HospitalDto dto, Stream? image = null)
+    public async Task<ResponseId> CreateWithImage(HospitalDto dto, Stream? image = null)
     {
         var entity = (Hospital)dto;
 
-        if (image != null)
+        try
         {
-            var imageName = Helper.GenerateImageName();
-            _ = DataAccessImageService.SaveSingleImage(image, imageName);
-            entity.Photo = imageName;
-        }
-        else
-            entity.Photo = null;
-
-        var result = await Context.Hospitals.AddAsync(entity);
-
-        if (entity.HospitalPhoneNumbers != null)
-        {
-            if (entity.HospitalPhoneNumbers.Count < 1)
+            if (image != null)
             {
-                entity.HospitalPhoneNumbers.Add(new() { Id = result.Entity.Id, TelephoneNumber = "20-0000" });
+                var imageName = Helper.GenerateImageName();
+                _ = DataAccessImageService.SaveSingleImage(image, imageName);
+                entity.Photo = imageName;
             }
-        }
-        if (string.IsNullOrEmpty(entity.CodeNumber))
-            entity.CodeNumber = "hos-" + Context.Hospitals.Count().ToString();
-        await Context.SaveChangesAsync();
+            else
+                entity.Photo = null;
 
-        return await ReadHospitalById(result.Entity.Id); //(HospitalDto) result.Entity;
+            var result = await Context.Hospitals.AddAsync(entity);
+
+            if (entity.HospitalPhoneNumbers != null)
+            {
+                if (entity.HospitalPhoneNumbers.Count < 1)
+                {
+                    entity.HospitalPhoneNumbers.Add(new() { Id = result.Entity.Id, TelephoneNumber = "20-0000" });
+                }
+            }
+            if (string.IsNullOrEmpty(entity.CodeNumber))
+                entity.CodeNumber = "hos-" + Context.Hospitals.Count().ToString();
+            var row = await Context.SaveChangesAsync();
+            if (row > 0)
+            {
+                return new ResponseId(true, "created", result.Entity.Id);
+            }
+            return new ResponseId(false, "No row effected ", result.Entity.Id); //(BuildingDto) result.Entity;
+        }
+        catch (Exception ex)
+        {
+            return new ResponseId(false, ex.Message, 0);
+        }
     }
     #endregion
 
@@ -112,50 +123,55 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         }
     }
 
-    public async Task<AllHospitalsDto?> ReadAllHospitals(string isActive, string? lang, int page = 1, int pageSize = 10)
+    public async Task<AllHospitalsDto?> ReadAllHospitals(string? status, string? lang, int? pageSize, int page = 1)
     {
-        int skip = Helper.SkipValue(page, pageSize);
         IQueryable<Hospital> query = Context.Hospitals;
 
         var total = 0;
-
-        if (isActive == "inactive")
+        if (status is not null)
         {
-            query = query.Where(h => h.IsDeleted == true);
-            total = Context.Hospitals.Count(h => h.IsDeleted == true);
-        }
 
-        else if (isActive == "active")
-        {
-            query = query.Where(h => h.IsDeleted == false);
-            total = Context.Hospitals.Count(h => h.IsDeleted == false);
+            if (status.Equals("inactive"))
+            {
+                query = query.Where(h => h.IsDeleted);
+            }
+            else if (status.Equals("active"))
+            {
+                query = query.Where(h => !h.IsDeleted);
+            }
         }
+        query = query.OrderByDescending(o => o.Id);
 
-        if (total < 1) 
+        total = query.Count();
+        if (total < 0) 
             return null;
 
-        query = query.Skip(skip).Take(pageSize);
 
-        if (lang != null)
+        // page size
+        if (pageSize.HasValue)
         {
-            query = query.Include(tranc1 => tranc1.HospitalTranslations
-                         .Where(post => post.LangCode == lang)
-                         .OrderBy(post => post.Name));
+            int skip = Helper.SkipValue(page, pageSize.Value);
+            query = query.Skip(skip).Take(pageSize.Value);
+        }
+        else pageSize = total;
+
+        // lang
+        if (lang is not null)
+        {
+            query = query.Include(tranc1 => tranc1.HospitalTranslations.Where(t => t.LangCode == lang));
         }
         else
         {
-            query = query
-                .Include(tranc2 => tranc2.HospitalTranslations)
-                .Include(y => y.HospitalPhoneNumbers);
+            query = query.Include(tranc2 => tranc2.HospitalTranslations);
         }
-        query = query.OrderByDescending(o => o.CreateOn);
+        
         await query.ToListAsync();
 
         var all = new AllHospitalsDto();
         var result = HospitalDto.ToList(query);
         all.Total = total;
         all.Page = page;
-        all.PageSize = pageSize;
+        all.PageSize = pageSize!.Value;
         all.Hospitals = result.ToList();
         return all;
     }
@@ -166,13 +182,13 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         {
             IQueryable<HospitalTranslation> query = Context.HospitalTranslations;
 
-        if (!string.IsNullOrEmpty(name))
-        {
-            query = query.Where(t => t.Name.Contains(name) && t.Hospital.IsDeleted == false);
-        }
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(t => t.Name.Contains(name) && t.Hospital != null && t.Hospital.IsDeleted == false);
+            }
 
-        List<HospitalTranslation> results = await query.ToListAsync();
-        return results;
+            List<HospitalTranslation> results = await query.ToListAsync();
+            return results;
         }
         catch (Exception)
         {
@@ -181,7 +197,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         }
     }
 
-    public async Task<AllHospitalsDto?> SearchByHospitalNameOrCode(string searchTerm, string lang = "ar", int page = 1,int pageSize = 10)
+    public async Task<AllHospitalsDto?> SearchByHospitalNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = 10)
     {
         int skip = Helper.SkipValue(page, pageSize);
         IQueryable<Hospital> query = Context.Hospitals;

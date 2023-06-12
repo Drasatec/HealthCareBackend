@@ -12,7 +12,7 @@ public partial class DoctorsDegreesTranslation
 
     public short? DoctorDegreeId { get; set; }
 
-    public string? LangCode { get; set; }
+    public string LangCode { get; set; } = null!;
     [JsonIgnore]
     public virtual DoctorsDegree? DoctorDegree { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using DataAccess.Contexts;
+using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
@@ -15,7 +16,7 @@ public class GenericRepository : IGenericRepository// where T : class
 
 
 
-    public async Task<Response> GenericCreateWithImage<TEntity>(TEntity tEntity, Stream? image = null) where TEntity : class
+    public async Task<Response<object>> GenericCreateWithImage<TEntity>(TEntity tEntity, Stream? image = null) where TEntity : class
     {
         var entity = (dynamic)tEntity;
 
@@ -43,14 +44,14 @@ public class GenericRepository : IGenericRepository// where T : class
 
             if (row > 0)
             {
-                return new Response(true, "id: " + result.Entity.Id);
+                return new Response<object>(true, "id: " + result.Entity.Id);
             }
 
-            return new Response(false, "No rows affected");
+            return new Response<object>(false, "No rows affected");
         }
         catch (Exception ex)
         {
-            return new Response(false, ex.Message);
+            return new Response<object>(false, ex.Message);
         }
     }
 
@@ -184,6 +185,37 @@ public class GenericRepository : IGenericRepository// where T : class
             return null;
         }
     }
+    
+    public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(int? baseId, Expression<Func<TEntity, bool>> filter1, Expression<Func<TEntity, bool>>? filter2, int? page, int? pageSize) where TEntity : class
+    {
+        try
+        {
+            IQueryable<TEntity> query = Context.Set<TEntity>();
+
+            if (filter1 != null)
+            {
+                query = query.Where(filter1);
+            }
+
+            if (baseId.HasValue && filter2 != null)
+            {
+                query = query.Where(filter2);
+            }
+
+            if (page.HasValue && pageSize.HasValue)
+            {
+                int skip = (page.Value - 1) * pageSize.Value;
+                query = query.Skip(skip).Take(pageSize.Value);
+            }
+
+            return await query.ToListAsync();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
 
 
 
@@ -210,32 +242,32 @@ public class GenericRepository : IGenericRepository// where T : class
 
 
     // this func writed by chat
-    void test()
-    {
+    //void test()
+    //{
 
-        //    try
-        //    {
-        //        var current = await Context.Set<TEntity>().SingleOrDefaultAsync(predicate);
-        //        if (current != null)
-        //        {
-        //            var propertyInfo = (propertyExpression.Body as MemberExpression)?.Member as PropertyInfo;
-        //            if (propertyInfo != null && propertyInfo.PropertyType == typeof(bool))
-        //            {
-        //                propertyInfo.SetValue(current, propertyValue);
-        //                Context.Attach(entity);
-        //                Context.Entry(entity).Property(propertyExpression).IsModified = true;
-        //                var rowEffected = await Context.SaveChangesAsync();
-        //                if (rowEffected > 0)
-        //                    return new Response(true, $"Update on entity with Id: {id}");
-        //            }
-        //        }
-        //        return new Response(false, $"Entity with Id: {id} not found");
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return new Response(false, $"No changes on entity with Id: {id}");
-        //    }
-    }
+    //    //    try
+    //    //    {
+    //    //        var current = await Context.Set<TEntity>().SingleOrDefaultAsync(predicate);
+    //    //        if (current != null)
+    //    //        {
+    //    //            var propertyInfo = (propertyExpression.Body as MemberExpression)?.Member as PropertyInfo;
+    //    //            if (propertyInfo != null && propertyInfo.PropertyType == typeof(bool))
+    //    //            {
+    //    //                propertyInfo.SetValue(current, propertyValue);
+    //    //                Context.Attach(entity);
+    //    //                Context.Entry(entity).Property(propertyExpression).IsModified = true;
+    //    //                var rowEffected = await Context.SaveChangesAsync();
+    //    //                if (rowEffected > 0)
+    //    //                    return new Response(true, $"Update on entity with Id: {id}");
+    //    //            }
+    //    //        }
+    //    //        return new Response(false, $"Entity with Id: {id} not found");
+    //    //    }
+    //    //    catch (Exception)
+    //    //    {
+    //    //        return new Response(false, $"No changes on entity with Id: {id}");
+    //    //    }
+    //}
 
 
 

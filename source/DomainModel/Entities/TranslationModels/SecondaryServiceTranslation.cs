@@ -12,7 +12,7 @@ public partial class SecondaryServiceTranslation
 
     public int? SecondaryServiceId { get; set; }
 
-    public string? LangCode { get; set; }
+    public string LangCode { get; set; } = null!;
 
     //public virtual Language? LangCodeNavigation { get; set; }
     [JsonIgnore]

@@ -14,7 +14,7 @@ public partial class MedicalSpecialtyTranslation
 
     public int? MedicalSpecialtyId { get; set; }
 
-    public string? LangCode { get; set; }
+    public string LangCode { get; set; } = null!;
     [JsonIgnore]
     public virtual MedicalSpecialty? MedicalSpecialty { get; set; }
 
