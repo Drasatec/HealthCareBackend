@@ -19,6 +19,7 @@ namespace DataAccess.UnitOfWorks
         public IBuildingRepository Buildings { get; private set; }
         public IFloorRepository Floors { get; private set; }
         public IRoomRepository Rooms { get; private set; }
+        public IMedicalSpecialtyRepository MedicalSpecialteis{ get; private set; }
 
 
         public UnitOfWork(AppDbContext context )
@@ -28,6 +29,7 @@ namespace DataAccess.UnitOfWorks
             Hospitals = new HospitalRepository(Context);
             Floors = new FloorRepository(Context);
             Rooms = new RoomRepository(Context);
+            MedicalSpecialteis = new MedicalSpecialtyRepository(Context);
         }
 
 

@@ -78,9 +78,9 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("all", Order = 0412)]
-    public async Task<IActionResult> GetAll([FromQuery] bool? isBuildActive, [FromQuery] string status = "active", [FromQuery] string? lang = null, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAll([FromQuery] int? roomTypeId, [FromQuery(Name = "floorId")] int? baseId, [FromQuery(Name = "isFloorActive")] bool? isBaseActive, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int page = 1, [FromQuery] string? lang = null)
     {
-        var resutl = await Data.Rooms.ReadAll(isBuildActive, status, lang, page, pageSize);
+        var resutl = await Data.Rooms.ReadAll(roomTypeId, baseId, isBaseActive, status, lang, pageSize, page);
         if (resutl == null)
         {
             return Ok(new Response(true, "no content"));
@@ -93,15 +93,14 @@ public class RoomController : ControllerBase
     {
         if (!string.IsNullOrEmpty(name))
         {
-            return Ok(await Data.Floors.GenericSearchByText<RoomTranslation>(
+            return Ok(await Data.Rooms.GenericSearchByText<RoomTranslation>(
                 baseId,
                 t => t.Name.Contains(name),
                 en => en.Room != null && en.Room.FloorId.Equals(baseId),
                 page, pageSize));
-
         }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.Floors.SearchByNameOrCode(searchTerm, lang, page, pageSize));
+            return Ok(await Data.Rooms.SearchByNameOrCode(searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }

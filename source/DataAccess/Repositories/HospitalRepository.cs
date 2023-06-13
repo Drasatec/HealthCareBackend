@@ -207,7 +207,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
                h => h.Id,
                t => t.HospitalId,
                (h, t) => new { Hospital = h, Translation = t })
-           .Where(x => (x.Hospital.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == "ar")
+           .Where(x => (x.Hospital.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
            .Skip(skip).Take(pageSize)
            .Select(x => new HospitalDto
            {

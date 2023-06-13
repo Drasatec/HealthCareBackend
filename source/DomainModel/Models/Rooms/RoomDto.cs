@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace DomainModel.Models.Rooms;
 
@@ -16,8 +17,8 @@ public class RoomDto
     public string? Photo { get; set; }
 
     public string? CodeNumber { get; set; }
-
-    public string? Kind { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Kind { get; set; } = null;
 
     //public bool? IsActive { get; set; }
 
@@ -30,6 +31,8 @@ public class RoomDto
     public int FloorId { get; set; }
 
     public int RoomTypeId { get; set; }
+    
+    //public RoomType RoomType { get; set; } = null!;
 
     public virtual ICollection<RoomTranslation>? RoomTranslations { get; set; } = null!;
 
@@ -47,12 +50,12 @@ public class RoomDto
             IsDeleted = entity.IsDeleted,
             Photo = entity.Photo,
             RoomTypeId = entity.RoomTypeId,
-            //IsActive = entity.IsActive,
             Kind = entity.Kind,
             HospitalId = entity.HospitalId,
             BuildId = entity.BuildId,
             FloorId = entity.FloorId,
-            RoomTranslations = entity.RoomTranslations
+            RoomTranslations = entity.RoomTranslations,
+            //RoomType = entity.RoomType
         };
     }
 
@@ -77,7 +80,8 @@ public class RoomDto
             FloorId = dto.FloorId,
             RoomTypeId= dto.RoomTypeId,
             Kind = dto.Kind,
-            RoomTranslations = listTranc
+            RoomTranslations = listTranc,
+           // RoomType = dto.RoomType
 
         };
 

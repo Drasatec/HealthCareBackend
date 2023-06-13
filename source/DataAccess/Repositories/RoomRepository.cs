@@ -4,8 +4,11 @@ using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
+using DomainModel.Models.Floors;
 using DomainModel.Models.Rooms;
 using Microsoft.EntityFrameworkCore;
+using System.Buffers.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.Repositories;
 
@@ -39,11 +42,11 @@ public class RoomRepository : GenericRepository, IRoomRepository
             {
                 return new ResponseId(true, "created ", result.Entity.Id);
             }
-            return new ResponseId(false, "No row effected ", 0); 
+            return new ResponseId(false, "No row effected ", 0);
         }
         catch (Exception ex)
         {
-            return new ResponseId(false, ex.Message, 0);
+            return new ResponseId(false, ex.Message + ex.InnerException.Message, 0);
         }
     }
     #endregion
@@ -97,79 +100,118 @@ public class RoomRepository : GenericRepository, IRoomRepository
     #region Read
     public async Task<RoomDto?> ReadById(int? Id, string? lang = null)
     {
-        var _context = Context.HosRooms.Where(x => x.Id == Id);
-        if (lang == null)
-        {
-            _context = _context.Include(tranc => tranc.RoomTranslations);
-        }
-        else
-        {
-            _context = _context.Include(tranc => tranc.RoomTranslations.Where(la => la.LangCode == lang));
-        }
         try
         {
-            var entity = await _context
-                .SingleOrDefaultAsync();
-            return entity!;
+            var query = Context.HosRooms.Where(x => x.Id == Id);
+            return await query
+                .Include(type => type.RoomType)
+                .ThenInclude(n => n.RoomTypeTranslations)
+                .Select(room => new RoomDto
+                {
+                    Id = room.Id,
+                    CodeNumber = room.CodeNumber,
+                    Photo = room.Photo,
+                    IsDeleted   = room.IsDeleted,
+                    RoomTypeId = room.RoomTypeId,
+                    FloorId = room.FloorId,
+                    BuildId = room.BuildId,
+                    HospitalId = room.HospitalId,
+                    Kind = room.RoomType.RoomTypeTranslations.Where(la => la.LangCode == lang).FirstOrDefault()!.Name,
+                    RoomTranslations = lang == null ? room.RoomTranslations.ToList() : room.RoomTranslations.Where(t => t.LangCode == lang).ToList(),
+                })
+                .FirstOrDefaultAsync();
+            //return await ss;
         }
-        catch (ArgumentNullException)
+        catch (Exception)
         {
             return null;
         }
     }
 
-    public async Task<AllRoomDto?> ReadAll(bool? isBuildActive, string isActive, string? lang, int page = 1, int pageSize = Constants.PageSize)
+
+    public async Task<AllRoomDto?> ReadAll(int? roomTypeId, int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int page = 1)
     {
-        int skip = Helper.SkipValue(page, pageSize);
         IQueryable<HosRoom> query = Context.HosRooms;
 
         var total = 0;
-
-        if (isActive == "inactive")
+        if (status is not null)
         {
-            query = query.Where(h => h.IsDeleted == true);
-            total = Context.HosRooms.Count(h => h.IsDeleted == true);
+
+            if (status.Equals("inactive"))
+            {
+                query = query.Where(h => h.IsDeleted);
+            }
+            else if (status.Equals("active"))
+            {
+                query = query.Where(h => !h.IsDeleted);
+            }
         }
-        else if (isActive == "active")
-        {
-            query = query.Where(h => h.IsDeleted == false);
-            total = Context.HosRooms.Count(h => h.IsDeleted == false);
-        }
 
-
-        if (isBuildActive != null)
+        if (isBaseActive is not null)
         {
-            if (isBuildActive.Value)
-                query = query.Where(h => h.Build.IsDeleted == false);
+            if (isBaseActive.Value)
+                query = query.Where(h => !h.Floor.IsDeleted);
             else
-                query = query.Where(h => h.Build.IsDeleted == true);
+                query = query.Where(h => h.Floor.IsDeleted);
         }
 
-
-
-        if (total < 1) return null;
-        query = query.Skip(skip).Take(pageSize);
-
-        if (lang != null)
+        if (baseid.HasValue)
         {
-            query = query.Include(tranc1 => tranc1.RoomTranslations
-                         .Where(post => post.LangCode == lang)
-                         .OrderBy(post => post.Name));
+            query = query.Where(ho => ho.FloorId.Equals(baseid));
+        }
+        if (roomTypeId is not null)
+        {
+            query = query.Where(ty => ty.RoomTypeId == roomTypeId);
+        }
+
+        query = query.OrderByDescending(o => o.Id);
+
+        total = query.Count();
+        if (total < 0)
+            return null;
+
+
+        // page size
+        if (pageSize.HasValue)
+        {
+            int skip = Helper.SkipValue(page, pageSize.Value);
+            query = query.Skip(skip).Take(pageSize.Value);
+        }
+        else pageSize = total;
+
+        // lang
+        if (lang is not null)
+        {
+            query = query.Include(tranc1 => tranc1.RoomTranslations.Where(t => t.LangCode == lang));
         }
         else
         {
-            query = query
-                .Include(tranc2 => tranc2.RoomTranslations);
+            query = query.Include(tranc2 => tranc2.RoomTranslations);
         }
-        query = query.OrderByDescending(o => o.Id);
-        await query.ToListAsync();
+        // query = query.Include(rt => rt.RoomType.RoomTypeTranslations.Where(tranc => tranc.LangCode == lang)) ;
+        var result = await query
+             .Select(room => new RoomDto
+             {
+                 Id = room.Id,
+                 CodeNumber = room.CodeNumber,
+                 Photo = room.Photo,
+                 IsDeleted = room.IsDeleted,
+                 RoomTypeId = room.RoomTypeId,
+                 FloorId = room.FloorId,
+                 BuildId = room.BuildId,
+                 HospitalId = room.HospitalId,
+                 Kind = room.RoomType.RoomTypeTranslations.Where(la => la.LangCode == lang).FirstOrDefault()!.Name,
+                 RoomTranslations = lang == null ? room.RoomTranslations.ToList() : room.RoomTranslations.Where(t => t.LangCode == lang).ToList(),
+             })
+             .ToListAsync();
 
-        var all = new AllRoomDto();
-        var result = RoomDto.ToList(query);
-        all.Total = total;
-        all.Page = page;
-        all.PageSize = pageSize;
-        all.Rooms = result.ToList();
+        AllRoomDto all = new()
+        {
+            Total = total,
+            Page = page,
+            PageSize = pageSize!.Value,
+            Rooms = result
+        };
         return all;
     }
 
@@ -179,7 +221,7 @@ public class RoomRepository : GenericRepository, IRoomRepository
 
         if (!string.IsNullOrEmpty(name))
         {
-            query = query.Where(t => t.Name.Contains(name) && t.Room!= null && t.Room.IsDeleted == false);
+            query = query.Where(t => t.Name.Contains(name) && t.Room != null && t.Room.IsDeleted == false);
         }
 
         List<RoomTranslation> results = await query.ToListAsync();
