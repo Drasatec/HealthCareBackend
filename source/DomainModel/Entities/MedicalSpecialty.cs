@@ -8,7 +8,7 @@ public partial class MedicalSpecialty
 {
     public int Id { get; set; }
 
-    public string? CodeNumber { get; set; }
+    public string CodeNumber { get; set; } = string.Empty;
 
     public bool? IsActive { get; set; }
 
@@ -16,7 +16,7 @@ public partial class MedicalSpecialty
 
     public string? Reason { get; set; }
 
-    public bool? Appearance { get; set; }
+    public bool Appearance { get; set; }
 
     public string? Photo { get; set; }
 

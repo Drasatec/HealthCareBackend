@@ -55,7 +55,7 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("names", Order = 0411)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? floorId, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? floorId, [FromQuery] int? page, [FromQuery] int? pageSize )
     {
 
         Expression<Func<RoomTranslation, bool>> filterExpression;

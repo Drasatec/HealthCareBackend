@@ -174,8 +174,7 @@ public class RoomRepository : GenericRepository, IRoomRepository
         // page size
         if (pageSize.HasValue)
         {
-            int skip = Helper.SkipValue(page, pageSize.Value);
-            query = query.Skip(skip).Take(pageSize.Value);
+            GenericPagination(ref query, pageSize.Value, page);
         }
         else pageSize = total;
 

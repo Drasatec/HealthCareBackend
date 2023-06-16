@@ -4,6 +4,7 @@ using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace DataAccess.Repositories;
@@ -111,7 +112,7 @@ public class GenericRepository : IGenericRepository// where T : class
         }
     }
 
-    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter,int? page, int? pageSize, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy, params Expression<Func<TEntity, object>>[]? includes) where TEntity : class
+    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy, params Expression<Func<TEntity, object>>[]? includes) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
@@ -151,8 +152,9 @@ public class GenericRepository : IGenericRepository// where T : class
 
         if (page.HasValue && pageSize.HasValue)
         {
-            int skip = (page.Value - 1) * pageSize.Value;
-            query = query.Skip(skip).Take(pageSize.Value);
+            GenericPagination(ref query, pageSize.Value, page.Value);
+            //int skip = (page.Value - 1) * pageSize.Value;
+            //query = query.Skip(skip).Take(pageSize.Value);
         }
 
         if (selectExpression != null)
@@ -185,7 +187,7 @@ public class GenericRepository : IGenericRepository// where T : class
             return null;
         }
     }
-    
+
     public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(int? baseId, Expression<Func<TEntity, bool>> filter1, Expression<Func<TEntity, bool>>? filter2, int? page, int? pageSize) where TEntity : class
     {
         try
@@ -216,12 +218,53 @@ public class GenericRepository : IGenericRepository// where T : class
         }
     }
 
+    #region protected methods
+    protected void GenericPagination<TQuery>(ref IQueryable<TQuery> query, int? pageSize, int? page) where TQuery : class
+    {
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            int skip = (page.Value - 1) * pageSize.Value;
+            query = query.Skip(skip).Take(pageSize.Value);
+            //return true;
+        }
+        // return false;
+    }
+    protected void GenericPagination<TQuery>(ref IQueryable<TQuery> query, ref int? pageSize, ref int? page, int totalCount=0) where TQuery : class
+    {
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            //if (page.Value * pageSize > totalCount)
+            //    return;
+            int skip = (page.Value - 1) * pageSize.Value;
+            query = query.Skip(skip).Take(pageSize.Value);
+        }
+        else
+        {
+            page = 0;
+            pageSize = 0;
+        }
+    }
+    
+    protected void GenericStatus<TQuery>(ref IQueryable<TQuery> query) where TQuery : class
+    {
+        
+    }
+
+    //protected void GenericSkip(ref int? page, int? pageSize)
+    //{
+    //    page = (page - 1) * pageSize;
+    //}
+    #endregion
 
 
 
 
 
 
+    #region private methods
+    #endregion
 
 
 

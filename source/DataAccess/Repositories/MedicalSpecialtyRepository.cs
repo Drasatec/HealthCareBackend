@@ -6,11 +6,6 @@ using DomainModel.Interfaces;
 using DomainModel.Models.Floors;
 using DomainModel.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DomainModel.Models.MedicalSpecialteis;
 
 namespace DataAccess.Repositories;
@@ -124,11 +119,12 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
         }
     }
 
-    public async Task<AllMedicalSpecialtyDto?> ReadAll(int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int page = 1)
+    public async Task<AllMedicalSpecialtyDto?> ReadAll(int? baseid, bool? appearance, string? status, string? lang, int? pageSize, int? page)
     {
+
         IQueryable<MedicalSpecialty> query = Context.MedicalSpecialties;
 
-        var total = 0;
+        var totalCount = 0;
         if (status is not null)
         {
 
@@ -142,33 +138,28 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
             }
         }
 
-        //if (isBaseActive is not null)
-        //{
-        //    if (isBaseActive.Value)
-        //        query = query.Where(h => !h.Build.IsDeleted);
-        //    else
-        //        query = query.Where(h => h.Build.IsDeleted);
-        //}
+        if (appearance is not null)
+        {
+
+            if (appearance.Value)
+                query = query.Where(h => h.Appearance);
+            else
+                query = query.Where(h => !h.Appearance);
+        }
 
         if (baseid.HasValue)
         {
-            query = query.Where(ho => ho.Hospitals.Where(x=>x.Id.Equals(baseid)).SingleOrDefault().Id == baseid);
+            query = query.Where(s => s.Hospitals.Any(h => h.Id == baseid));
         }
 
         query = query.OrderByDescending(o => o.Id);
 
-        total = query.Count();
-        if (total < 0)
+        totalCount = query.Count();
+        if (totalCount < 0)
             return null;
 
-
         // page size
-        if (pageSize.HasValue)
-        {
-            int skip = Helper.SkipValue(page, pageSize.Value);
-            query = query.Skip(skip).Take(pageSize.Value);
-        }
-        else pageSize = total;
+        GenericPagination(ref query, ref pageSize, ref page, totalCount);
 
         // lang
         if (lang is not null)
@@ -184,64 +175,109 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
 
         var all = new AllMedicalSpecialtyDto();
         var result = MedicalSpecialtyDto.ToList(query);
-        all.Total = total;
+        all.Total = totalCount;
         all.Page = page;
-        all.PageSize = pageSize!.Value;
+        all.PageSize = pageSize;
         all.MedicalSpecialties = result.ToList();
         return all;
     }
 
-
-    public async Task<List<MedicalSpecialtyTranslation>> SearchByName(string name, int? buildId)
+    public async Task<AllMedicalSpecialtyDto?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
     {
-        IQueryable<MedicalSpecialtyTranslation> query = Context.MedicalSpecialtyTranslations;
+        var query = from h in Context.MedicalSpecialties
+                    join t in Context.MedicalSpecialtyTranslations on h.Id equals t.MedicalSpecialtyId
+                    where (h.CodeNumber.Contains(searchTerm) || t.Name.Contains(searchTerm))
+                          && t.LangCode == lang
+                    select new MedicalSpecialtyDto
+                    {
+                        Id = h.Id,
+                        Photo = h.Photo,
+                        CodeNumber = h.CodeNumber,
+                        Appearance = h.Appearance,
+                        IsActive = h.IsActive,
+                        IsDeleted = h.IsDeleted,
+                        MedicalSpecialtyTranslations = new List<MedicalSpecialtyTranslation> { t }
+                    };
 
-        if (!string.IsNullOrEmpty(name))
+        if (isActive.HasValue)
         {
-            query = query.Where(t => t.Name.Contains(name));
+            if (!isActive.Value)
+            {
+                query = query.Where(h => h.IsDeleted);
+            }
+            else if (isActive.Value)
+            {
+                query = query.Where(h => !h.IsDeleted);
+            }
         }
 
-        //if (buildId.HasValue)
-        //{
-        //    query = query.Where(ho => ho.Floor != null && ho.Floor.BuildId.Equals(buildId));
-        //}
+        var totalCount = await query.CountAsync();
 
-        return await query.ToListAsync();
+        GenericPagination(ref query, ref pageSize, ref page, totalCount);
+
+        var listDto = await query.OrderByDescending(h => h.Id)
+                                 .ToListAsync();
+
+        var all = new AllMedicalSpecialtyDto
+        {
+            Total = totalCount,
+            Page = page,
+            PageSize = pageSize,
+            MedicalSpecialties = listDto
+        };
+
+        return all;
     }
+    #endregion
 
-    public async Task<AllMedicalSpecialtyDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = Constants.PageSize)
+
+    /* deleted
+         public async Task<AllMedicalSpecialtyDto?> SearchByNameOrCode1(string searchTerm, string lang, int page, int pageSize)
     {
         int skip = Helper.SkipValue(page, pageSize);
         IQueryable<MedicalSpecialty> query = Context.MedicalSpecialties;
 
-        var hospitals = await Context.MedicalSpecialties
-           .Join(Context.MedicalSpecialtyTranslations,
-               h => h.Id,
-               t => t.MedicalSpecialtyId,
-               (h, t) => new { MedicalSpecialty = h, Translation = t })
-           .Where(x => (x.MedicalSpecialty.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
-           .Skip(skip).Take(pageSize)
-           .Select(x => new MedicalSpecialtyDto
-           {
-               Id = x.MedicalSpecialty.Id,
-               Photo = x.MedicalSpecialty.Photo,
-               CodeNumber = x.MedicalSpecialty.CodeNumber,
-               Appearance = x.MedicalSpecialty.Appearance,
-               IsActive = x.MedicalSpecialty.IsActive,
-               IsDeleted = x.MedicalSpecialty.IsDeleted,
-               MedicalSpecialtyTranslations = new List<MedicalSpecialtyTranslation> { x.Translation }
-           })
-           .ToListAsync();
+        var totalCount = await query
+            .Join(Context.MedicalSpecialtyTranslations,
+                h => h.Id,
+                t => t.MedicalSpecialtyId,
+                (h, t) => new { MedicalSpecialty = h, Translation = t })
+            .Where(x => (x.MedicalSpecialty.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) ||
+                        x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
+            .CountAsync();
+
+        var hospitals = await query
+            .Join(Context.MedicalSpecialtyTranslations,
+                h => h.Id,
+                t => t.MedicalSpecialtyId,
+                (h, t) => new { MedicalSpecialty = h, Translation = t })
+            .Where(x => (x.MedicalSpecialty.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) ||
+                        x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
+            .Select(x => new MedicalSpecialtyDto
+            {
+                Id = x.MedicalSpecialty.Id,
+                Photo = x.MedicalSpecialty.Photo,
+                CodeNumber = x.MedicalSpecialty.CodeNumber,
+                Appearance = x.MedicalSpecialty.Appearance,
+                IsActive = x.MedicalSpecialty.IsActive,
+                IsDeleted = x.MedicalSpecialty.IsDeleted,
+                MedicalSpecialtyTranslations = new List<MedicalSpecialtyTranslation> { x.Translation }
+            })
+            .Skip(skip)
+            .Take(pageSize)
+            .ToListAsync();
 
         var all = new AllMedicalSpecialtyDto
         {
-            Total = hospitals.Count,
+            Total = totalCount,
             Page = page,
             PageSize = pageSize,
             MedicalSpecialties = hospitals
         };
+
         return all;
     }
-
-    #endregion
+     
+     
+     */
 }

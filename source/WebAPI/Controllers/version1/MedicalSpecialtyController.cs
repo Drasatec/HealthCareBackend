@@ -53,34 +53,28 @@ public class MedicalSpecialtyController : ControllerBase
         return Ok(result);
     }
 
+
     [HttpGet("names", Order = 0911)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? hosId, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? hosId, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         Expression<Func<MedicalSpecialtyTranslation, bool>> filterExpression;
         if (hosId.HasValue)
         {
-            filterExpression = f => 
+            filterExpression = f =>
             f.LangCode == lang && f.MedicalSpecialty != null &&
-            f.MedicalSpecialty.Hospitals.Where(hos=>hos.Id == hosId).FirstOrDefault()!.Id == hosId;
+            f.MedicalSpecialty.Hospitals.Where(hos => hos.Id == hosId).FirstOrDefault()!.Id == hosId;
         }
         else
             filterExpression = f => f.LangCode == lang;
 
-        var result = await Data.MedicalSpecialteis.GenericReadAll(filterExpression, (hos) =>
-        new MedicalSpecialtyTranslation
-        {
-            Id = hos.Id,
-            LangCode = hos.LangCode,
-            Name = hos.Name,
-            MedicalSpecialtyId = hos.MedicalSpecialtyId,
-        }, page, pageSize);
+        var result = await Data.MedicalSpecialteis.GenericReadAll(filterExpression, null!, page, pageSize);
         return Ok(result);
     }
 
     [HttpGet("all", Order = 0912)]
-    public async Task<IActionResult> GetAll([FromQuery(Name = "hosid")] int? baseId, [FromQuery(Name = "isBuildActive")] bool? isBaseActive, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int page = 1, [FromQuery] string? lang = null)
+    public async Task<IActionResult> GetAll([FromQuery(Name = "hosid")] int? baseId, [FromQuery] bool? appearance, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang = null)
     {
-        var resutl = await Data.MedicalSpecialteis.ReadAll(baseId, isBaseActive, status, lang, pageSize, page);
+        var resutl = await Data.MedicalSpecialteis.ReadAll(baseId, appearance, status, lang, pageSize, page);
         if (resutl == null)
         {
             return Ok(new Response(true, "no content"));
@@ -89,18 +83,17 @@ public class MedicalSpecialtyController : ControllerBase
     }
 
     [HttpGet("search", Order = 0914)]
-    public async Task<IActionResult> Search([FromQuery(Name = "buildId")] int? baseId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> Search(bool? active, [FromQuery(Name = "hosId")] int? baseId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? lang = Constants.BaseLang)
     {
         if (!string.IsNullOrEmpty(name))
         {
-            //return Ok(await Data.MedicalSpecialteis.SearchByName(name));
             return Ok(await Data.MedicalSpecialteis.GenericSearchByText<MedicalSpecialtyTranslation>(baseId,
                 t => t.Name.Contains(name),
-                ho => ho.MedicalSpecialty != null && ho.MedicalSpecialty.Hospitals.Equals(baseId),
+                ho => ho.MedicalSpecialty != null && ho.MedicalSpecialty.Hospitals.Any(z=>z.Id == baseId),
                 page, pageSize));
         }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.MedicalSpecialteis.SearchByNameOrCode(searchTerm, lang, page, pageSize));
+            return Ok(await Data.MedicalSpecialteis.SearchByNameOrCode(active,searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }

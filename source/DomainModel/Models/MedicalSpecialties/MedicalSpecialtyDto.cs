@@ -15,7 +15,7 @@ public class MedicalSpecialtyDto
 
     public bool IsDeleted { get; set; }
 
-    public bool? Appearance { get; set; }
+    public bool Appearance { get; set; }
 
     public string? Reason { get; set; }
 

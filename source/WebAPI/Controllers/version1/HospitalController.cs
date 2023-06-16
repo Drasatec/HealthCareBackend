@@ -70,14 +70,16 @@ public class HospitalController : ControllerBase
         var result = await Data.Hospitals.GenericReadAll(filterExpression, (hos) =>
         new HospitalTranslation
         {
-            Id = hos.Id, LangCode = hos.LangCode,Name = hos.Name,
+            Id = hos.Id,
+            LangCode = hos.LangCode,
+            Name = hos.Name,
             HospitalId = hos.HospitalId,
-        },page,pageSize);
+        }, page, pageSize);
         return Ok(result);
     }
 
     [HttpGet("all", Order = 0112)]
-    public async Task<IActionResult> GetAll([FromQuery] string? status, [FromQuery] int? pageSize=null, [FromQuery] int page = 1, [FromQuery] string? lang = null)
+    public async Task<IActionResult> GetAll([FromQuery] string? status, [FromQuery] int? pageSize = null, [FromQuery] int page = 1, [FromQuery] string? lang = null)
     {
         var resutl = await Data.Hospitals.ReadAllHospitals(status, lang, pageSize, page);
         if (resutl == null)
@@ -88,7 +90,7 @@ public class HospitalController : ControllerBase
     }
 
     [HttpGet("search", Order = 0114)]
-    public async Task<IActionResult> Search([FromQuery] string? name,bool? active, [FromQuery] string? searchTerm, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> Search([FromQuery] string? name, bool? active, [FromQuery] string? searchTerm, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
     {
         if (!string.IsNullOrEmpty(name))
         {
@@ -110,7 +112,7 @@ public class HospitalController : ControllerBase
                 LangCode = hos.LangCode,
                 Name = hos.Name,
                 HospitalId = hos.HospitalId,
-            },page,pageSize);
+            }, page, pageSize);
 
 
             return Ok(result);
