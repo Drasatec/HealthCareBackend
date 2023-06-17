@@ -39,4 +39,7 @@ public partial class Hospital
     public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
 
     public virtual ICollection<MedicalSpecialty> Specialties { get; set; } = new List<MedicalSpecialty>();
+
+    //public virtual ICollection<HospitalMedicalSpecialties> HospitalSpecialties { get; set; } = new List<HospitalMedicalSpecialties>();
+
 }

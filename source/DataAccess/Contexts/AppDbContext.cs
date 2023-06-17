@@ -104,6 +104,20 @@ public class AppDbContext : DbContext
     {
         modelBuilder.UseCollation("Arabic_100_CI_AS_KS_WS_SC_UTF8");
 
+       // modelBuilder.Entity<HospitalMedicalSpecialties>()
+       //.HasKey(hs => new { hs.HospitalId, hs.SpecialtyId });
+
+       // modelBuilder.Entity<HospitalMedicalSpecialties>()
+       //     .HasOne(hs => hs.Hospital)
+       //     .WithMany(h => h.HospitalSpecialties)
+       //     .HasForeignKey(hs => hs.HospitalId);
+
+       // modelBuilder.Entity<HospitalMedicalSpecialties>()
+       //     .HasOne(hs => hs.Specialty)
+       //     .WithMany(s => s.HospitalSpecialties)
+       //     .HasForeignKey(hs => hs.SpecialtyId);
+
+
         modelBuilder.Entity<Booking>(entity =>
         {
             entity.ToTable("Booking");
