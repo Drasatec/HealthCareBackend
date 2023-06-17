@@ -5,8 +5,8 @@ namespace DomainModel.Models.Hospitals;
 
 public  class AllHospitalsDto
 {
-    public int Total { get; set; } 
-    public int Page { get; set; } = 1;
-    public int PageSize { get; set; } = Constants.PageSize;
+    public int Total { get; set; }
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
     public List<HospitalDto>? Hospitals { get; set; } = new List<HospitalDto>();
 }

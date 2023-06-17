@@ -6,6 +6,7 @@ using DomainModel.Interfaces;
 using DomainModel.Models;
 using DomainModel.Models.Buildings;
 using DomainModel.Models.Floors;
+using DomainModel.Models.Rooms;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
@@ -119,7 +120,7 @@ public class FloorRepository : GenericRepository, IFloorRepository
         }
     }
 
-    public async Task<AllFloorDto?> ReadAll(int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int page = 1)
+    public async Task<AllFloorDto?> ReadAll(int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int? page)
     {
         IQueryable<HosFloor> query = Context.HosFloors;
 
@@ -158,11 +159,7 @@ public class FloorRepository : GenericRepository, IFloorRepository
 
 
         // page size
-        if (pageSize.HasValue)
-        {
-            GenericPagination(ref query, pageSize.Value, page);
-        }
-        else pageSize = total;
+        GenericPagination(ref query, ref pageSize, ref page, total);
 
         // lang
         if (lang is not null)
@@ -180,7 +177,7 @@ public class FloorRepository : GenericRepository, IFloorRepository
         var result = FloorDto.ToList(query);
         all.Total = total;
         all.Page = page;
-        all.PageSize = pageSize!.Value;
+        all.PageSize = pageSize;
         all.Floors = result.ToList();
         return all;
     }
@@ -203,33 +200,48 @@ public class FloorRepository : GenericRepository, IFloorRepository
         return  await query.ToListAsync();
     }
 
-    public async Task<AllFloorDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = Constants.PageSize)
+    public async Task<AllFloorDto?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
     {
-        int skip = Helper.SkipValue(page, pageSize);
-        IQueryable<HosFloor> query = Context.HosFloors;
+        var query = from h in Context.HosFloors 
+                    join t in Context.FloorTranslations on h.Id equals t.FloorId
+                    where (h.CodeNumber.Contains(searchTerm) || t.Name.Contains(searchTerm))
+                          && t.LangCode == lang
+                    select new FloorDto
+                    {
+                        Id = h.Id,
+                        Photo = h.Photo,
+                        CodeNumber = h.CodeNumber,
+                        IsDeleted = h.IsDeleted,
+                        HospitalId = h.HospitalId,
+                        BuildId = h.BuildId,
+                        CreateOn = h.CreateOn,
+                        FloorTranslations= new List<FloorTranslation> { t }
+                    };
 
-        var hospitals = await Context.HosFloors
-           .Join(Context.FloorTranslations,
-               h => h.Id,
-               t => t.FloorId,
-               (h, t) => new { HosFloor = h, Translation = t })
-           .Where(x => (x.HosFloor.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
-           .Skip(skip).Take(pageSize)
-           .Select(x => new FloorDto
-           {
-               Id = x.HosFloor.Id,
-               Photo = x.HosFloor.Photo,
-               CodeNumber = x.HosFloor.CodeNumber,
-               FloorTranslations = new List<FloorTranslation> { x.Translation }
-           })
-           .ToListAsync();
+        if (isActive.HasValue)
+        {
+            if (!isActive.Value)
+            {
+                query = query.Where(h => h.IsDeleted);
+            }
+            else if (isActive.Value)
+            {
+                query = query.Where(h => !h.IsDeleted);
+            }
+        }
+
+        var totalCount = await query.CountAsync();
+
+        GenericPagination(ref query, ref pageSize, ref page, totalCount);
+
+        var listDto = await query.OrderByDescending(h => h.Id).ToListAsync();
 
         var all = new AllFloorDto
         {
-            Total = hospitals.Count,
+            Total = totalCount,
             Page = page,
             PageSize = pageSize,
-            Floors = hospitals
+            Floors = listDto
         };
         return all;
     }

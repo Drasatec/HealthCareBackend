@@ -10,10 +10,17 @@ namespace DomainModel.Interfaces
     public interface IUnitOfWork : IDisposable
     {
         IHospitalRepository Hospitals { get; }
+
         IBuildingRepository Buildings { get; }
+
         IFloorRepository Floors { get; }
+
         IRoomRepository Rooms { get; }
+
         IMedicalSpecialtyRepository MedicalSpecialteis { get; }
+
+        IClinicRepository Clinics { get; }
+
         int Complete();
     }
 }

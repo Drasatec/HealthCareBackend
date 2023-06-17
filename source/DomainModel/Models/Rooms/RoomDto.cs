@@ -22,7 +22,7 @@ public class RoomDto
 
     //public bool? IsActive { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     public int HospitalId { get; set; }
 

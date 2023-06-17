@@ -21,17 +21,17 @@ public partial class PeriodWorkDoctorClinic
 
     public byte? OnDay { get; set; }
 
+    public virtual Hospital? Hospital { get; set; }
+
     public virtual HosBuilding? Build { get; set; }
+
+    public virtual HosRoom? Room { get; set; }
+
+    public virtual HosFloor? Floor { get; set; }
 
     public virtual Clinic Clinic { get; set; } = null!;
 
     public virtual Doctor Doctor { get; set; } = null!;
-
-    public virtual HosFloor? Floor { get; set; }
-
-    public virtual Hospital? Hospital { get; set; }
-
-    public virtual HosRoom? Room { get; set; }
 
     public virtual WorkingPeriod WorkingPeriod { get; set; } = null!;
 }

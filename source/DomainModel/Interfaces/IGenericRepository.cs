@@ -21,6 +21,6 @@ namespace DomainModel.Interfaces
         Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy, params Expression<Func<TEntity, object>>[] includes) where TEntity : class;
         Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> selectExpression, int? page, int? pageSize) where TEntity : class;
         Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> selectExpression, int? page, int? pageSize) where TEntity : class;
-        Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(int? baseId, Expression<Func<TEntity, bool>> filter1, Expression<Func<TEntity, bool>>? filter2, int? page, int? pageSize) where TEntity : class;
+        Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(int? parentId, Expression<Func<TEntity, bool>> filter1, Expression<Func<TEntity, bool>>? filter2, int? page, int? pageSize) where TEntity : class;
     }
 }

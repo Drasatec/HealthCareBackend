@@ -123,7 +123,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         }
     }
 
-    public async Task<AllHospitalsDto?> ReadAllHospitals(string? status, string? lang, int? pageSize, int page = 1)
+    public async Task<AllHospitalsDto?> ReadAllHospitals(string? status, string? lang, int? pageSize, int? page)
     {
         IQueryable<Hospital> query = Context.Hospitals;
 
@@ -148,12 +148,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
 
 
         // page size
-        if (pageSize.HasValue)
-        {
-            int skip = Helper.SkipValue(page, pageSize.Value);
-            query = query.Skip(skip).Take(pageSize.Value);
-        }
-        else pageSize = total;
+        GenericPagination(ref query, ref pageSize, ref page, total);
 
         // lang
         if (lang is not null)
@@ -171,7 +166,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         var result = HospitalDto.ToList(query);
         all.Total = total;
         all.Page = page;
-        all.PageSize = pageSize!.Value;
+        all.PageSize = pageSize;
         all.Hospitals = result.ToList();
         return all;
     }
@@ -197,36 +192,45 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         }
     }
 
-    public async Task<AllHospitalsDto?> SearchByHospitalNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = 10)
+    public async Task<AllHospitalsDto?> SearchByHospitalNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
     {
-        int skip = Helper.SkipValue(page, pageSize);
-        IQueryable<Hospital> query = Context.Hospitals;
+        var query = from h in Context.Hospitals
+                    join t in Context.HospitalTranslations on h.Id equals t.HospitalId
+                    where (h.CodeNumber.Contains(searchTerm) || t.Name.Contains(searchTerm))
+                          && t.LangCode == lang
+                    select new HospitalDto
+                    {
+                        Id = h.Id,
+                        Photo = h.Photo,
+                        CodeNumber = h.CodeNumber,
+                        IsDeleted = h.IsDeleted,
+                        HospitalTrasnlations = new List<HospitalTranslation> { t }
+                    };
 
-        var hospitals = await Context.Hospitals
-           .Join(Context.HospitalTranslations,
-               h => h.Id,
-               t => t.HospitalId,
-               (h, t) => new { Hospital = h, Translation = t })
-           .Where(x => (x.Hospital.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
-           .Skip(skip).Take(pageSize)
-           .Select(x => new HospitalDto
-           {
-               Id = x.Hospital.Id,
-               Photo = x.Hospital.Photo,
-               CodeNumber = x.Hospital.CodeNumber,
-               Email = x.Hospital.Email,
-               WhatsAppNumber = x.Hospital.WhatsAppNumber,
-               IsDeleted = x.Hospital.IsDeleted,
-               HospitalTrasnlations = new List<HospitalTranslation> { x.Translation }
-           })
-           .ToListAsync();
+        if (isActive.HasValue)
+        {
+            if (!isActive.Value)
+            {
+                query = query.Where(h => h.IsDeleted);
+            }
+            else if (isActive.Value)
+            {
+                query = query.Where(h => !h.IsDeleted);
+            }
+        }
+
+        var totalCount = await query.CountAsync();
+
+        GenericPagination(ref query, ref pageSize, ref page, totalCount);
+
+        var listDto = await query.OrderByDescending(h => h.Id).ToListAsync();
 
         var all = new AllHospitalsDto
         {
-            Total = hospitals.Count,
+            Total = totalCount,
             Page = page,
             PageSize = pageSize,
-            Hospitals = hospitals
+            Hospitals = listDto
         };
         return all;
     }

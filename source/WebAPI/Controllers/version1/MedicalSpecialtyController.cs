@@ -7,7 +7,7 @@ using DomainModel.Helpers;
 
 namespace WebAPI.Controllers.version1;
 
-[Route("api/[controller]", Order = 09)]
+[Route("api/[controller]", Order = 08)]
 [ApiController]
 [ApiVersion("1.0")]
 public class MedicalSpecialtyController : ControllerBase
@@ -19,9 +19,12 @@ public class MedicalSpecialtyController : ControllerBase
         Data = data;
     }
 
-    // ============================= post ============================= 1
 
-    [HttpPost("add", Order = 0901)]
+
+    // ============================= post ============================= 
+
+
+    [HttpPost("add", Order = 0801)]
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] MedicalSpecialtyDto model)
     {
 
@@ -41,9 +44,11 @@ public class MedicalSpecialtyController : ControllerBase
         return Created("fawzy", response);
     }
 
-    // ============================= get ============================= 4
 
-    [HttpGet(Order = 0901)]
+    // ============================= get ============================= 
+
+
+    [HttpGet(Order = 0801)]
     public async Task<IActionResult> GetById([FromQuery] int id, [FromQuery] string? lang)
     {
         if (id < 1)
@@ -54,7 +59,8 @@ public class MedicalSpecialtyController : ControllerBase
     }
 
 
-    [HttpGet("names", Order = 0911)]
+
+    [HttpGet("names", Order = 0811)]
     public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? hosId, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         Expression<Func<MedicalSpecialtyTranslation, bool>> filterExpression;
@@ -71,10 +77,12 @@ public class MedicalSpecialtyController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("all", Order = 0912)]
-    public async Task<IActionResult> GetAll([FromQuery(Name = "hosid")] int? baseId, [FromQuery] bool? appearance, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang = null)
+
+
+    [HttpGet("all", Order = 0812)]
+    public async Task<IActionResult> GetAll([FromQuery(Name = "hosid")] int? parentId, [FromQuery] bool? appearance, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
     {
-        var resutl = await Data.MedicalSpecialteis.ReadAll(baseId, appearance, status, lang, pageSize, page);
+        var resutl = await Data.MedicalSpecialteis.ReadAll(parentId, appearance, status, lang, pageSize, page);
         if (resutl == null)
         {
             return Ok(new Response(true, "no content"));
@@ -82,14 +90,16 @@ public class MedicalSpecialtyController : ControllerBase
         return Ok(resutl);
     }
 
-    [HttpGet("search", Order = 0914)]
-    public async Task<IActionResult> Search(bool? active, [FromQuery(Name = "hosId")] int? baseId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? lang = Constants.BaseLang)
+
+
+    [HttpGet("search", Order = 0814)]
+    public async Task<IActionResult> Search([FromQuery(Name = "hosId")] int? parentId, [FromQuery] string? searchTerm, [FromQuery] string? name, bool? active, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? lang)
     {
         if (!string.IsNullOrEmpty(name))
         {
-            return Ok(await Data.MedicalSpecialteis.GenericSearchByText<MedicalSpecialtyTranslation>(baseId,
+            return Ok(await Data.MedicalSpecialteis.GenericSearchByText<MedicalSpecialtyTranslation>(parentId,
                 t => t.Name.Contains(name),
-                ho => ho.MedicalSpecialty != null && ho.MedicalSpecialty.Hospitals.Any(z=>z.Id == baseId),
+                ho => ho.MedicalSpecialty != null && ho.MedicalSpecialty.Hospitals.Any(z=>z.Id == parentId),
                 page, pageSize));
         }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
@@ -98,9 +108,11 @@ public class MedicalSpecialtyController : ControllerBase
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }
 
-    // ============================= put ============================= 4
 
-    [HttpPut("edit/{id}", Order = 0920)]
+    // ============================= put ============================= 
+
+
+    [HttpPut("edit/{id}", Order = 0820)]
     public async Task<IActionResult> UpdateSingleWithImage([FromForm] IFormFile? file, [FromForm] MedicalSpecialtyDto model, int id)
     {
         Response<MedicalSpecialtyDto?> response;
@@ -118,7 +130,9 @@ public class MedicalSpecialtyController : ControllerBase
         return Created("https//fawzy", response);
     }
 
-    [HttpPut("edit-translations/{buildId?}", Order = 0922)]
+
+
+    [HttpPut("edit-translations/{buildId?}", Order = 0822)]
     public async Task<IActionResult> Add_EditTranslations([FromForm] List<MedicalSpecialtyTranslation> translations, int? buildId)
     {
         Response response;
@@ -135,7 +149,9 @@ public class MedicalSpecialtyController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpPut("deactivate", Order = 0925)]
+
+
+    [HttpPut("deactivate", Order = 0825)]
     public async Task<IActionResult> EditSingleProp([FromQuery] int? id, [FromQuery] string status)
     {
         if (!id.HasValue)
@@ -151,13 +167,15 @@ public class MedicalSpecialtyController : ControllerBase
         {
             return BadRequest(new Response(false, "The status field in this context allows the values 'active' or 'inactive' "));
         }
-        MedicalSpecialty hospital = new() { Id = id.Value, IsDeleted = isDeleted };
-        return Ok(await Data.MedicalSpecialteis.GenericUpdateSinglePropertyById(id.Value, hospital, p => p.IsDeleted));
+        MedicalSpecialty entity = new() { Id = id.Value, IsDeleted = isDeleted };
+        return Ok(await Data.MedicalSpecialteis.GenericUpdateSinglePropertyById(id.Value, entity, p => p.IsDeleted));
     }
 
-    // ============================= delete ============================= 2
 
-    [HttpDelete("delete-translat", Order = 0930)]
+    // ============================= delete ============================= 
+
+
+    [HttpDelete("delete-translat", Order = 0830)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)
     {
         MedicalSpecialtyTranslation entity = new();

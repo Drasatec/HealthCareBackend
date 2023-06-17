@@ -90,7 +90,7 @@ public class HospitalController : ControllerBase
     }
 
     [HttpGet("search", Order = 0114)]
-    public async Task<IActionResult> Search([FromQuery] string? name, bool? active, [FromQuery] string? searchTerm, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, bool? active, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? lang)
     {
         if (!string.IsNullOrEmpty(name))
         {
@@ -118,7 +118,7 @@ public class HospitalController : ControllerBase
             return Ok(result);
         }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.Hospitals.SearchByHospitalNameOrCode(searchTerm, lang, page, pageSize));
+            return Ok(await Data.Hospitals.SearchByHospitalNameOrCode(active, searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }

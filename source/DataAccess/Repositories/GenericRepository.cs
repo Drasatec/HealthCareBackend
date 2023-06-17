@@ -152,9 +152,7 @@ public class GenericRepository : IGenericRepository// where T : class
 
         if (page.HasValue && pageSize.HasValue)
         {
-            GenericPagination(ref query, pageSize.Value, page.Value);
-            //int skip = (page.Value - 1) * pageSize.Value;
-            //query = query.Skip(skip).Take(pageSize.Value);
+            GenericPagination(ref query, ref pageSize, ref page);
         }
 
         if (selectExpression != null)
@@ -188,7 +186,7 @@ public class GenericRepository : IGenericRepository// where T : class
         }
     }
 
-    public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(int? baseId, Expression<Func<TEntity, bool>> filter1, Expression<Func<TEntity, bool>>? filter2, int? page, int? pageSize) where TEntity : class
+    public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(int? parentId, Expression<Func<TEntity, bool>> filter1, Expression<Func<TEntity, bool>>? filter2, int? page, int? pageSize) where TEntity : class
     {
         try
         {
@@ -199,7 +197,7 @@ public class GenericRepository : IGenericRepository// where T : class
                 query = query.Where(filter1);
             }
 
-            if (baseId.HasValue && filter2 != null)
+            if (parentId.HasValue && filter2 != null)
             {
                 query = query.Where(filter2);
             }
@@ -218,25 +216,17 @@ public class GenericRepository : IGenericRepository// where T : class
         }
     }
 
-    #region protected methods
-    protected void GenericPagination<TQuery>(ref IQueryable<TQuery> query, int? pageSize, int? page) where TQuery : class
-    {
 
-        if (page.HasValue && pageSize.HasValue)
-        {
-            int skip = (page.Value - 1) * pageSize.Value;
-            query = query.Skip(skip).Take(pageSize.Value);
-            //return true;
-        }
-        // return false;
-    }
-    protected void GenericPagination<TQuery>(ref IQueryable<TQuery> query, ref int? pageSize, ref int? page, int totalCount=0) where TQuery : class
+    #region protected methods
+    protected static void GenericPagination<TQuery>(ref IQueryable<TQuery> query, ref int? pageSize, ref int? page, int totalCount = 0) where TQuery : class
     {
 
         if (page.HasValue && pageSize.HasValue)
         {
             //if (page.Value * pageSize > totalCount)
-            //    return;
+            //{
+
+            //}
             int skip = (page.Value - 1) * pageSize.Value;
             query = query.Skip(skip).Take(pageSize.Value);
         }
@@ -246,15 +236,10 @@ public class GenericRepository : IGenericRepository// where T : class
             pageSize = 0;
         }
     }
-    
-    protected void GenericStatus<TQuery>(ref IQueryable<TQuery> query) where TQuery : class
-    {
-        
-    }
 
-    //protected void GenericSkip(ref int? page, int? pageSize)
+    //protected static void GenericStatus<TQuery>(ref IQueryable<TQuery> query) where TQuery : class
     //{
-    //    page = (page - 1) * pageSize;
+
     //}
     #endregion
 

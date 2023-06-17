@@ -1,24 +1,23 @@
 ﻿using DataAccess.Contexts;
-using DomainModel.Entities.TranslationModels;
 using DomainModel.Entities;
+using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
-using DomainModel.Models.Floors;
 using DomainModel.Models;
+using DomainModel.Models.Dtos;
 using Microsoft.EntityFrameworkCore;
-using DomainModel.Models.MedicalSpecialteis;
 
 namespace DataAccess.Repositories;
 
-public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRepository
+internal class ClinicRepository : GenericRepository, IClinicRepository
 {
-    public MedicalSpecialtyRepository(AppDbContext context) : base(context) { }
+    public ClinicRepository(AppDbContext context) : base(context) { }
 
 
     #region Add
-    public async Task<ResponseId> CreateWithImage(MedicalSpecialtyDto dto, Stream? image = null)
+    public async Task<ResponseId> CreateWithImage(ClinicDto dto, Stream? image = null)
     {
-        var entity = (MedicalSpecialty)dto;
+        var entity = (Clinic)dto;
 
         try
         {
@@ -31,10 +30,10 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
             else
                 entity.Photo = null;
 
-            var result = await Context.MedicalSpecialties.AddAsync(entity);
+            var result = await Context.Clinics.AddAsync(entity);
 
             if (string.IsNullOrEmpty(entity.CodeNumber))
-                entity.CodeNumber = "bui-" + Context.MedicalSpecialties.Count().ToString();
+                entity.CodeNumber = "clinic-" + Context.Clinics.Count().ToString();
             var row = await Context.SaveChangesAsync();
             if (row > 0)
             {
@@ -44,19 +43,19 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
         }
         catch (Exception ex)
         {
-            return new ResponseId(false, ex.Message, 0);
+            return new ResponseId(false, ex.Message+"____and____"+ ex.InnerException?.Message, 0);
         }
     }
     #endregion
 
 
     #region Update
-    public async Task<Response<MedicalSpecialtyDto?>> Update(MedicalSpecialtyDto dto, int id, Stream? image = null)
+    public async Task<Response<ClinicDto?>> Update(ClinicDto dto, int id, Stream? image = null)
     {
-        Response<MedicalSpecialtyDto?> respons;
+        Response<ClinicDto?> respons;
         try
         {
-            var current = Context.MedicalSpecialties.Find(id);
+            var current = Context.Clinics.Find(id);
             if (current == null)
                 return respons = new(false, $"id: {id} is not found");
             dto.Id = id;
@@ -96,16 +95,16 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
 
 
     #region Read
-    public async Task<MedicalSpecialtyDto?> ReadById(int? Id, string? lang = null)
+    public async Task<ClinicDto?> ReadById(int? Id, string? lang = null)
     {
-        var _context = Context.MedicalSpecialties.Where(x => x.Id == Id);
+        var _context = Context.Clinics.Where(x => x.Id == Id);
         if (lang == null)
         {
-            _context = _context.Include(tranc => tranc.MedicalSpecialtyTranslations);
+            _context = _context.Include(tranc => tranc.ClinicTranslations);
         }
         else
         {
-            _context = _context.Include(tranc => tranc.MedicalSpecialtyTranslations.Where(la => la.LangCode == lang));
+            _context = _context.Include(tranc => tranc.ClinicTranslations.Where(la => la.LangCode == lang));
         }
         try
         {
@@ -120,10 +119,10 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
     }
 
 
-    public async Task<PagedResponse<MedicalSpecialtyDto>?> ReadAll(int? baseid, bool? appearance, string? status, string? lang, int? pageSize, int? page)
+    public async Task<PagedResponse<ClinicDto>?> ReadAll(int? baseid, bool? appearance, string? status, string? lang, int? pageSize, int? page)
     {
 
-        IQueryable<MedicalSpecialty> query = Context.MedicalSpecialties;
+        IQueryable<Clinic> query = Context.Clinics;
 
         var totalCount = 0;
         if (status is not null)
@@ -150,7 +149,7 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
 
         if (baseid.HasValue)
         {
-            query = query.Where(s => s.Hospitals.Any(h => h.Id == baseid));
+            query = query.Where(s => s.SpecialtyId == baseid);
         }
 
         query = query.OrderByDescending(o => o.Id);
@@ -165,17 +164,17 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
         // lang
         if (lang is not null)
         {
-            query = query.Include(tranc1 => tranc1.MedicalSpecialtyTranslations.Where(post => post.LangCode == lang));
+            query = query.Include(tranc1 => tranc1.ClinicTranslations.Where(post => post.LangCode == lang));
         }
         else
         {
-            query = query.Include(tranc2 => tranc2.MedicalSpecialtyTranslations);
+            query = query.Include(tranc2 => tranc2.ClinicTranslations);
         }
 
         await query.ToListAsync();
 
-        var result = MedicalSpecialtyDto.ToList(query);
-        var all = new PagedResponse<MedicalSpecialtyDto>
+        var result = ClinicDto.ToList(query);
+        var all = new PagedResponse<ClinicDto>
         {
             Total = totalCount,
             Page = page,
@@ -187,13 +186,13 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
     }
 
 
-    public async Task<PagedResponse<MedicalSpecialtyDto>?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
+    public async Task<PagedResponse<ClinicDto>?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
     {
-        var query = from h in Context.MedicalSpecialties
-                    join t in Context.MedicalSpecialtyTranslations on h.Id equals t.MedicalSpecialtyId
+        var query = from h in Context.Clinics
+                    join t in Context.ClinicTranslations on h.Id equals t.ClinicId
                     where (h.CodeNumber.Contains(searchTerm) || t.Name.Contains(searchTerm))
                           && t.LangCode == lang
-                    select new MedicalSpecialtyDto
+                    select new ClinicDto
                     {
                         Id = h.Id,
                         Photo = h.Photo,
@@ -201,7 +200,7 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
                         Appearance = h.Appearance,
                         IsActive = h.IsActive,
                         IsDeleted = h.IsDeleted,
-                        MedicalSpecialtyTranslations = new List<MedicalSpecialtyTranslation> { t }
+                        ClinicTranslations = new List<ClinicTranslation> { t }
                     };
 
         if (isActive.HasValue)
@@ -223,7 +222,7 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
         var listDto = await query.OrderByDescending(h => h.Id)
                                  .ToListAsync();
 
-        var all = new PagedResponse<MedicalSpecialtyDto>
+        var all = new PagedResponse<ClinicDto>
         {
             Total = totalCount,
             Page = page,
@@ -236,53 +235,4 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
     #endregion
 
 
-    /* deleted
-         public async Task<AllMedicalSpecialtyDto?> SearchByNameOrCode1(string searchTerm, string lang, int page, int pageSize)
-    {
-        int skip = Helper.SkipValue(page, pageSize);
-        IQueryable<MedicalSpecialty> query = Context.MedicalSpecialties;
-
-        var totalCount = await query
-            .Join(Context.MedicalSpecialtyTranslations,
-                h => h.Id,
-                t => t.MedicalSpecialtyId,
-                (h, t) => new { MedicalSpecialty = h, Translation = t })
-            .Where(x => (x.MedicalSpecialty.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) ||
-                        x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
-            .CountAsync();
-
-        var hospitals = await query
-            .Join(Context.MedicalSpecialtyTranslations,
-                h => h.Id,
-                t => t.MedicalSpecialtyId,
-                (h, t) => new { MedicalSpecialty = h, Translation = t })
-            .Where(x => (x.MedicalSpecialty.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) ||
-                        x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
-            .Select(x => new MedicalSpecialtyDto
-            {
-                Id = x.MedicalSpecialty.Id,
-                Photo = x.MedicalSpecialty.Photo,
-                CodeNumber = x.MedicalSpecialty.CodeNumber,
-                Appearance = x.MedicalSpecialty.Appearance,
-                IsActive = x.MedicalSpecialty.IsActive,
-                IsDeleted = x.MedicalSpecialty.IsDeleted,
-                MedicalSpecialtyTranslations = new List<MedicalSpecialtyTranslation> { x.Translation }
-            })
-            .Skip(skip)
-            .Take(pageSize)
-            .ToListAsync();
-
-        var all = new AllMedicalSpecialtyDto
-        {
-            Total = totalCount,
-            Page = page,
-            PageSize = pageSize,
-            MedicalSpecialties = hospitals
-        };
-
-        return all;
-    }
-     
-     
-     */
 }

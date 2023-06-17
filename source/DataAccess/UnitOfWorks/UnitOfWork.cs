@@ -20,7 +20,7 @@ namespace DataAccess.UnitOfWorks
         public IFloorRepository Floors { get; private set; }
         public IRoomRepository Rooms { get; private set; }
         public IMedicalSpecialtyRepository MedicalSpecialteis{ get; private set; }
-
+        public IClinicRepository Clinics { get; private set; }
 
         public UnitOfWork(AppDbContext context )
         {
@@ -30,6 +30,7 @@ namespace DataAccess.UnitOfWorks
             Floors = new FloorRepository(Context);
             Rooms = new RoomRepository(Context);
             MedicalSpecialteis = new MedicalSpecialtyRepository(Context);
+            Clinics = new ClinicRepository(Context);
         }
 
 

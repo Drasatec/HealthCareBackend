@@ -11,7 +11,7 @@ namespace DomainModel.Models.Rooms;
 public class AllRoomDto
 {
     public int Total { get; set; }
-    public int Page { get; set; } = 1;
-    public int PageSize { get; set; } = Constants.PageSize;
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
     public List<RoomDto>? Rooms { get; set; } = new List<RoomDto>();
 }

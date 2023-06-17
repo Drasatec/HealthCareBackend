@@ -21,7 +21,8 @@ public class BuildingController : ControllerBase
     }
 
 
-    // ============================= post ============================= 1
+    // ============================= post ============================= 
+
 
     [HttpPost("building/add", Order = 0201)]
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] BuildingDto model)
@@ -43,7 +44,10 @@ public class BuildingController : ControllerBase
         return Created("fawzy", response);
     }
 
-    // ============================= get ============================= 4
+
+
+    // ============================= get =============================
+
 
     [HttpGet("building/", Order = 0201)]
     public async Task<IActionResult> GetById([FromQuery] int id, [FromQuery] string? lang)
@@ -54,6 +58,7 @@ public class BuildingController : ControllerBase
         var result = await Data.Buildings.ReadById(id, lang);
         return Ok(result);
     }
+
 
     [HttpGet("building/names", Order = 0211)]
     public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? hosId, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
@@ -78,6 +83,7 @@ public class BuildingController : ControllerBase
         return Ok(result);
     }
 
+
     [HttpGet("buildings/all", Order = 0212)]
     public async Task<IActionResult> GetAll([FromQuery]int? hosId, [FromQuery] bool? isHosActive, [FromQuery] string? status, [FromQuery] int ? pageSize , [FromQuery] int page = 1, [FromQuery] string? lang = null)
     {
@@ -91,24 +97,28 @@ public class BuildingController : ControllerBase
 
 
     [HttpGet("buildings/search", Order = 0214)]
-    public async Task<IActionResult> Search([FromQuery(Name = "hosId")] int? baseId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> Search([FromQuery(Name = "hosId")] int? parentId, [FromQuery] string? searchTerm, [FromQuery] string? name, bool? active, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? lang)
     {
         if (!string.IsNullOrEmpty(name))
         {
             return Ok(await Data.Buildings.GenericSearchByText<BuildingTranslation>(
-                baseId,
+                parentId,
                 t => t.Name.Contains(name),
-                ho => ho.Buildeing != null && ho.Buildeing.HospitalId.Equals(baseId),
+                ho => ho.Buildeing != null && ho.Buildeing.HospitalId.Equals(parentId),
                 page, pageSize));
 
         }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.Floors.SearchByNameOrCode(searchTerm, lang, page, pageSize));
+            return Ok(await Data.Buildings.SearchByNameOrCode(active,searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }
 
-    // ============================= put ============================= 4
+    
+    
+    // ============================= put ============================= 
+
+
 
     [HttpPut("building/edit/{id}", Order = 0220)]
     public async Task<IActionResult> UpdateSingleWithImage([FromForm] IFormFile? file, [FromForm] BuildingDto model, int id)
@@ -128,6 +138,7 @@ public class BuildingController : ControllerBase
         return Created("https//fawzy", response);
     }
 
+
     [HttpPut("building/edit-translations/{buildId?}", Order = 0222)]
     public async Task<IActionResult> Add_EditTranslations([FromForm] List<BuildingTranslation> translations, int? buildId)
     {
@@ -145,6 +156,7 @@ public class BuildingController : ControllerBase
         return BadRequest(response);
     }
 
+
     [HttpPut("building/deactivate", Order = 0225)]
     public async Task<IActionResult> EditSingleProp([FromQuery] int? id, [FromQuery] string status)
     {
@@ -161,11 +173,14 @@ public class BuildingController : ControllerBase
         {
             return BadRequest(new Response(false, "The status field in this context allows the values 'active' or 'inactive' "));
         }
-        HosBuilding hospital = new() { Id = id.Value, IsDeleted = isDeleted };
-        return Ok(await Data.Buildings.GenericUpdateSinglePropertyById(id.Value, hospital, p => p.IsDeleted));
+        HosBuilding entity = new() { Id = id.Value, IsDeleted = isDeleted };
+        return Ok(await Data.Buildings.GenericUpdateSinglePropertyById(id.Value, entity, p => p.IsDeleted));
     }
 
-    // ============================= delete ============================= 2
+
+
+    // ============================= delete ============================= 
+
 
     [HttpDelete("building/delete-translat", Order = 0230)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)

@@ -5,6 +5,7 @@ using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
 using DomainModel.Models.Buildings;
+using DomainModel.Models.Floors;
 using Microsoft.EntityFrameworkCore;
 namespace DataAccess.Repositories;
 
@@ -119,7 +120,7 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
         }
     }
 
-    public async Task<AllBuildingDto?> ReadAll(int? hosId, bool? isHosActive, string? status, string? lang, int? pageSize, int page = 1)
+    public async Task<AllBuildingDto?> ReadAll(int? hosId, bool? isHosActive, string? status, string? lang, int? pageSize, int? page)
     {
         IQueryable<HosBuilding> query = Context.HosBuildings;
 
@@ -138,11 +139,6 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
                 //total = Context.HosBuildings.Count(h => !h.IsDeleted);
             }
         }
-        //else
-        //    total = Context.HosBuildings.Count();
-
-        //if (total < 1) 
-        //    return null;
 
         if (isHosActive is not null)
         {
@@ -165,11 +161,7 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
 
 
         // page size
-        if (pageSize.HasValue)
-        {
-            GenericPagination(ref query, pageSize.Value, page);
-        }
-        else pageSize = total;
+        GenericPagination(ref query, ref pageSize, ref page, total);
 
         // lang
         if (lang is not null)
@@ -187,57 +179,53 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
         var result = BuildingDto.ToList(query);
         all.Total = total;
         all.Page = page;
-        all.PageSize = pageSize!.Value;
+        all.PageSize = pageSize;
         all.Buildings = result.ToList();
         return all;
     }
 
-    public async Task<List<BuildingTranslation>> SearchByName(string name, int? hosId)
-    {
-        IQueryable<BuildingTranslation> query = Context.BuildingTranslations;
 
-        if (!string.IsNullOrEmpty(name))
+
+    public async Task<AllBuildingDto?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
+    {
+        var query = from h in Context.HosBuildings
+                    join t in Context.BuildingTranslations on h.Id equals t.BuildeingId
+                    where (h.CodeNumber.Contains(searchTerm) || t.Name.Contains(searchTerm))
+                          && t.LangCode == lang
+                    select new BuildingDto
+                    {
+                        Id = h.Id,
+                        Photo = h.Photo,
+                        CodeNumber = h.CodeNumber,
+                        IsDeleted = h.IsDeleted,
+                        HospitalId = h.HospitalId,
+                        BuildingTranslation = new List<BuildingTranslation> { t }
+                    };
+
+        if (isActive.HasValue)
         {
-            query = query.Where(t => t.Name.Contains(name));
-            //query = query.Where(t => t.Name.Contains(name)&& t.Buildeing!= null && t.Buildeing.IsDeleted == false);
+            if (!isActive.Value)
+            {
+                query = query.Where(h => h.IsDeleted);
+            }
+            else if (isActive.Value)
+            {
+                query = query.Where(h => !h.IsDeleted);
+            }
         }
 
-        if (hosId.HasValue)
-        {
-            query = query.Where(ho => ho.Buildeing != null && ho.Buildeing.HospitalId.Equals(hosId));
-        }
+        var totalCount = await query.CountAsync();
 
-        return await query.ToListAsync();
-    }
+        GenericPagination(ref query, ref pageSize, ref page, totalCount);
 
-    public async Task<AllBuildingDto?> SearchByNameOrCode(string searchTerm, string lang = "ar", int page = 1, int pageSize = Constants.PageSize)
-    {
-        int skip = Helper.SkipValue(page, pageSize);
-
-        var query = await Context.HosBuildings
-           .Join(Context.BuildingTranslations,
-               h => h.Id,
-               t => t.BuildeingId,
-               (h, t) => new { HosBuilding = h, Translation = t })
-
-           .Where(x => (x.HosBuilding.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
-           .Skip(skip).Take(pageSize)
-           .Select(x => new BuildingDto
-           {
-               Id = x.HosBuilding.Id,
-               Photo = x.HosBuilding.Photo,
-               CodeNumber = x.HosBuilding.CodeNumber,
-               HospitalId = x.HosBuilding.HospitalId,
-               BuildingTranslation = new List<BuildingTranslation> { x.Translation }
-           })
-           .ToListAsync();
+        var listDto = await query.OrderByDescending(h => h.Id).ToListAsync();
 
         var all = new AllBuildingDto
         {
-            Total = query.Count,
+            Total = totalCount,
             Page = page,
             PageSize = pageSize,
-            Buildings = query
+            Buildings = listDto
         };
         return all;
     }

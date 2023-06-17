@@ -78,9 +78,9 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("all", Order = 0412)]
-    public async Task<IActionResult> GetAll([FromQuery] int? roomTypeId, [FromQuery(Name = "floorId")] int? baseId, [FromQuery(Name = "isFloorActive")] bool? isBaseActive, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int page = 1, [FromQuery] string? lang = null)
+    public async Task<IActionResult> GetAll([FromQuery] int? roomTypeId, [FromQuery(Name = "floorId")] int? parentId, [FromQuery(Name = "isFloorActive")] bool? isBaseActive, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int page , [FromQuery] string? lang)
     {
-        var resutl = await Data.Rooms.ReadAll(roomTypeId, baseId, isBaseActive, status, lang, pageSize, page);
+        var resutl = await Data.Rooms.ReadAll(roomTypeId, parentId, isBaseActive, status, lang, pageSize, page);
         if (resutl == null)
         {
             return Ok(new Response(true, "no content"));
@@ -88,19 +88,20 @@ public class RoomController : ControllerBase
         return Ok(resutl);
     }
 
+
     [HttpGet("search", Order = 0414)]
-    public async Task<IActionResult> Search([FromQuery(Name = "floorId")] int? baseId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> Search([FromQuery(Name = "floorId")] int? parentId, [FromQuery] string? searchTerm, [FromQuery] string? name, [FromQuery] string? lang, bool? active, [FromQuery] int? page , [FromQuery] int? pageSize)
     {
         if (!string.IsNullOrEmpty(name))
         {
             return Ok(await Data.Rooms.GenericSearchByText<RoomTranslation>(
-                baseId,
+                parentId,
                 t => t.Name.Contains(name),
-                en => en.Room != null && en.Room.FloorId.Equals(baseId),
+                en => en.Room != null && en.Room.FloorId.Equals(parentId),
                 page, pageSize));
         }
         else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
-            return Ok(await Data.Rooms.SearchByNameOrCode(searchTerm, lang, page, pageSize));
+            return Ok(await Data.Rooms.SearchByNameOrCode(active,searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }
@@ -158,8 +159,8 @@ public class RoomController : ControllerBase
         {
             return BadRequest(new Response(false, "The status field in this context allows the values 'active' or 'inactive' "));
         }
-        HosRoom hospital = new() { Id = id.Value, IsDeleted = isDeleted };
-        return Ok(await Data.Rooms.GenericUpdateSinglePropertyById(id.Value, hospital, p => p.IsDeleted));
+        HosRoom entity = new() { Id = id.Value, IsDeleted = isDeleted };
+        return Ok(await Data.Rooms.GenericUpdateSinglePropertyById(id.Value, entity, p => p.IsDeleted));
     }
 
     // ============================= delete ============================= 2
