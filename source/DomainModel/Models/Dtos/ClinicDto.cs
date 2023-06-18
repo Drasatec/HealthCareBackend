@@ -10,7 +10,7 @@ public class ClinicDto
 
     public string? Photo { get; set; }
 
-    public bool IsActive { get; set; }
+    //public bool IsActive { get; set; }
 
     public bool IsDeleted { get; set; }
 
@@ -45,7 +45,7 @@ public class ClinicDto
             CodeNumber = entity.CodeNumber,
             Photo = entity.Photo,
             Appearance = entity.Appearance,
-            IsActive = entity.IsActive,
+           // IsActive = entity.IsActive,
             IsDeleted = entity.IsDeleted,
             Phone = entity.Phone,
             Reason = entity.Reason,
@@ -85,7 +85,7 @@ public class ClinicDto
             WorkingHours = dto.WorkingHours,
             Phone   = dto.Phone,
             Appearance = dto.Appearance,
-            IsActive = dto.IsActive,
+            //IsActive = dto.IsActive,
             ClinicTranslations = listTranc,
         };
 

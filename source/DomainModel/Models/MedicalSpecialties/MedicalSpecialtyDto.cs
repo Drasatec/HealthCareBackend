@@ -11,15 +11,13 @@ public class MedicalSpecialtyDto
 
     public string? CodeNumber { get; set; }
 
-    public bool? IsActive { get; set; }
+    //public bool IsActive { get; set; }
 
     public bool IsDeleted { get; set; }
 
     public bool Appearance { get; set; }
 
     public string? Reason { get; set; }
-
-    public int HospitalId { get; set; }
 
     public ICollection<MedicalSpecialtyTranslation> MedicalSpecialtyTranslations { get; set; } = null!;
 
@@ -37,7 +35,7 @@ public class MedicalSpecialtyDto
             IsDeleted = entity.IsDeleted,
             Photo = entity.Photo,
             Appearance = entity.Appearance,
-            IsActive = entity.IsActive,
+            //IsActive = entity.IsActive,
             Reason = entity.Reason,
             MedicalSpecialtyTranslations = entity.MedicalSpecialtyTranslations
         };
@@ -60,7 +58,7 @@ public class MedicalSpecialtyDto
             CodeNumber = dto.CodeNumber ?? string.Empty,
             Photo = dto.Photo,
             Appearance = dto.Appearance,
-            IsActive = dto.IsActive,
+            //IsActive = dto.IsActive,
             Reason = dto.Reason,
             MedicalSpecialtyTranslations = listTranc
         };

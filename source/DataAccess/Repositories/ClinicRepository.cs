@@ -82,7 +82,7 @@ internal class ClinicRepository : GenericRepository, IClinicRepository
             current = dto;
             Context.Update(current).Property(propa => propa.Photo).IsModified = modfied;
             Context.Entry(current).Property(p => p.IsDeleted).IsModified = false;
-            Context.Entry(current).Property(p => p.Appearance).IsModified = false;
+            //Context.Entry(current).Property(p => p.Appearance).IsModified = false;
             await Context.SaveChangesAsync();
             return respons = new(true, $"update on id: {id}", null);
         }
@@ -198,7 +198,7 @@ internal class ClinicRepository : GenericRepository, IClinicRepository
                         Photo = h.Photo,
                         CodeNumber = h.CodeNumber,
                         Appearance = h.Appearance,
-                        IsActive = h.IsActive,
+                        //IsActive = h.IsActive,
                         IsDeleted = h.IsDeleted,
                         ClinicTranslations = new List<ClinicTranslation> { t }
                     };

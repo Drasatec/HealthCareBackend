@@ -83,13 +83,13 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
             current = dto;
             Context.Update(current).Property(propa => propa.Photo).IsModified = modfied;
             Context.Entry(current).Property(p => p.IsDeleted).IsModified = false;
-            Context.Entry(current).Property(p => p.Appearance).IsModified = false;
+            //Context.Entry(current).Property(p => p.Appearance).IsModified = false;
             await Context.SaveChangesAsync();
             return respons = new(true, $"update on id: {id}", null);
         }
         catch (Exception ex)
         {
-            return respons = new(false, "can not duplicate foreignKey with same Id ......." + ex.Message, null); ;
+            return respons = new(false, "can not duplicate foreignKey with same Id ......." + ex.Message+"________and _______"+ex.InnerException?.Message, null); ;
         }
     }
     #endregion
@@ -199,7 +199,7 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
                         Photo = h.Photo,
                         CodeNumber = h.CodeNumber,
                         Appearance = h.Appearance,
-                        IsActive = h.IsActive,
+                        //IsActive = h.IsActive,
                         IsDeleted = h.IsDeleted,
                         MedicalSpecialtyTranslations = new List<MedicalSpecialtyTranslation> { t }
                     };
