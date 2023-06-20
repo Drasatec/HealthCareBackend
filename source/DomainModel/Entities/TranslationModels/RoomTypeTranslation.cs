@@ -8,7 +8,7 @@ public partial class RoomTypeTranslation
 {
     public int Id { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public int? RoomTypeId { get; set; }
 

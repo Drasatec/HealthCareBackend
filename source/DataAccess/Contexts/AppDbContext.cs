@@ -670,10 +670,12 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("TypesVisit");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CodeNumber)
-                .HasMaxLength(16)
-                .IsUnicode(false);
+               .HasMaxLength(16)
+               .IsUnicode(false);
+            entity.Property(e => e.CreateOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
         });
 
         modelBuilder.Entity<SecondaryService>(entity =>

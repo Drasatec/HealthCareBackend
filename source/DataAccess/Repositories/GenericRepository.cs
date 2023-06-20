@@ -4,17 +4,56 @@ using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace DataAccess.Repositories;
 
-public class GenericRepository : IGenericRepository// where T : class
+public class GenericRepository : IGenericRepository
 {
     protected AppDbContext Context { get; set; }
     public GenericRepository(AppDbContext context) => Context = context;
 
 
+    // create
+    public async Task<Response<TEntity>> GenericCreate<TEntity>(TEntity entity) where TEntity : class
+    {
+        //var entity = (dynamic)tEntity;
+        try
+        {
+            var result = await Context.Set<TEntity>().AddAsync(entity);
+
+            var row = await Context.SaveChangesAsync();
+
+            if (row > 0)
+            {
+                return new Response<TEntity>(true, "succcess", result.Entity);
+            }
+
+            return new Response<TEntity>(false, "No rows affected");
+        }
+        catch (Exception ex)
+        {
+            return new Response<TEntity>(false, ex.Message + "and______" + ex.InnerException!.Message);
+        }
+    }
+
+
+    public async Task<TEntity?> GenericReadById<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>? include) where TEntity : class
+    {
+        IQueryable<TEntity> query = Context.Set<TEntity>();
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+        if (include != null)
+            query = query.Include(include);
+
+        return await query.FirstOrDefaultAsync();
+    }
 
 
     public async Task<Response<object>> GenericCreateWithImage<TEntity>(TEntity tEntity, Stream? image = null) where TEntity : class
@@ -55,7 +94,7 @@ public class GenericRepository : IGenericRepository// where T : class
             return new Response<object>(false, ex.Message);
         }
     }
-
+    // edit
     public async Task<Response> GenericUpdate<TEntity>(List<TEntity> entity) where TEntity : class
     {
         var res = new Response();
@@ -69,12 +108,37 @@ public class GenericRepository : IGenericRepository// where T : class
         catch (Exception ex)
         {
             res.Success = false;
-            res.Message = "can not duplicate foreignKey with same Id ......." + ex.Message;
+            res.Message = ex.Message + "and_____" + ex.InnerException?.Message;
             return res;
         }
     }
 
-    public async Task<Response> GenericDelete<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> expression, params int[] ids) where TEntity : class
+    public async Task<Response> GenericUpdate<TEntity>(TEntity entity, params Expression<Func<TEntity, object>>[]? propertiesNotModified) where TEntity : class
+    {
+        var res = new Response();
+        try
+        {
+            Context.Set<TEntity>().Update(entity);
+
+            if (propertiesNotModified is not null)
+                foreach (var prop in propertiesNotModified)
+                {
+                    Context.Entry(entity).Property(prop).IsModified = false;
+                }
+
+            await Context.SaveChangesAsync();
+            res.Success = true;
+            return res;
+        }
+        catch (Exception ex)
+        {
+            res.Success = false;
+            res.Message = ex.Message + "and_____" + ex.InnerException?.Message;
+            return res;
+        }
+    }
+
+    public async Task<Response> GenericDelete<TEntity>(Expression<Func<TEntity, bool>> expression, params int[] ids) where TEntity : class
     {
         var arrayIds = string.Join(" ", ids);
         try
@@ -82,7 +146,7 @@ public class GenericRepository : IGenericRepository// where T : class
             var current = await Context.Set<TEntity>().Where(expression).ToListAsync();
             if (current != null)
             {
-                Context.RemoveRange(current);
+                Context.RemoveRange(current); 
             }
             var rowEffict = await Context.SaveChangesAsync();
             if (rowEffict > 0) return new Response(true, $"delete ids of {typeof(TEntity).Name}: {arrayIds} ");
@@ -91,7 +155,7 @@ public class GenericRepository : IGenericRepository// where T : class
         }
         catch (Exception ex)
         {
-            return new Response(false, ex.Message);
+            return new Response(false, ex.Message + "and_____" + ex.InnerException?.Message);
         }
     }
 
@@ -112,36 +176,51 @@ public class GenericRepository : IGenericRepository// where T : class
         }
     }
 
-    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy, params Expression<Func<TEntity, object>>[]? includes) where TEntity : class
+
+    // read
+    public async Task<PagedResponse<TEntity>?> GenericReadAllWihInclude<TEntity>(
+       Expression<Func<TEntity, bool>>? filter,
+       Expression<Func<TEntity, object>>? orderBy,
+       Expression<Func<TEntity, object>>? include,
+       int? page, int? pageSize) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
+        int total;
         if (filter != null)
         {
             query = query.Where(filter);
         }
-        if (includes != null)
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
-
         if (orderBy != null)
         {
-            query = orderBy(query);
+            query = query.OrderByDescending(orderBy);
+            //query = orderBy(query);
         }
 
-        if (page.HasValue && pageSize.HasValue)
+
+        total = query.Count();
+        if (total < 0)
+            return null!;
+
+
+        // page size
+        GenericPagination(ref query, ref pageSize, ref page, total);
+
+        if (include != null)
+            query = query.Include(include);
+
+        PagedResponse<TEntity> all = new()
         {
-            int skip = (page.Value - 1) * pageSize.Value;
-            query = query.Skip(skip).Take(pageSize.Value);
-        }
-
-        return await query.ToListAsync();
+            Total = total,
+            Page = page,
+            PageSize = pageSize,
+            Data = await query.ToListAsync(),
+        };
+        return all;
     }
 
     // filter and select used in get names
-    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> selectExpression, int? page, int? pageSize) where TEntity : class
+    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>>? selectExpression, int? page, int? pageSize) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
@@ -160,7 +239,10 @@ public class GenericRepository : IGenericRepository// where T : class
         else
             return await query.ToListAsync();
     }
-    public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>> selectExpression, int? page, int? pageSize) where TEntity : class
+
+
+    // search
+    public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(Expression<Func<TEntity, bool>> filter, int? page, int? pageSize, Expression<Func<TEntity, TEntity>> selectExpression) where TEntity : class
     {
         try
         {
@@ -215,6 +297,38 @@ public class GenericRepository : IGenericRepository// where T : class
             return null;
         }
     }
+    
+    public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>? include, int? page, int? pageSize) where TEntity : class
+    {
+        try
+        {
+            IQueryable<TEntity> query = Context.Set<TEntity>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (include != null)
+            {
+                query = query.Include(include);
+            }
+
+            if (page.HasValue && pageSize.HasValue)
+            {
+                int skip = (page.Value - 1) * pageSize.Value;
+                query = query.Skip(skip).Take(pageSize.Value);
+            }
+
+            return await query.ToListAsync();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+
 
 
     #region protected methods
@@ -236,6 +350,9 @@ public class GenericRepository : IGenericRepository// where T : class
             pageSize = 0;
         }
     }
+
+
+
 
     //protected static void GenericStatus<TQuery>(ref IQueryable<TQuery> query) where TQuery : class
     //{

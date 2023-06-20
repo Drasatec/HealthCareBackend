@@ -185,9 +185,8 @@ public class BuildingController : ControllerBase
     [HttpDelete("building/delete-translat", Order = 0230)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)
     {
-        BuildingTranslation entity = new();
         var res = new Response();
-        res = await Data.Buildings.GenericDelete(entity, t => translteId.Contains(t.Id), translteId);
+        res = await Data.Buildings.GenericDelete<BuildingTranslation>(t => translteId.Contains(t.Id), translteId);
         // res = await Data.Buildings.DeleteTranslat(translteId);
         if (res.Success)
             return Ok(res);

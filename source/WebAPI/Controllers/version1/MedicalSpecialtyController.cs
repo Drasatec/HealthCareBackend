@@ -178,9 +178,8 @@ public class MedicalSpecialtyController : ControllerBase
     [HttpDelete("delete-translat", Order = 0830)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)
     {
-        MedicalSpecialtyTranslation entity = new();
         var res = new Response();
-        res = await Data.MedicalSpecialteis.GenericDelete(entity, t => translteId.Contains(t.Id), translteId);
+        res = await Data.MedicalSpecialteis.GenericDelete<MedicalSpecialtyTranslation>(t => translteId.Contains(t.Id), translteId);
         if (res.Success)
             return Ok(res);
         return BadRequest(res);

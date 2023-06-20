@@ -105,14 +105,15 @@ public class HospitalController : ControllerBase
             else
                 filterExpression = f => f.Name.Contains(name);
 
-            var result = await Data.Hospitals.GenericSearchByText(filterExpression, (hos) =>
-            new HospitalTranslation
+            var result = await Data.Hospitals.GenericSearchByText(filterExpression,
+            page, pageSize,
+            (hos) => new HospitalTranslation
             {
                 Id = hos.Id,
                 LangCode = hos.LangCode,
                 Name = hos.Name,
                 HospitalId = hos.HospitalId,
-            }, page, pageSize);
+            });
 
 
             return Ok(result);
@@ -191,9 +192,8 @@ public class HospitalController : ControllerBase
     [HttpDelete("delete-translat", Order = 0130)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)
     {
-        HospitalTranslation entity = new();
         var res = new Response();
-        res = await Data.Hospitals.GenericDelete(entity, t => translteId.Contains(t.Id), translteId);
+        res = await Data.Hospitals.GenericDelete<HospitalTranslation>(t => translteId.Contains(t.Id), translteId);
         // res = await Data.Hospitals.DeleteTranslat(translteId);
         if (res.Success)
             return Ok(res);
@@ -203,10 +203,8 @@ public class HospitalController : ControllerBase
     [HttpDelete("delete-phone", Order = 0131)]
     public async Task<IActionResult> DeletePhones([FromQuery] params int[] phoneId)
     {
-        HospitalPhoneNumber entity = new();
         var res = new Response();
-        res = await Data.Hospitals.GenericDelete(entity, t => phoneId.Contains(t.Id), phoneId);
-        //var res = await Data.Hospitals.DeletePhons(phoneId);
+        res = await Data.Hospitals.GenericDelete<HospitalPhoneNumber>(t => phoneId.Contains(t.Id), phoneId);
         if (res.Success)
             return Ok(res);
         return BadRequest(res);

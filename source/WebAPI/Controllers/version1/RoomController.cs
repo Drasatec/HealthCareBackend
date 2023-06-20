@@ -168,9 +168,8 @@ public class RoomController : ControllerBase
     [HttpDelete("delete-translat", Order = 0430)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)
     {
-        RoomTranslation entity = new();
         var res = new Response();
-        res = await Data.Rooms.GenericDelete(entity, t => translteId.Contains(t.Id), translteId);
+        res = await Data.Rooms.GenericDelete<RoomTranslation>(t => translteId.Contains(t.Id), translteId);
         if (res.Success)
             return Ok(res);
         return BadRequest(res);

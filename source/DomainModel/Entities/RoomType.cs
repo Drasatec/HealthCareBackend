@@ -9,11 +9,12 @@ public partial class RoomType
 {
     public int Id { get; set; }
 
-    public string? CodeNumber { get; set; }
+    public string CodeNumber { get; set; } = string.Empty;
 
-    public DateTime? CreateOn { get; set; }
+    public DateTime? CreateOn { get;}
 
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
+
     [JsonIgnore]
     public virtual ICollection<HosRoom> HosRooms { get; set; } = new List<HosRoom>();
 
