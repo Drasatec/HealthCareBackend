@@ -28,5 +28,6 @@ public partial class Service
 
     public virtual ICollection<ServiceTranslation> ServiceTranslations { get; set; } = new List<ServiceTranslation>();
 
-    public virtual ICollection<PriceCategory> PriceCategories { get; set; } = new List<PriceCategory>();
+    public virtual ICollection<ServicePrice> ServicePrices { get; set; } = new List<ServicePrice>();
+
 }

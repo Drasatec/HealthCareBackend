@@ -8,7 +8,7 @@ public partial class PriceCategoryTranslation
 {
     public int Id { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public int? PriceCategoryId { get; set; }
 

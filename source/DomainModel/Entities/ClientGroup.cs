@@ -7,7 +7,7 @@ public partial class ClientGroup
 {
     public int Id { get; set; }
 
-    public string? CodeNumber { get; set; }
+    public string? GroupCode { get; set; }
 
     public string? GroupName { get; set; }
 

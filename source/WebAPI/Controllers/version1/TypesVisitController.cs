@@ -131,9 +131,9 @@ public class TypesVisitController : ControllerBase
     {
         Response response;
 
-        TypesVisit entity = model;
+       // TypesVisit entity = model;
 
-        response = await Data.TypesVisits.GenericUpdate(entity, null);
+        response = await Data.TypesVisits.GenericUpdate(model, c=>c.CreateOn!, d=>d.IsDeleted);
 
         if (!response.Success)
             return BadRequest(response);

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Versioning;
 using WebApi.Startup;
 using WebAPI.Startup;
-//  Scaffold-DbContext 'Data Source=DESKTOP-JT9VS5J\SQLEXPRESS; Initial Catalog=alrahma_care_db;Trusted_Connection=true; TrustServerCertificate=true;' Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models2
+//  Scaffold-DbContext 'Data Source=DESKTOP-JT9VS5J\SQLEXPRESS; Initial Catalog=alrahma_care_db;Trusted_Connection=true; TrustServerCertificate=true;' Microsoft.EntityFrameworkCore.SqlServer -OutputDir My_Models2
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.RegisterServices();
 builder.Services.RegisterDbContext(builder.Configuration);

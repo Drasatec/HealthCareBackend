@@ -1,12 +1,6 @@
 ﻿using DataAccess.Contexts;
 using DataAccess.Repositories;
-using DomainModel.Entities;
 using DomainModel.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.UnitOfWorks
 {
@@ -23,6 +17,10 @@ namespace DataAccess.UnitOfWorks
         public IClinicRepository Clinics { get; private set; }
         public IGenericRepository RoomTypes { get; private set; }
         public IGenericRepository TypesVisits { get; private set; }
+        public IGenericRepository WorkingPeriods { get; private set; }
+        public IGenericRepository Generic { get; private set; }
+
+        public IDoctorRepository Doctors { get; private set; }
 
         public UnitOfWork(AppDbContext context )
         {
@@ -35,6 +33,9 @@ namespace DataAccess.UnitOfWorks
             Clinics = new ClinicRepository(Context);
             RoomTypes = new GenericRepository(Context);
             TypesVisits = new GenericRepository(Context);
+            WorkingPeriods = new GenericRepository(Context);
+            Generic = new GenericRepository(Context);
+            Doctors = new DoctorRepository(Context);
         }
 
 

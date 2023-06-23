@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities;
-
 public partial class MedicalSpecialty
 {
     public int Id { get; set; }
@@ -24,9 +21,8 @@ public partial class MedicalSpecialty
 
     public virtual ICollection<MedicalSpecialtyTranslation> MedicalSpecialtyTranslations { get; set; } = new List<MedicalSpecialtyTranslation>();
 
-    public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
+    public virtual ICollection<SpecialtiesDoctor> SpecialtiesDoctors { get; set; } = new List<SpecialtiesDoctor>();
 
     public virtual ICollection<Hospital> Hospitals { get; set; } = new List<Hospital>();
-    //public virtual ICollection<HospitalMedicalSpecialties> HospitalSpecialties { get; set; } = new List<HospitalMedicalSpecialties>();
 
 }

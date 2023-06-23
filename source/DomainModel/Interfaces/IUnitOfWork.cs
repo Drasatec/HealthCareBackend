@@ -22,6 +22,9 @@ namespace DomainModel.Interfaces
         IClinicRepository Clinics { get; }
         IGenericRepository RoomTypes { get; }
         IGenericRepository TypesVisits { get; }
+        IGenericRepository WorkingPeriods { get; }
+        IGenericRepository Generic { get; }
+        IDoctorRepository Doctors { get; }
 
         int Complete();
     }

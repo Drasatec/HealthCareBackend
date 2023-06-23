@@ -8,7 +8,7 @@ public partial class DoctorTranslation
 {
     public int Id { get; set; }
 
-    public string? FullName { get; set; }
+    public string FullName { get; set; }  = string.Empty;
 
     public string? Headline { get; set; }
 
