@@ -65,8 +65,9 @@ public class DoctorController : ControllerBase
         if (specialtyId.HasValue)
         {
             filterExpression = f =>
-            f.LangCode == lang && f.Doctor != null&&
-            f.Doctor.SpecialtiesDoctors.Any(s=>s.MedicalSpecialtyId== specialtyId);
+            f.LangCode == lang &&
+            f.Doctor != null &&
+            f.Doctor.SpecialtiesDoctors.Any(s => s.MedicalSpecialtyId == specialtyId);
         }
         else
             filterExpression = f => f.LangCode == lang;
@@ -78,9 +79,9 @@ public class DoctorController : ControllerBase
 
 
     [HttpGet("all", Order = 0912)]
-    public async Task<IActionResult> GetAll([FromQuery(Name = "specialtyId")] int? parentId, [FromQuery] bool? appearance, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
+    public async Task<IActionResult> GetAll(int? hosId , int? specialtyId, [FromQuery] bool? appearanceOnSite, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
     {
-        var resutl = await Data.Doctors.ReadAll(parentId, appearance, status, lang, pageSize, page);
+        var resutl = await Data.Doctors.ReadAll(hosId, specialtyId, appearanceOnSite, status, lang, pageSize, page);
         if (resutl is null)
         {
             return Ok(new Response(true, "no content"));

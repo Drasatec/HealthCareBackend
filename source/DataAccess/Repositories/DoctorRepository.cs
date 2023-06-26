@@ -88,13 +88,13 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             current = dto;
             Context.Update(current).Property(propa => propa.Photo).IsModified = modfied;
             Context.Entry(current).Property(p => p.IsDeleted).IsModified = false;
-            //Context.Entry(current).Property(p => p.Appearance).IsModified = false;
+            //Context.Entry(current).Property(p => p).IsModified = false;
             await Context.SaveChangesAsync();
             return respons = new(true, $"update on id: {id}", null);
         }
         catch (Exception ex)
         {
-            return respons = new(false, "can not duplicate foreignKey with same Id ......." + ex.Message, null); ;
+            return respons = new(false, "can not duplicate foreignKey with same Id ......." + ex.Message + ex.InnerException?.Message, null);
         }
     }
     #endregion
@@ -125,7 +125,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
     }
 
 
-    public async Task<PagedResponse<DoctorDto>?> ReadAll(int? baseid, bool? appearance, string? status, string? lang, int? pageSize, int? page)
+    public async Task<PagedResponse<DoctorDto>?> ReadAll(int? hosId, int? specialtyId, bool? appearance, string? status, string? lang, int? pageSize, int? page)
     {
 
         IQueryable<Doctor> query = Context.Doctors;
@@ -153,9 +153,14 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                 query = query.Where(h => !h.IsAppearanceOnSite);
         }
 
-        if (baseid.HasValue)
+        if (specialtyId.HasValue)
         {
-           // query = query.Where(s => s.SpecialtiesDoctors.Any(i=>i.MedicalSpecialtyId == baseid));
+            query = query.Where(s => s.SpecialtiesDoctors.Any(i => i.MedicalSpecialtyId == specialtyId));
+        }
+
+        if (hosId.HasValue)
+        {
+            query = query.Where(s => s.DoctorsWorkHospitals.Any(i => i.HospitalId == hosId));
         }
 
         query = query.OrderByDescending(o => o.Id);
@@ -204,7 +209,17 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                         Photo = h.Photo,
                         CodeNumber = h.CodeNumber,
                         IsDeleted = h.IsDeleted,
-                        DoctorTranslations = new List<DoctorTranslation> { t }
+                        DocStatus = h.DocStatus,
+                        DoctorsDegreeId = h.DoctorsDegreeId,
+                        Gender = h.Gender,
+                        IsAppearanceOnSite = h.IsAppearanceOnSite,
+                        NationalityId = h.NationalityId,
+                        PhoneNumber = h.PhoneNumber,
+                        PhoneNumberAppearance = h.PhoneNumberAppearance,
+                        Reason = h.Reason,
+                        VisitPriceAppearance = h.VisitPriceAppearance,
+                        WorkingHours = h.WorkingHours,
+                        DoctorTranslations = new List<DoctorTranslation> { t },
                     };
 
         if (isActive.HasValue)
@@ -235,6 +250,58 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         };
 
         return all;
+    }
+
+
+    public async Task<List<DoctorVisitPriceDto?>> ReadDoctorVisitPrices(int? docId, int? priceCategoryId, int? typeVisitId, int? price, string lang)
+    {
+        var query = from h in Context.DoctorVisitPrices
+
+                    join dt in Context.DoctorTranslations on h.DoctorId equals dt.DoctorId
+                    where dt.LangCode == lang
+
+                    join pc in Context.PriceCategoryTranslations on h.PriceCategoryId equals pc.PriceCategoryId
+                    where pc.LangCode == lang
+
+                    join tv in Context.TypesVisitTranslations on h.TypeVisitId equals tv.TypeVisitId
+                    where tv.LangCode == lang
+
+                    select new DoctorVisitPriceDto
+                    {
+                        Id = h.Id,
+                        DoctorId = h.DoctorId,
+                        PriceCategoryId = h.PriceCategoryId,
+                        Price = h.Price,
+                        TypeVisitId = h.TypeVisitId,
+                        PriceCurrency = h.PriceCurrency,
+
+                        DoctorName = dt.FullName,
+                        PriceCategory = pc.Name,
+                        TypeVisit = tv.Name,
+
+                    };
+
+        if (docId.HasValue)
+        {
+            query = query.Where(d => d.DoctorId.Equals(docId));
+        }
+
+        if (priceCategoryId.HasValue)
+        {
+            query = query.Where(pc => pc.PriceCategoryId.Equals(priceCategoryId));
+        }
+
+        if (typeVisitId.HasValue)
+        {
+            query = query.Where(t => t.TypeVisitId.Equals(typeVisitId));
+        }
+
+        if (price.HasValue)
+        {
+            query = query.Where(p => p.Price >= price);
+        }
+
+        return await query.ToListAsync();
     }
     #endregion
 

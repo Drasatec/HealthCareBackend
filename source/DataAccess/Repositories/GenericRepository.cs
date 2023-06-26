@@ -36,24 +36,11 @@ public class GenericRepository : IGenericRepository
         }
         catch (Exception ex)
         {
-            return new Response<TEntity>(false, ex.Message + "and______" + ex.InnerException!.Message);
+            return new Response<TEntity>(false, ex.Message + "and______" + ex.InnerException?.Message);
         }
     }
 
 
-    public async Task<TEntity?> GenericReadById<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>? include) where TEntity : class
-    {
-        IQueryable<TEntity> query = Context.Set<TEntity>();
-
-        if (filter != null)
-        {
-            query = query.Where(filter);
-        }
-        if (include != null)
-            query = query.Include(include);
-
-        return await query.FirstOrDefaultAsync();
-    }
 
 
     public async Task<Response<object>> GenericCreateWithImage<TEntity>(TEntity tEntity, Stream? image = null) where TEntity : class
@@ -217,6 +204,21 @@ public class GenericRepository : IGenericRepository
             Data = await query.ToListAsync(),
         };
         return all;
+    }
+
+
+    public async Task<TEntity?> GenericReadById<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>? include) where TEntity : class
+    {
+        IQueryable<TEntity> query = Context.Set<TEntity>();
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+        if (include != null)
+            query = query.Include(include);
+
+        return await query.FirstOrDefaultAsync();
     }
 
     // filter and select used in get names

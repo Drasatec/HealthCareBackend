@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DomainModel.Entities;
-public partial class PriceDoctorVisit
+public partial class DoctorVisitPrice
 {
     public int Id { get; set; }
 

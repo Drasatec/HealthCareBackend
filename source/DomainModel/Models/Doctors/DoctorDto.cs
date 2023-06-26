@@ -64,7 +64,7 @@ public class DoctorDto
     public static implicit operator Doctor(DoctorDto arg)
     {
         var listTranc = new List<DoctorTranslation>();
-        Doctor hospital;
+        Doctor doctor;
         if (arg.DoctorTranslations != null)
             foreach (var item in arg.DoctorTranslations)
             {
@@ -72,7 +72,7 @@ public class DoctorDto
                 listTranc.Add(item);
             }
 
-        hospital = new Doctor
+        doctor = new Doctor
         {
             Id = arg.Id,
             CodeNumber = arg.CodeNumber ?? string.Empty,
@@ -91,7 +91,7 @@ public class DoctorDto
             DoctorTranslations = listTranc
         };
 
-        return hospital;
+        return doctor;
     }
 
     public static List<DoctorDto> ToList(IEnumerable<Doctor> hospitals)

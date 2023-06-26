@@ -74,7 +74,7 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<PriceCategoryTranslation> PriceCategoryTranslations { get; set; }
 
-    public virtual DbSet<PriceDoctorVisit> PriceDoctorVisits { get; set; }
+    public virtual DbSet<DoctorVisitPrice> DoctorVisitPrices { get; set; }
 
     public virtual DbSet<RoomTranslation> RoomTranslations { get; set; }
 
@@ -314,6 +314,27 @@ public class AppDbContext : DbContext
                 .HasConstraintName("FK_DoctorsWorkHospital_HospitalId");
         });
 
+        modelBuilder.Entity<DoctorVisitPrice>(entity =>
+        {
+            entity.ToTable("DoctorVisitPrices");
+
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.PriceCurrency)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Doctor).WithMany()
+                .HasForeignKey(d => d.DoctorId)
+                .HasConstraintName("FK_DoctorVisitPrices_DoctorId");
+
+            entity.HasOne(d => d.PriceCategory).WithMany()
+                .HasForeignKey(d => d.PriceCategoryId)
+                .HasConstraintName("FK_DoctorVisitPrices_PriceCategoryId");
+
+            entity.HasOne(d => d.TypeVisit).WithMany()
+                .HasForeignKey(d => d.TypeVisitId)
+                .HasConstraintName("FK_DoctorVisitPrices_TypeVisitId");
+        });
 
 
 
@@ -631,29 +652,7 @@ public class AppDbContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<PriceDoctorVisit>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("PriceDoctorVisit");
 
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
-            entity.Property(e => e.PriceCurrency)
-                .HasMaxLength(10)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.Doctor).WithMany()
-                .HasForeignKey(d => d.DoctorId)
-                .HasConstraintName("FK_PriceDoctorVisit_DoctorId");
-
-            entity.HasOne(d => d.PriceCategory).WithMany()
-                .HasForeignKey(d => d.PriceCategoryId)
-                .HasConstraintName("FK_PriceDoctorVisit_PriceCategoryId");
-
-            entity.HasOne(d => d.TypeVisit).WithMany()
-                .HasForeignKey(d => d.TypeVisitId)
-                .HasConstraintName("FK_PriceDoctorVisit_TypeVisitId");
-        });
 
         modelBuilder.Entity<RoomType>(entity =>
         {
