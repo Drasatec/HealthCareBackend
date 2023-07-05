@@ -52,6 +52,8 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<Language> Languages { get; set; }
 
+    public virtual DbSet<Weekday> Weekdays { get; set; }
+
     public virtual DbSet<MainService> MainServices { get; set; }
 
     public virtual DbSet<MainServiceTranslation> MainServiceTranslations { get; set; }
@@ -75,6 +77,8 @@ public class AppDbContext : DbContext
     public virtual DbSet<PriceCategoryTranslation> PriceCategoryTranslations { get; set; }
 
     public virtual DbSet<DoctorVisitPrice> DoctorVisitPrices { get; set; }
+    
+    public virtual DbSet<DoctorAttachment> DoctorAttachments { get; set; }
 
     public virtual DbSet<RoomTranslation> RoomTranslations { get; set; }
 
@@ -336,7 +340,22 @@ public class AppDbContext : DbContext
                 .HasConstraintName("FK_DoctorVisitPrices_TypeVisitId");
         });
 
+        modelBuilder.Entity<DoctorAttachment>(entity =>
+        {
+            entity.ToTable("DoctorAttachments");
 
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Title).HasMaxLength(100);
+
+            entity.Property(e => e.DateProduced).HasColumnType("date");
+            entity.Property(e => e.CreateOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            //entity.HasOne(d => d.Doctor).WithMany()
+            //    .HasForeignKey(d => d.DoctorId)
+            //    .HasConstraintName("FK_DoctorAttachments_DoctorId");
+        });
 
         modelBuilder.Entity<HosBuilding>(entity =>
         {
@@ -597,9 +616,9 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<PeriodWorkDoctorClinic>(entity =>
         {
-            entity.HasKey(e => new { e.DoctorId, e.ClinicId, e.WorkingPeriodId });
-
             entity.ToTable("PeriodWorkDoctorClinic");
+
+            entity.HasIndex(e => new { e.HospitalId, e.OnDay, e.DoctorId, e.ClinicId, e.WorkingPeriodId }, "UK_PeriodWorkDoctorClinic_AllProperty").IsUnique();
 
             entity.HasIndex(e => e.DoctorId, "IX_PeriodWorkDoctorClinic_DoctorId");
 
@@ -607,9 +626,9 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => new { e.HospitalId, e.ClinicId, e.OnDay }, "IX_PeriodWorkDoctorClinic_Hospital_Clinic_OnDay");
 
-            entity.HasOne(d => d.Build).WithMany(p => p.PeriodWorkDoctorClinics)
-                .HasForeignKey(d => d.BuildId)
-                .HasConstraintName("FK_PeriodWorkDoctorClinic_BuildId");
+            //entity.HasOne(d => d.Build).WithMany(p => p.PeriodWorkDoctorClinics)
+            //    .HasForeignKey(d => d.BuildId)
+            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_BuildId");
 
             entity.HasOne(d => d.Clinic).WithMany(p => p.PeriodWorkDoctorClinics)
                 .HasForeignKey(d => d.ClinicId)
@@ -621,17 +640,17 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PeriodWorkDoctorClinic_DoctorId");
 
-            entity.HasOne(d => d.Floor).WithMany(p => p.PeriodWorkDoctorClinics)
-                .HasForeignKey(d => d.FloorId)
-                .HasConstraintName("FK_PeriodWorkDoctorClinic_FloorId");
+            //entity.HasOne(d => d.Floor).WithMany(p => p.PeriodWorkDoctorClinics)
+            //    .HasForeignKey(d => d.FloorId)
+            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_FloorId");
 
             entity.HasOne(d => d.Hospital).WithMany(p => p.PeriodWorkDoctorClinics)
                 .HasForeignKey(d => d.HospitalId)
                 .HasConstraintName("FK_PeriodWorkDoctorClinic_HospitalId");
 
-            entity.HasOne(d => d.Room).WithMany(p => p.PeriodWorkDoctorClinics)
-                .HasForeignKey(d => d.RoomId)
-                .HasConstraintName("FK_PeriodWorkDoctorClinic_RoomId");
+            //entity.HasOne(d => d.Room).WithMany(p => p.PeriodWorkDoctorClinics)
+            //    .HasForeignKey(d => d.RoomId)
+            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_RoomId");
 
             //entity.HasOne(d => d.WorkingPeriod).WithMany(p => p.PeriodWorkDoctorClinics)
             //    .HasForeignKey(d => d.WorkingPeriodId)
@@ -1115,6 +1134,17 @@ public class AppDbContext : DbContext
             entity.HasOne(d => d.Ssntype).WithMany(p => p.SsntypesTranslations)
                 .HasForeignKey(d => d.SsntypeId)
                 .HasConstraintName("FK_SSNTypesTranslations_SSNTypeId");
+        });
+        
+        modelBuilder.Entity<Weekday>(entity =>
+        {
+            entity.ToTable("Weekdays");
+
+            entity.HasIndex(e => new { e.DayNumber, e.LangCode }, "UK_Weekdays_Id_LangCode").IsUnique();
+
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
         });
 
         //OnModelCreatingPartial(modelBuilder);

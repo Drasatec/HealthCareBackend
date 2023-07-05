@@ -20,7 +20,6 @@ public class GenericRepository : IGenericRepository
     // create
     public async Task<Response<TEntity>> GenericCreate<TEntity>(TEntity entity) where TEntity : class
     {
-        //var entity = (dynamic)tEntity;
         try
         {
             var result = await Context.Set<TEntity>().AddAsync(entity);

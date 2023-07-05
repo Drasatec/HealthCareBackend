@@ -26,7 +26,7 @@ public class DoctorController : ControllerBase
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] DoctorDto model)
     {
 
-        ResponseId response;
+        Response<DoctorDto> response;
 
         if (model == null)
         {
@@ -40,6 +40,24 @@ public class DoctorController : ControllerBase
             response = await Data.Doctors.CreateWithImage(model, file.OpenReadStream());
 
         return Created("fawzy", response);
+    }
+
+    [HttpPost("upload")]
+    public IActionResult UploadFile(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file is selected.");
+        }
+
+        var filePath = Path.Combine("path_to_save", file.FileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            file.CopyTo(stream);
+        }
+
+        return Ok("File uploaded successfully.");
     }
 
 

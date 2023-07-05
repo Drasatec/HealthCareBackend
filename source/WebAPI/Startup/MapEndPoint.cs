@@ -20,6 +20,5 @@ public static class MapEndPoint
         app.Run();
         return app;
     }
-
 }
 

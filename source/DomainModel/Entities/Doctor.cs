@@ -48,5 +48,7 @@ public partial class Doctor
     public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
 
     public virtual ICollection<SpecialtiesDoctor> SpecialtiesDoctors { get; set; } = new List<SpecialtiesDoctor>();
+    public virtual ICollection<DoctorAttachment> DoctorAttachments { get; set; } = new List<DoctorAttachment>();
+
 
 }

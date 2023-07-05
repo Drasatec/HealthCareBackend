@@ -85,7 +85,7 @@ public class DoctorDto
             Gender = arg.Gender,
             PhoneNumberAppearance = arg.PhoneNumberAppearance,
             VisitPriceAppearance = arg.VisitPriceAppearance,
-            IsDeleted = arg.IsDeleted,
+            //IsDeleted = arg.IsDeleted,
             IsAppearanceOnSite = arg.IsAppearanceOnSite,
             NationalityId = arg.NationalityId,
             DoctorTranslations = listTranc

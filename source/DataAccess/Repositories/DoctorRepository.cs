@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DomainModel.Models.Doctors;
+using System.Diagnostics;
 
 namespace DataAccess.Repositories;
 
@@ -21,7 +22,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
 
 
     #region Add
-    public async Task<ResponseId> CreateWithImage(DoctorDto dto, Stream? image = null)
+    public async Task<Response<DoctorDto>> CreateWithImage(DoctorDto dto, Stream? image = null)
     {
         var entity = (Doctor)dto;
 
@@ -39,17 +40,17 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             var result = await Context.Doctors.AddAsync(entity);
 
             if (string.IsNullOrEmpty(entity.CodeNumber))
-                entity.CodeNumber = "clinic-" + Context.Doctors.Count().ToString();
+                entity.CodeNumber = "entity-" + Context.Doctors.Count().ToString();
             var row = await Context.SaveChangesAsync();
             if (row > 0)
             {
-                return new ResponseId(true, "created ", result.Entity.Id);
+                return new Response<DoctorDto>(true, "created ", result.Entity);
             }
-            return new ResponseId(false, "No row effected ", 0);
+            return new Response<DoctorDto>(false, "No row effected ", null);
         }
         catch (Exception ex)
         {
-            return new ResponseId(false, ex.Message + "____and____" + ex.InnerException?.Message, 0);
+            return new Response<DoctorDto>(false, ex.Message + "____and____" + ex.InnerException?.Message, null);
         }
     }
     #endregion
@@ -253,7 +254,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
     }
 
 
-    public async Task<List<DoctorVisitPriceDto?>> ReadDoctorVisitPrices(int? docId, int? priceCategoryId, int? typeVisitId, int? price, string lang)
+    public async Task<List<DoctorVisitPriceDto?>> ReadDoctorVisitPrices(int? id, int? docId, int? priceCategoryId, int? typeVisitId, int? price, string lang)
     {
         var query = from h in Context.DoctorVisitPrices
 
@@ -281,6 +282,11 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
 
                     };
 
+        if (id.HasValue)
+        {
+            query = query.Where(i => i.Id.Equals(id));
+        }
+
         if (docId.HasValue)
         {
             query = query.Where(d => d.DoctorId.Equals(docId));
@@ -303,7 +309,89 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
 
         return await query.ToListAsync();
     }
-    #endregion
 
+
+    public async Task<List<PeriodWorkDoctorClinicDto>> ReadDoctorWorkPeriod(int? id, int? docId, int? hosId, int? clinicId, int? periodId, byte? day, string? lang)
+    {
+        IQueryable<PeriodWorkDoctorClinicDto> query;
+        if (lang == null)
+            query = Context.PeriodWorkDoctorClinics.Select((h) => new PeriodWorkDoctorClinicDto
+            {
+                Id = h.Id,
+                DoctorId = h.DoctorId,
+                ClinicId = h.ClinicId,
+                HospitalId = h.HospitalId,
+                WorkingPeriodId = h.WorkingPeriodId,
+                OnDay = h.OnDay,
+            });
+        else
+            query = from h in Context.PeriodWorkDoctorClinics
+
+                    join dt in Context.DoctorTranslations on h.DoctorId equals dt.DoctorId
+                    where dt.LangCode == lang
+
+                    join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
+                    where hos.LangCode == lang
+
+                    join ct in Context.ClinicTranslations on h.ClinicId equals ct.ClinicId
+                    where ct.LangCode == lang
+
+                    join wpt in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wpt.WorkingPeriodId
+                    where wpt.LangCode == lang
+
+                    join dy in Context.Weekdays on h.OnDay equals dy.DayNumber
+                    where dy.LangCode == lang
+
+                    select new PeriodWorkDoctorClinicDto
+                    {
+                        Id = h.Id,
+                        DoctorId = h.DoctorId,
+                        ClinicId = h.ClinicId,
+                        HospitalId = h.HospitalId,
+                        WorkingPeriodId = h.WorkingPeriodId,
+                        OnDay = h.OnDay,
+
+                        DayName = dy.WeekdayName,
+                        Doctor = dt.FullName,
+                        Hospital = hos.Name,
+                        Clinic = ct.Name,
+                        WorkingPeriod = wpt.Name,
+                    };
+
+        if (id.HasValue)
+        {
+            query = query.Where(i => i.Id.Equals(id));
+        }
+        else
+        {
+            if (docId.HasValue)
+            {
+                query = query.Where(d => d.DoctorId.Equals(docId));
+            }
+
+            if (hosId.HasValue)
+            {
+                query = query.Where(pc => pc.HospitalId.Equals(hosId));
+            }
+
+            if (clinicId.HasValue)
+            {
+                query = query.Where(t => t.ClinicId.Equals(clinicId));
+            }
+
+            if (periodId.HasValue)
+            {
+                query = query.Where(w => w.WorkingPeriodId.Equals(periodId));
+            }
+
+            if (day.HasValue)
+            {
+                query = query.Where(p => p.OnDay.Equals(day));
+            }
+        }
+
+        return await query.OrderByDescending(h => h.Id).ToListAsync();
+    }
+    #endregion
 
 }

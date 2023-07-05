@@ -46,13 +46,13 @@ public class DoctorVisitPriceController : ControllerBase
 
     // this method get data from DoctorRepository
     [HttpGet(Order = 0801)]
-    public async Task<IActionResult> Get([FromQuery] int? docId, int? priceCategoryId, int? typeVisitId, int? price, string? lang)
+    public async Task<IActionResult> Get([FromQuery] int? id, int? docId, int? priceCategoryId, int? typeVisitId, int? price, string? lang)
     {
         if (docId < 1 || priceCategoryId < 1 || typeVisitId < 1 || price < 1)
             return BadRequest(new Error("400", "can not assign 0"));
 
         if (lang != null)
-           return Ok(await Data.Doctors.ReadDoctorVisitPrices(docId, priceCategoryId, typeVisitId, price, lang));
+           return Ok(await Data.Doctors.ReadDoctorVisitPrices(id,docId, priceCategoryId, typeVisitId, price, lang));
         else
             return BadRequest(new Error("400", "The lang field is required"));
     }
