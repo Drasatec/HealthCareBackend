@@ -4,6 +4,8 @@ using DomainModel.Models;
 using System.Linq.Expressions;
 using DomainModel.Contracts;
 using DomainModel.Models.Doctors;
+using DomainModel.Services;
+using DomainModel.Helpers;
 
 namespace WebAPI.Controllers.version1;
 
@@ -19,9 +21,9 @@ public class DoctorController : ControllerBase
         Data = data;
     }
 
+    #region Doctor
+
     // ============================= post ============================= 
-
-
     [HttpPost("add", Order = 0901)]
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] DoctorDto model)
     {
@@ -42,25 +44,6 @@ public class DoctorController : ControllerBase
         return Created("fawzy", response);
     }
 
-    [HttpPost("upload")]
-    public IActionResult UploadFile(IFormFile file)
-    {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest("No file is selected.");
-        }
-
-        var filePath = Path.Combine("path_to_save", file.FileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            file.CopyTo(stream);
-        }
-
-        return Ok("File uploaded successfully.");
-    }
-
-
     // ============================= get ============================= 
 
 
@@ -73,8 +56,6 @@ public class DoctorController : ControllerBase
         var result = await Data.Doctors.ReadById(id, lang);
         return Ok(result);
     }
-
-
 
     [HttpGet("names", Order = 0911)]
     public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? specialtyId, [FromQuery] int? page, [FromQuery] int? pageSize)
@@ -97,7 +78,7 @@ public class DoctorController : ControllerBase
 
 
     [HttpGet("all", Order = 0912)]
-    public async Task<IActionResult> GetAll(int? hosId , int? specialtyId, [FromQuery] bool? appearanceOnSite, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
+    public async Task<IActionResult> GetAll(int? hosId, int? specialtyId, [FromQuery] bool? appearanceOnSite, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
     {
         var resutl = await Data.Doctors.ReadAll(hosId, specialtyId, appearanceOnSite, status, lang, pageSize, page);
         if (resutl is null)
@@ -148,7 +129,6 @@ public class DoctorController : ControllerBase
     }
 
 
-
     [HttpPut("edit-translations/{buildId?}", Order = 0922)]
     public async Task<IActionResult> Add_EditTranslations([FromForm] List<DoctorTranslation> translations, int? buildId)
     {
@@ -165,8 +145,6 @@ public class DoctorController : ControllerBase
 
         return BadRequest(response);
     }
-
-
 
     [HttpPut("deactivate", Order = 0925)]
     public async Task<IActionResult> EditSingleProp([FromQuery] int? id, [FromQuery] string status)
@@ -191,7 +169,6 @@ public class DoctorController : ControllerBase
 
     // ============================= delete ============================= 
 
-
     [HttpDelete("delete-translat", Order = 0930)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)
     {
@@ -201,5 +178,9 @@ public class DoctorController : ControllerBase
             return Ok(res);
         return BadRequest(res);
     }
+
+    #endregion
+
+
 
 }// end class

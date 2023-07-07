@@ -1,4 +1,5 @@
 ﻿
+using DomainModel.Entities;
 using DomainModel.Models;
 using DomainModel.Models.Doctors;
 
@@ -15,4 +16,6 @@ public interface IDoctorRepository : IGenericRepository
 
     Task<List<DoctorVisitPriceDto?>> ReadDoctorVisitPrices(int? id, int? docId, int? priceCategoryId, int? typeVisitId, int? price, string lang);
     Task<List<PeriodWorkDoctorClinicDto>> ReadDoctorWorkPeriod(int? id, int? docId, int? hosId, int? clinicId, int? periodId, byte? day, string? lang);
+    Task<Response<DoctorDto?>> UpdateAttachment(DoctorAttachment docAttachmnet, string ext, Stream? file = null);
+    //Task<Response<DoctorAttachment>> AddDoctorAttachment(DoctorAttachment entity, Stream file);
 }

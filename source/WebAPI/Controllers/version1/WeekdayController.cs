@@ -41,7 +41,6 @@ public class WeekdayController : ControllerBase
             return Created("", response);
         }
         return BadRequest(res);
-
     }
 
 
@@ -49,29 +48,45 @@ public class WeekdayController : ControllerBase
 
 
     [HttpGet(Order = 0801)]
-    public async Task<IActionResult> GetById([FromQuery] int id, [FromQuery] string? lang)
+    public async Task<IActionResult> GetById([FromQuery] int? id)
     {
-        if (id < 1) return BadRequest(new Error("400", "can not assign 0"));
+        if (id < 1)
+            return BadRequest(new Error("400", "can not assign 0"));
 
-        var result = await Data.Generic.GenericReadById<Weekday>(i => i.Id == id, null);
+        var result = await Data.Generic.GenericReadById<Weekday>(f => f.Id.Equals(id), null);
+
+        return Ok(result);
+    }
+
+    [HttpGet("day",Order = 0801)]
+    public async Task<IActionResult> GetByDayNumber([FromQuery] byte? day)
+    {
+        if (day < 1)
+            return BadRequest(new Error("400", "can not assign 0"));
+
+        Expression<Func<Weekday, bool>> filter;
+
+        if (day.HasValue)
+            filter = f => f.DayNumber.Equals(day);
+        else
+           return BadRequest(new Error("400", "can not assign null"));
+
+        var result = await Data.Generic.GenericReadAll(filter, null,null,null);
 
         return Ok(result);
     }
 
 
-
     [HttpGet("names", Order = 0811)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, int? page, int? pageSize)
     {
-
         var result = await Data.Generic.GenericReadAll<Weekday>(t => t.LangCode.Equals(lang), null, page, pageSize);
-
         return Ok(result);
     }
 
     // not working
     [HttpGet("all", Order = 0812)]
-    public async Task<IActionResult> GetAll([FromQuery] bool? isActive, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
+    public async Task<IActionResult> GetAll([FromQuery] bool? isActive, int? pageSize, int? page, string? lang)
     {
 
         var result = await Data.Generic.GenericReadAll<Weekday>(t => t.LangCode.Equals(lang), null, page, pageSize);

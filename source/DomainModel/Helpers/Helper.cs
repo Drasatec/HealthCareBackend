@@ -7,6 +7,13 @@ public static class Helper
         return $"{Guid.NewGuid()}.jpeg";
     }
     
+    public static string GenerateFileName(string fileName)
+    {
+        var extension = Path.GetExtension(fileName);
+
+        return $"{Guid.NewGuid()}{extension}";
+    }
+    
     public static int SkipValue(int page, int pageSize )
     {
         return  (page - 1) * pageSize;

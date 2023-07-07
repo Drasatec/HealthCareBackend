@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using DomainModel.Models.Doctors;
 using System.Diagnostics;
+using DomainModel.Services;
+using System.Net.Mail;
 
 namespace DataAccess.Repositories;
 
@@ -53,6 +55,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             return new Response<DoctorDto>(false, ex.Message + "____and____" + ex.InnerException?.Message, null);
         }
     }
+    
     #endregion
 
 
@@ -92,6 +95,47 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             //Context.Entry(current).Property(p => p).IsModified = false;
             await Context.SaveChangesAsync();
             return respons = new(true, $"update on id: {id}", null);
+        }
+        catch (Exception ex)
+        {
+            return respons = new(false, "can not duplicate foreignKey with same Id ......." + ex.Message + ex.InnerException?.Message, null);
+        }
+    }
+
+    public async Task<Response<DoctorDto?>> UpdateAttachment(DoctorAttachment docAttachmnet,string ext, Stream? file = null)
+    {
+        Response<DoctorDto?> respons;
+        try
+        {
+            var current = Context.DoctorAttachments.Find(docAttachmnet.Id);
+            if (current == null)
+                return respons = new(false, $"id: {docAttachmnet.Id} is not found");
+
+            var fileName = "";
+            var modfied = false;
+
+            if (file != null)
+            {
+                // if file in database is null
+                if (string.IsNullOrEmpty(current.AttachFileName))
+                {
+                    fileName = Helper.GenerateFileName(ext);
+                    _ = FileService.SaveSingleFile(file, fileName);
+                    docAttachmnet.AttachFileName = fileName;
+                    modfied = true;
+                }
+                else
+                {
+                    _ = FileService.UpdateSingleFile(file, current.AttachFileName);
+                    modfied = false;
+                }
+            }
+            current = docAttachmnet;
+            Context.Update(current).Property(propa => propa.AttachFileName).IsModified = modfied;
+            Context.Entry(current).Property(p => p.CreateOn).IsModified = false;
+            await Context.SaveChangesAsync();
+
+            return respons = new(true, $"update on id: {docAttachmnet.Id}", null);
         }
         catch (Exception ex)
         {
