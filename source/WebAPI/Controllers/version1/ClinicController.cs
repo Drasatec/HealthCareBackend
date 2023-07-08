@@ -58,14 +58,29 @@ public class ClinicController : ControllerBase
 
 
     [HttpGet("names", Order = 0911)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? specialtyId, [FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang,int? hosId,  int? specialtyId, int? page, int? pageSize)
     {
         Expression<Func<ClinicTranslation, bool>> filterExpression;
-        if (specialtyId.HasValue)
+        if (specialtyId.HasValue && hosId.HasValue)
+        {
+            filterExpression = f =>
+            f.LangCode == lang && f.Clinic != null &&
+            f.Clinic.SpecialtyId == specialtyId &&
+            f.Clinic.HospitalId == hosId;
+        }
+
+        else if (specialtyId.HasValue)
         {
             filterExpression = f =>
             f.LangCode == lang && f.Clinic != null &&
             f.Clinic.SpecialtyId == specialtyId;
+        }
+
+        else if (hosId.HasValue)
+        {
+            filterExpression = f =>
+            f.LangCode == lang && f.Clinic != null &&
+            f.Clinic.HospitalId == hosId;
         }
         else
             filterExpression = f => f.LangCode == lang;

@@ -19,8 +19,10 @@ namespace DataAccess.UnitOfWorks
         public IGenericRepository TypesVisits { get; private set; }
         public IGenericRepository WorkingPeriods { get; private set; }
         public IGenericRepository Generic { get; private set; }
-
         public IDoctorRepository Doctors { get; private set; }
+
+        public IClientRepository HosClients { get; private set; }
+
 
         public UnitOfWork(AppDbContext context )
         {
@@ -36,6 +38,7 @@ namespace DataAccess.UnitOfWorks
             WorkingPeriods = new GenericRepository(Context);
             Generic = new GenericRepository(Context);
             Doctors = new DoctorRepository(Context);
+            HosClients = new ClientRepository(context);
         }
 
 

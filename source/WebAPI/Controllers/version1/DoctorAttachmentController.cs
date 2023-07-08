@@ -55,6 +55,16 @@ public class DoctorAttachmentController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("get-all_attachments", Order = 09011)]
+    public async Task<IActionResult> GetAllattachmentByDocId([FromQuery] int docId, int? page, int? pageSize)
+    {
+        if (docId < 1)
+            return BadRequest(new Error("400", "can not assign 0"));
+
+        var result = await Data.Generic.GenericReadAll<DoctorAttachment>(f => f.DoctorId == docId, null, page, pageSize) ;
+        return Ok(result);
+    }
+
     [HttpPut("edit_attachment", Order = 09201)]
     public async Task<IActionResult> UpdateAttachment([FromForm] IFormFile? file, [FromForm] DoctorAttachment model)
     {

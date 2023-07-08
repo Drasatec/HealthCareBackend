@@ -39,9 +39,6 @@ public class GenericRepository : IGenericRepository
         }
     }
 
-
-
-
     public async Task<Response<object>> GenericCreateWithImage<TEntity>(TEntity tEntity, Stream? image = null) where TEntity : class
     {
         var entity = (dynamic)tEntity;
@@ -80,6 +77,7 @@ public class GenericRepository : IGenericRepository
             return new Response<object>(false, ex.Message);
         }
     }
+
     // edit
     public async Task<Response> GenericUpdate<TEntity>(List<TEntity> entity) where TEntity : class
     {
@@ -145,7 +143,7 @@ public class GenericRepository : IGenericRepository
         }
     }
 
-    public async Task<Response> GenericUpdateSinglePropertyById<TEntity>(int id, TEntity entity, Expression<Func<TEntity, bool>> propertyExpression) where TEntity : class
+    public async Task<Response> GenericUpdateSinglePropertyById<TEntity>(int id, TEntity entity, Expression<Func<TEntity, object>> propertyExpression) where TEntity : class
     {
         try
         {
@@ -221,7 +219,7 @@ public class GenericRepository : IGenericRepository
     }
 
     // filter and select used in get names
-    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TEntity>>? selectExpression, int? page, int? pageSize) where TEntity : class
+    public async Task<IEnumerable<TEntity>> GenericReadAll<TEntity>(Expression<Func<TEntity, bool>>? filter, Expression<Func<TEntity, TEntity>>? selectExpression, int? page, int? pageSize) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 

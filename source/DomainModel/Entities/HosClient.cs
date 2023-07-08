@@ -7,11 +7,11 @@ public partial class HosClient
 {
     public int Id { get; set; }
 
-    public string? CodeNumber { get; set; }
+    public string CodeNumber { get; set; } = string.Empty;
 
-    public string? NameEn { get; set; }
+    public string NameEn { get; set; } = string.Empty;
 
-    public string? NameOriginalLang { get; set; }
+    public string NameOriginalLang { get; set; } = string.Empty;
 
     public string? Address { get; set; }
 
@@ -29,7 +29,7 @@ public partial class HosClient
 
     public string? Password { get; set; }
 
-    public byte? ClientStatus { get; set; }
+    public byte ClientStatus { get; set; }
 
     public string? Reason { get; set; }
 

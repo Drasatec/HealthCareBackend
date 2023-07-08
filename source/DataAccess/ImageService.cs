@@ -12,7 +12,7 @@ public static class DataAccessImageService
     private const string medium = "medium";
     private const string small = "small";
     //private const string large = "large";
-    private static readonly  string path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot\\Images");
+    private static readonly  string path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot\\Images\\");
 
     public static async Task<string> SaveSingleImage(Stream image, string? name = null)
     {
