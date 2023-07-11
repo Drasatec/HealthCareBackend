@@ -1,6 +1,7 @@
 ﻿using DomainModel.Entities;
 using DomainModel.Entities.TranslationModels;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace DataAccess.Contexts;
 
@@ -12,6 +13,15 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options): base(options){}
 
     #region DbSets
+    public virtual DbSet<Currency> Currencies { get; set; }
+
+    public virtual DbSet<EmployeesStatus> EmployeesStatuses { get; set; }
+
+    public virtual DbSet<EmployeesStatusTranslation> EmployeesStatusTranslations { get; set; }
+
+    public virtual DbSet<Gender> Genders { get; set; }
+
+
     public virtual DbSet<Booking> Bookings { get; set; }
 
     public virtual DbSet<BuildingTranslation> BuildingTranslations { get; set; }
@@ -213,6 +223,74 @@ public class AppDbContext : DbContext
 
 
 
+        modelBuilder.Entity<Currency>(entity =>
+        {
+            entity.HasIndex(e => e.CurrencyName, "IX_Currencies_CurrencyName");
+
+            entity.Property(e => e.Country)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("country");
+            entity.Property(e => e.CurrencyCode)
+                .HasMaxLength(3)
+                .IsUnicode(false);
+            entity.Property(e => e.CurrencyName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Latitude).HasColumnType("decimal(10, 8)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(10, 8)");
+            entity.Property(e => e.Symbol)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<EmployeesStatus>(entity =>
+        {
+            entity.ToTable("EmployeesStatus");
+
+            entity.Property(e => e.CreateOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<EmployeesStatusTranslation>(entity =>
+        {
+            entity.HasIndex(e => e.StatusName, "IX_EmployeesStatusTranslations_StatusName");
+
+            entity.HasIndex(e => new { e.EmployeeStatusId, e.LangCode }, "UK_EmployeesStatusTranslations_LangCode_EmployeeStatusId").IsUnique();
+
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.StatusName).HasMaxLength(20);
+
+            entity.HasOne(d => d.EmployeeStatus).WithMany(p => p.EmployeesStatusTranslations)
+                .HasForeignKey(d => d.EmployeeStatusId)
+                .HasConstraintName("FK_EmployeesStatusTranslations_EmployeeStatusId");
+
+            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.EmployeesStatusTranslations)
+            //    .HasForeignKey(d => d.LangCode)
+            //    .HasConstraintName("FK_EmployeesStatusTranslations_LangCode");
+        });
+
+        modelBuilder.Entity<Gender>(entity =>
+        {
+            entity.HasIndex(e => e.GenderNumber, "IX_Genders_GenderNumber");
+
+            entity.HasIndex(e => new { e.GenderNumber, e.LangCode }, "UK_Genders_GenderNumber_LangCode").IsUnique();
+
+            entity.Property(e => e.GenderName).HasMaxLength(20);
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+
+            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.Genders)
+            //    .HasForeignKey(d => d.LangCode)
+            //    .OnDelete(DeleteBehavior.ClientSetNull)
+            //    .HasConstraintName("FK_Genders_LangCode");
+        });
+
+
 
         modelBuilder.Entity<Doctor>(entity =>
         {
@@ -270,7 +348,11 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<DoctorsDegree>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.ToTable("DoctorsDegrees");
+            entity.Property(e => e.CreateOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
         });
 
         modelBuilder.Entity<DoctorsDegreesTranslation>(entity =>
@@ -1140,7 +1222,7 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("Weekdays");
 
-            entity.HasIndex(e => new { e.DayNumber, e.LangCode }, "UK_Weekdays_Id_LangCode").IsUnique();
+            entity.HasIndex(e => new { e.DayNumber, e.LangCode }, "UK_Weekdays_DayNumber_LangCode").IsUnique();
 
             entity.Property(e => e.LangCode)
                 .HasMaxLength(6)
@@ -1149,6 +1231,6 @@ public class AppDbContext : DbContext
 
         //OnModelCreatingPartial(modelBuilder);
     }
-
+    
     //partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

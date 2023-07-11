@@ -120,7 +120,7 @@ public class FloorRepository : GenericRepository, IFloorRepository
         }
     }
 
-    public async Task<AllFloorDto?> ReadAll(int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int? page)
+    public async Task<PagedResponse<FloorDto>?> ReadAll(int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int? page)
     {
         IQueryable<HosFloor> query = Context.HosFloors;
 
@@ -173,12 +173,12 @@ public class FloorRepository : GenericRepository, IFloorRepository
 
         await query.ToListAsync();
 
-        var all = new AllFloorDto();
+        var all = new PagedResponse<FloorDto>();
         var result = FloorDto.ToList(query);
         all.Total = total;
         all.Page = page;
         all.PageSize = pageSize;
-        all.Floors = result.ToList();
+        all.Data = result.ToList();
         return all;
     }
 
@@ -200,7 +200,7 @@ public class FloorRepository : GenericRepository, IFloorRepository
         return  await query.ToListAsync();
     }
 
-    public async Task<AllFloorDto?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
+    public async Task<PagedResponse<FloorDto>?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
     {
         var query = from h in Context.HosFloors 
                     join t in Context.FloorTranslations on h.Id equals t.FloorId
@@ -236,12 +236,12 @@ public class FloorRepository : GenericRepository, IFloorRepository
 
         var listDto = await query.OrderByDescending(h => h.Id).ToListAsync();
 
-        var all = new AllFloorDto
+        var all = new PagedResponse<FloorDto>
         {
             Total = totalCount,
             Page = page,
             PageSize = pageSize,
-            Floors = listDto
+            Data = listDto
         };
         return all;
     }

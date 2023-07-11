@@ -50,5 +50,4 @@ public partial class Doctor
     public virtual ICollection<SpecialtiesDoctor> SpecialtiesDoctors { get; set; } = new List<SpecialtiesDoctor>();
     public virtual ICollection<DoctorAttachment> DoctorAttachments { get; set; } = new List<DoctorAttachment>();
 
-
 }

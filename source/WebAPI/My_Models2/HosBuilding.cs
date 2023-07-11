@@ -26,6 +26,4 @@ public partial class HosBuilding
     public virtual ICollection<HosRoom> HosRooms { get; set; } = new List<HosRoom>();
 
     public virtual Hospital Hospital { get; set; } = null!;
-
-    public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
 }

@@ -17,7 +17,11 @@ public partial class Language
 
     public virtual ICollection<DoctorsDegreesTranslation> DoctorsDegreesTranslations { get; set; } = new List<DoctorsDegreesTranslation>();
 
+    public virtual ICollection<EmployeesStatusTranslation> EmployeesStatusTranslations { get; set; } = new List<EmployeesStatusTranslation>();
+
     public virtual ICollection<FloorTranslation> FloorTranslations { get; set; } = new List<FloorTranslation>();
+
+    public virtual ICollection<Gender> Genders { get; set; } = new List<Gender>();
 
     public virtual ICollection<HospitalTranslation> HospitalTranslations { get; set; } = new List<HospitalTranslation>();
 
@@ -42,6 +46,8 @@ public partial class Language
     public virtual ICollection<SsntypesTranslation> SsntypesTranslations { get; set; } = new List<SsntypesTranslation>();
 
     public virtual ICollection<TypesVisitTranslation> TypesVisitTranslations { get; set; } = new List<TypesVisitTranslation>();
+
+    public virtual ICollection<Weekday> Weekdays { get; set; } = new List<Weekday>();
 
     public virtual ICollection<WorkingPeriodTranslation> WorkingPeriodTranslations { get; set; } = new List<WorkingPeriodTranslation>();
 }

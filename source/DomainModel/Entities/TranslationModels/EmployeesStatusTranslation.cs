@@ -4,17 +4,18 @@ using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.TranslationModels;
 
-public partial class DoctorsDegreesTranslation
+public partial class EmployeesStatusTranslation
 {
     public int Id { get; set; }
 
-    public string DegreeName { get; set; } = string.Empty;
+    public string StatusName { get; set; } = string.Empty;
 
-    public short? DoctorDegreeId { get; set; }
+    public short EmployeeStatusId { get; set; }
 
     public string LangCode { get; set; } = null!;
+
     [JsonIgnore]
-    public virtual DoctorsDegree? DoctorDegree { get; set; }
+    public virtual EmployeesStatus? EmployeeStatus { get; set; }
 
     //public virtual Language? LangCodeNavigation { get; set; }
 }

@@ -120,7 +120,7 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
         }
     }
 
-    public async Task<AllBuildingDto?> ReadAll(int? hosId, bool? isHosActive, string? status, string? lang, int? pageSize, int? page)
+    public async Task<PagedResponse<BuildingDto>?> ReadAll(int? hosId, bool? isHosActive, string? status, string? lang, int? pageSize, int? page)
     {
         IQueryable<HosBuilding> query = Context.HosBuildings;
 
@@ -175,18 +175,18 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
 
         await query.ToListAsync();
 
-        var all = new AllBuildingDto();
+        var all = new PagedResponse<BuildingDto>();
         var result = BuildingDto.ToList(query);
         all.Total = total;
         all.Page = page;
         all.PageSize = pageSize;
-        all.Buildings = result.ToList();
+        all.Data = result.ToList();
         return all;
     }
 
 
 
-    public async Task<AllBuildingDto?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
+    public async Task<PagedResponse<BuildingDto>?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
     {
         var query = from h in Context.HosBuildings
                     join t in Context.BuildingTranslations on h.Id equals t.BuildeingId
@@ -220,12 +220,12 @@ public class BuildingRepository : GenericRepository, IBuildingRepository
 
         var listDto = await query.OrderByDescending(h => h.Id).ToListAsync();
 
-        var all = new AllBuildingDto
+        var all = new PagedResponse<BuildingDto>
         {
             Total = totalCount,
             Page = page,
             PageSize = pageSize,
-            Buildings = listDto
+            Data = listDto
         };
         return all;
     }

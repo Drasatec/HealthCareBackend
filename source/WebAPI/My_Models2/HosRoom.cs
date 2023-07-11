@@ -33,8 +33,6 @@ public partial class HosRoom
 
     public virtual Hospital Hospital { get; set; } = null!;
 
-    public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
-
     public virtual ICollection<RoomTranslation> RoomTranslations { get; set; } = new List<RoomTranslation>();
 
     public virtual RoomType RoomType { get; set; } = null!;

@@ -123,7 +123,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         }
     }
 
-    public async Task<AllHospitalsDto?> ReadAllHospitals(string? status, string? lang, int? pageSize, int? page)
+    public async Task<PagedResponse<HospitalDto>?> ReadAllHospitals(string? status, string? lang, int? pageSize, int? page)
     {
         IQueryable<Hospital> query = Context.Hospitals;
 
@@ -162,12 +162,12 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         
         await query.ToListAsync();
 
-        var all = new AllHospitalsDto();
+        var all = new PagedResponse<HospitalDto>();
         var result = HospitalDto.ToList(query);
         all.Total = total;
         all.Page = page;
         all.PageSize = pageSize;
-        all.Hospitals = result.ToList();
+        all.Data = result.ToList();
         return all;
     }
 
@@ -192,7 +192,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         }
     }
 
-    public async Task<AllHospitalsDto?> SearchByHospitalNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
+    public async Task<PagedResponse<HospitalDto>?> SearchByHospitalNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
     {
         var query = from h in Context.Hospitals
                     join t in Context.HospitalTranslations on h.Id equals t.HospitalId
@@ -225,12 +225,12 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
 
         var listDto = await query.OrderByDescending(h => h.Id).ToListAsync();
 
-        var all = new AllHospitalsDto
+        var all = new PagedResponse<HospitalDto>
         {
             Total = totalCount,
             Page = page,
             PageSize = pageSize,
-            Hospitals = listDto
+            Data = listDto
         };
         return all;
     }

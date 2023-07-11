@@ -1,7 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Collections.Generic;
 
-namespace DomainModel.Entities;
-public class Weekday
+namespace WebAPI.My_Models2;
+
+public partial class Weekday
 {
     public int Id { get; set; }
 
@@ -10,4 +12,6 @@ public class Weekday
     public string WeekdayName { get; set; } = null!;
 
     public string LangCode { get; set; } = null!;
+
+    public virtual Language LangCodeNavigation { get; set; } = null!;
 }

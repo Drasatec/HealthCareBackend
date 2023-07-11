@@ -4,6 +4,7 @@ using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
+using DomainModel.Models.Dtos;
 using DomainModel.Models.Floors;
 using DomainModel.Models.MedicalSpecialteis;
 using DomainModel.Models.Rooms;
@@ -130,7 +131,7 @@ public class RoomRepository : GenericRepository, IRoomRepository
     }
 
 
-    public async Task<AllRoomDto?> ReadAll(int? roomTypeId, int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int? page)
+    public async Task<PagedResponse<RoomDto>?> ReadAll(int? roomTypeId, int? baseid, bool? isBaseActive, string? status, string? lang, int? pageSize, int? page)
     {
         IQueryable<HosRoom> query = Context.HosRooms;
 
@@ -201,19 +202,19 @@ public class RoomRepository : GenericRepository, IRoomRepository
              })
              .ToListAsync();
 
-        AllRoomDto all = new()
+        PagedResponse<RoomDto> all = new()
         {
             Total = total,
             Page = page,
             PageSize = pageSize,
-            Rooms = result
+            Data = result
         };
         return all;
     }
 
 
 
-    public async Task<AllRoomDto?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
+    public async Task<PagedResponse<RoomDto>?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
     {
         var query = from h in Context.HosRooms
                     join t in Context.RoomTranslations on h.Id equals t.RoomId
@@ -252,47 +253,47 @@ public class RoomRepository : GenericRepository, IRoomRepository
         var listDto = await query.OrderByDescending(h => h.Id)
                                  .ToListAsync();
 
-        var all = new AllRoomDto
+        var all = new PagedResponse<RoomDto>
         {
             Total = totalCount,
             Page = page,
             PageSize = pageSize,
-            Rooms = listDto
+            Data = listDto
         };
         return all;
     }
 
     // old
-    public async Task<AllRoomDto?> SearchByNameOrCode1(string searchTerm, string lang = "ar", int page = 1, int pageSize = Constants.PageSize)
-    {
-        int skip = Helper.SkipValue(page, pageSize);
-        IQueryable<HosRoom> query = Context.HosRooms;
+    //public async Task<PagedResponse<RoomDto>?> SearchByNameOrCode1(string searchTerm, string lang = "ar", int page = 1, int pageSize = Constants.PageSize)
+    //{
+    //    int skip = Helper.SkipValue(page, pageSize);
+    //    IQueryable<HosRoom> query = Context.HosRooms;
 
-        var hospitals = await Context.HosRooms
-           .Join(Context.RoomTranslations,
-               h => h.Id,
-               t => t.RoomId,
-               (h, t) => new { HosRoom = h, Translation = t })
-           .Where(x => (x.HosRoom.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
-           .Skip(skip).Take(pageSize)
-           .Select(x => new RoomDto
-           {
-               Id = x.HosRoom.Id,
-               Photo = x.HosRoom.Photo,
-               CodeNumber = x.HosRoom.CodeNumber,
-               RoomTranslations = new List<RoomTranslation> { x.Translation }
-           })
-           .ToListAsync();
+    //    var hospitals = await Context.HosRooms
+    //       .Join(Context.RoomTranslations,
+    //           h => h.Id,
+    //           t => t.RoomId,
+    //           (h, t) => new { HosRoom = h, Translation = t })
+    //       .Where(x => (x.HosRoom.CodeNumber.Contains(searchTerm) && x.Translation.LangCode == lang) || x.Translation.Name.Contains(searchTerm) && x.Translation.LangCode == lang)
+    //       .Skip(skip).Take(pageSize)
+    //       .Select(x => new RoomDto
+    //       {
+    //           Id = x.HosRoom.Id,
+    //           Photo = x.HosRoom.Photo,
+    //           CodeNumber = x.HosRoom.CodeNumber,
+    //           RoomTranslations = new List<RoomTranslation> { x.Translation }
+    //       })
+    //       .ToListAsync();
 
-        var all = new AllRoomDto
-        {
-            Total = hospitals.Count,
-            Page = page,
-            PageSize = pageSize,
-            Rooms = hospitals
-        };
-        return all;
-    }
+    //    var all = new PagedResponse<RoomDto>
+    //    {
+    //        Total = hospitals.Count,
+    //        Page = page,
+    //        PageSize = pageSize,
+    //        Data = hospitals
+    //    };
+    //    return all;
+    //}
 
     #endregion
 }

@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+
 namespace WebAPI.My_Models2;
 
 public partial class MedicalSpecialty

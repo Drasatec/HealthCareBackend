@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace WebAPI.My_Models2;
 
-public partial class PriceDoctorVisit
+public partial class DoctorVisitPrice
 {
     public int Id { get; set; }
 
