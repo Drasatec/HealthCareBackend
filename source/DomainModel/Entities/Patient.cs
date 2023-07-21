@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities;
 
@@ -10,9 +8,9 @@ public partial class Patient
 
     public string MedicalFileNumber { get; set; } = null!;
 
-    public string? PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; } = string.Empty;
 
-    public string? Address { get; set; }
+    //public string? Address { get; set; }  // delete this
 
     public byte? Gender { get; set; }
 
@@ -20,7 +18,7 @@ public partial class Patient
 
     public byte? MaritalStatus { get; set; }
 
-    public byte? Ssn { get; set; }
+    public byte? Ssn { get; set; } // delete this
 
     public byte? NationalId { get; set; }
 

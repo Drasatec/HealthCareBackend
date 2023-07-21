@@ -26,6 +26,7 @@ namespace DomainModel.Interfaces
         IGenericRepository Generic { get; }
         IDoctorRepository Doctors { get; }
         IClientRepository HosClients { get; }
+        IPatientRepository Patients { get; }
 
         int Complete();
     }

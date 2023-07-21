@@ -660,7 +660,6 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => e.MedicalFileNumber, "UQ__Patients__31851D959784584E").IsUnique();
 
-            entity.Property(e => e.Address).HasMaxLength(50);
             entity.Property(e => e.BirthDate).HasColumnType("date");
             entity.Property(e => e.BloodType)
                 .HasMaxLength(10)
@@ -1184,6 +1183,7 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => new { e.PatientId, e.LangCode }, "UK_PatientTranslations_LangCode_PatientId").IsUnique();
 
+            entity.Property(e => e.Address).HasMaxLength(50);
             entity.Property(e => e.Employer).HasMaxLength(50);
             entity.Property(e => e.FullName).HasMaxLength(60);
             entity.Property(e => e.LangCode)

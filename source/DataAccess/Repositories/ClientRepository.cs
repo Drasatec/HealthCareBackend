@@ -3,7 +3,7 @@ using DomainModel.Entities;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
-using DomainModel.Models.Client;
+using DomainModel.Models.Clients;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;

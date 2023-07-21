@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 using DomainModel.Contracts;
-using DomainModel.Models.Client;
+using DomainModel.Models.Clients;
 
 namespace WebAPI.Controllers.version1;
 

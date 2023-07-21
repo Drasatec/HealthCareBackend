@@ -1,14 +1,6 @@
-﻿using DomainModel.Entities.TranslationModels;
-using DomainModel.Entities;
-using DomainModel.Models.Doctors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DomainModel.Models.MedicalSpecialteis;
+﻿using DomainModel.Entities;
 
-namespace DomainModel.Models.Client;
+namespace DomainModel.Models.Clients;
 public class HotClientDto
 {
     public int Id { get; set; }

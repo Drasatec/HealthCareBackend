@@ -3,9 +3,6 @@ using DomainModel.Helpers;
 using DomainModel.Models;
 using DomainModel.Models.Doctors;
 using DomainModel.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
 
