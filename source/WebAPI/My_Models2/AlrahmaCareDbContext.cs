@@ -17,6 +17,10 @@ public partial class AlrahmaCareDbContext : DbContext
 
     public virtual DbSet<Booking> Bookings { get; set; }
 
+    public virtual DbSet<BookingStatus> BookingStatuses { get; set; }
+
+    public virtual DbSet<BookingStatusesTranslation> BookingStatusesTranslations { get; set; }
+
     public virtual DbSet<BuildingTranslation> BuildingTranslations { get; set; }
 
     public virtual DbSet<ClientGroup> ClientGroups { get; set; }
@@ -123,7 +127,7 @@ public partial class AlrahmaCareDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=DESKTOP-JT9VS5J\\SQLEXPRESS; Initial Catalog=alrahma_care_db;Trusted_Connection=true; TrustServerCertificate=true;");
+        => optionsBuilder.UseSqlServer("Data Source=pcFawzy\\SQLEXPRESS; Initial Catalog=alrahma_care_db;Trusted_Connection=true; TrustServerCertificate=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -138,29 +142,78 @@ public partial class AlrahmaCareDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.VisitingDate).HasColumnType("date");
 
+            entity.HasOne(d => d.BookingStatus).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.BookingStatusId)
+                .HasConstraintName("FK_Booking_BookingStatusId");
+
             entity.HasOne(d => d.Clinic).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.ClinicId)
                 .HasConstraintName("FK_Booking_ClinicId");
 
+            entity.HasOne(d => d.Currency).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.CurrencyId)
+                .HasConstraintName("FK_Booking_CurrencyId");
+
             entity.HasOne(d => d.Doctor).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.DoctorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Booking_DoctorId");
 
             entity.HasOne(d => d.Hospital).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.HospitalId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Booking_HospitalId");
 
             entity.HasOne(d => d.Patient).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.PatientId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Booking_PatientId");
+
+            entity.HasOne(d => d.PriceCategory).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.PriceCategoryId)
+                .HasConstraintName("FK_Booking_PriceCategoryId");
+
+            entity.HasOne(d => d.Specialty).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.SpecialtyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Booking_SpecialtyId");
 
             entity.HasOne(d => d.TypeVisit).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.TypeVisitId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Booking_TypeVisitId");
 
             entity.HasOne(d => d.WorkingPeriod).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.WorkingPeriodId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Booking_WorkingPeriodId");
+        });
+
+        modelBuilder.Entity<BookingStatus>(entity =>
+        {
+            entity.Property(e => e.CreateOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<BookingStatusesTranslation>(entity =>
+        {
+            entity.HasIndex(e => e.StatusName, "IX_BookingStatusesTranslations_StatusName");
+
+            entity.HasIndex(e => new { e.BookingStatusId, e.LangCode }, "UK_BookingStatusesTranslations_LangCode_BookingStatusId").IsUnique();
+
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.StatusName).HasMaxLength(50);
+
+            entity.HasOne(d => d.BookingStatus).WithMany(p => p.BookingStatusesTranslations)
+                .HasForeignKey(d => d.BookingStatusId)
+                .HasConstraintName("FK_BookingStatusesTranslations_BookingStatusId");
+
+            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.BookingStatusesTranslations)
+                .HasForeignKey(d => d.LangCode)
+                .HasConstraintName("FK_BookingStatusesTranslations_LangCode");
         });
 
         modelBuilder.Entity<BuildingTranslation>(entity =>
@@ -307,6 +360,8 @@ public partial class AlrahmaCareDbContext : DbContext
         {
             entity.HasIndex(e => e.CurrencyName, "IX_Currencies_CurrencyName");
 
+            entity.HasIndex(e => e.CurrencyCode, "UK_Currencies_CurrencyCode").IsUnique();
+
             entity.Property(e => e.Country)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -317,8 +372,8 @@ public partial class AlrahmaCareDbContext : DbContext
             entity.Property(e => e.CurrencyName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.Latitude).HasColumnType("decimal(10, 8)");
-            entity.Property(e => e.Longitude).HasColumnType("decimal(10, 8)");
+            entity.Property(e => e.Latitude).HasColumnType("decimal(12, 9)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(12, 9)");
             entity.Property(e => e.Symbol)
                 .HasMaxLength(10)
                 .IsUnicode(false);
@@ -830,9 +885,8 @@ public partial class AlrahmaCareDbContext : DbContext
 
             entity.HasIndex(e => e.PhoneNumber, "IX_Patients_PhoneNumber");
 
-            entity.HasIndex(e => e.MedicalFileNumber, "UQ__Patients__31851D95AB38E168").IsUnique();
+            entity.HasIndex(e => e.MedicalFileNumber, "UQ__Patients__31851D9553403873").IsUnique();
 
-            entity.Property(e => e.Address).HasMaxLength(50);
             entity.Property(e => e.BirthDate).HasColumnType("date");
             entity.Property(e => e.BloodType)
                 .HasMaxLength(10)
@@ -874,13 +928,13 @@ public partial class AlrahmaCareDbContext : DbContext
 
             entity.HasIndex(e => new { e.PatientId, e.LangCode }, "UK_PatientTranslations_LangCode_PatientId").IsUnique();
 
+            entity.Property(e => e.Address).HasMaxLength(50);
             entity.Property(e => e.Employer).HasMaxLength(50);
             entity.Property(e => e.FullName).HasMaxLength(60);
             entity.Property(e => e.LangCode)
                 .HasMaxLength(6)
                 .IsUnicode(false);
             entity.Property(e => e.Occupation).HasMaxLength(50);
-            entity.Property(e => e.Religion).HasMaxLength(50);
 
             entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.PatientTranslations)
                 .HasForeignKey(d => d.LangCode)

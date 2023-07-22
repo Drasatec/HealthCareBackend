@@ -654,25 +654,281 @@ VALUES
 
 GO
 -- ===========================================================================================================================================================
+-- Inserting data into SSNTypes
+INSERT INTO SSNTypes (CodeNumber)
+VALUES ('SSN1'),
+       ('SSN2'),
+       ('SSN3'),
+       ('SSN4'),
+       ('SSN5');
+
+-- Inserting translation data for the SSN types (English and Arabic translations)
+-- Assuming SSNTypeId starts from 1 for the first row in SSNTypes table
+INSERT INTO SSNTypesTranslations (Name, SSNTypeId, LangCode)
+VALUES
+('Social Security Number 1', 1, 'en'),
+('رقم الضمان الاجتماعي 1', 1, 'ar'),
+('Social Security Number 2', 2, 'en'),
+('رقم الضمان الاجتماعي 2', 2, 'ar'),
+('Social Security Number 3', 3, 'en'),
+('رقم الضمان الاجتماعي 3', 3, 'ar'),
+-- Continue inserting translations for other SSN types and languages.
+('Social Security Number 4', 4, 'en'),
+('رقم الضمان الاجتماعي 4', 4, 'ar'),
+('Social Security Number 5', 5, 'en'),
+('رقم الضمان الاجتماعي 5', 5, 'ar');
+
 GO
 -- ===========================================================================================================================================================
+-- Inserting data into WorkingPeriod
+INSERT INTO WorkingPeriod (CodeNumber, StartTime, EndTime)
+VALUES ('WP1', '08:00', '12:00'),
+       ('WP2', '13:00', '17:00'),
+       ('WP3', '09:00', '13:00'),
+       ('WP4', '14:00', '18:00'),
+       ('WP5', '10:00', '14:00');
+
+-- Inserting translation data for the working periods (English and Arabic translations)
+-- Assuming WorkingPeriodId starts from 1 for the first row in WorkingPeriod table
+INSERT INTO WorkingPeriodTranslations (Name, WorkingPeriodId, LangCode)
+VALUES
+('Morning Shift', 1, 'en'),
+('فترة الصباح', 1, 'ar'),
+('Afternoon Shift', 2, 'en'),
+('فترة الظهر', 2, 'ar'),
+('Day Shift', 3, 'en'),
+('فترة النهار', 3, 'ar'),
+-- Continue inserting translations for other working periods and languages.
+('Evening Shift', 4, 'en'),
+('فترة المساء', 4, 'ar'),
+('Late Shift', 5, 'en'),
+('فترة الليل', 5, 'ar');
+
 GO
 -- ===========================================================================================================================================================
+-- Inserting data into PriceCategories
+INSERT INTO PriceCategories (CodeNumber, Symbol)
+VALUES ('PC1', '$'),
+       ('PC2', '€'),
+       ('PC3', '£'),
+       ('PC4', '¥'),
+       ('PC5', '₹');
+
+-- Inserting translation data for the price categories (English and Arabic translations)
+-- Assuming PriceCategoryId starts from 1 for the first row in PriceCategories table
+INSERT INTO PriceCategoryTranslations (Name, PriceCategoryId, Description, LangCode)
+VALUES
+('Gold', 1, 'Gold Currency', 'en'),
+('الذهبية', 1, 'العملة الذهبية', 'ar'),
+('Silver', 2, 'Silver Currency', 'en'),
+('الفضية', 2, 'العملة الفضية', 'ar'),
+('Bronze', 3, 'Bronze Currency', 'en'),
+('البرونزية', 3, 'العملة البرونزية', 'ar'),
+-- Continue inserting translations for other price categories and languages.
+('Yen', 4, 'Yen Currency', 'en'),
+('الين', 4, 'العملة الين', 'ar'),
+('Rupees', 5, 'Rupees Currency', 'en'),
+('الروبية', 5, 'العملة الروبية', 'ar');
 GO
 -- ===========================================================================================================================================================
+-- Inserting data into TypesVisit
+INSERT INTO TypesVisit (CodeNumber) VALUES ('TV1'), ('TV2'), ('TV3'), ('TV4'), ('TV5');
+
+-- Inserting translation data for TypesVisit (English and Arabic translations)
+-- Assuming TypeVisitId starts from 1 for the first row in TypesVisit table
+INSERT INTO TypesVisitTranslations (Name, TypeVisitId, LangCode)
+VALUES
+('Visit Type 1', 1, 'en'),
+('زيارة نوع 1', 1, 'ar'),
+('Visit Type 2', 2, 'en'),
+('زيارة نوع 2', 2, 'ar'),
+('Visit Type 3', 3, 'en'),
+('زيارة نوع 3', 3, 'ar'),
+('Visit Type 4', 4, 'en'),
+('زيارة نوع 4', 4, 'ar'),
+('Visit Type 5', 5, 'en'),
+('زيارة نوع 5', 5, 'ar');
 GO
 -- ===========================================================================================================================================================
+-- Inserting data into Nationalities
+INSERT INTO Nationalities (Symbol) VALUES ('NT1'), ('NT2'), ('NT3'), ('NT4'), ('NT5');
+
+-- Inserting translation data for Nationalities (English and Arabic translations)
+-- Assuming NationalityId starts from 1 for the first row in Nationalities table
+INSERT INTO NationalitiesTranslations (Name, NationalityId, LangCode)
+VALUES
+('Nationality 1', 1, 'en'),
+('الجنسية 1', 1, 'ar'),
+('Nationality 2', 2, 'en'),
+('الجنسية 2', 2, 'ar'),
+('Nationality 3', 3, 'en'),
+('الجنسية 3', 3, 'ar'),
+('Nationality 4', 4, 'en'),
+('الجنسية 4', 4, 'ar'),
+('Nationality 5', 5, 'en'),
+('الجنسية 5', 5, 'ar');
 GO
 -- ===========================================================================================================================================================
+-- Inserting data into DoctorsDegrees
+INSERT INTO DoctorsDegrees (CreateOn) VALUES (GETDATE()), (GETDATE()), (GETDATE()), (GETDATE());
+
+-- Inserting translation data for DoctorsDegrees (English and Arabic translations)
+-- Assuming DoctorDegreeId starts from 1 for the first row in DoctorsDegrees table
+INSERT INTO DoctorsDegreesTranslations (DegreeName, DoctorDegreeId, LangCode)
+VALUES
+('General', 1, 'en'),
+('عام', 1, 'ar'),
+('Specialist', 2, 'en'),
+('اخصائي', 2, 'ar'),
+('Consultant', 3, 'en'),
+('استشاري', 3, 'ar'),
+('University Professor', 4, 'en'),
+('أستاذ جامعي', 4, 'ar');
+
 GO
 -- ===========================================================================================================================================================
+-- Inserting data into EmployeesStatus
+INSERT INTO EmployeesStatus (CreateOn) VALUES (GETDATE()), (GETDATE()), (GETDATE()), (GETDATE()), (GETDATE());
+
+-- Inserting translation data for EmployeesStatus (English and Arabic translations)
+-- Assuming EmployeeStatusId starts from 1 for the first row in EmployeesStatus table
+INSERT INTO EmployeesStatusTranslations (StatusName, EmployeeStatusId, LangCode)
+VALUES
+('On Leave', 1, 'en'),
+('في إجازة', 1, 'ar'),
+('Sick', 2, 'en'),
+('مريض', 2, 'ar'),
+('Terminated', 3, 'en'),
+('مفصول', 3, 'ar'),
+('No Longer Employed', 4, 'en'),
+('لم يعد يعمل معنا', 4, 'ar');
+
 GO
 -- ===========================================================================================================================================================
+-- Inserting data into Doctors
+INSERT INTO Doctors (CodeNumber, gender, Photo, WorkingHours, DocStatus, Reason, PhoneNumber, DoctorsDegreeId, NationalityId)
+VALUES
+('DOC001', 1, 'photo1.jpg', 8, 0, NULL, '+123456789', 1, 1),
+('DOC002', 2, 'photo2.jpg', 9, 0, NULL, '+987654321', 2, 2),
+('DOC003', 1, 'photo3.jpg', 7, 2, 'Standing reason', '+111111111', 3, 3),
+('DOC004', 1, 'photo4.jpg', 10, 1, 'Inactive reason', '+222222222', 1, 2),
+('DOC005', 2, 'photo5.jpg', 8, 0, NULL, '+333333333', 4, 1);
+
+-- Inserting translation data for Doctors (English and Arabic translations)
+-- Assuming DoctorId starts from 1 for the first row in Doctors table
+INSERT INTO DoctorTranslations (FullName, Headline, About, DoctorId, LangCode)
+VALUES
+('Dr. John Doe', 'General Practitioner', 'Experienced doctor specialized in general medicine.', 1, 'en'),
+('د. أحمد علي', 'اختصاصي باطنية', 'طبيب ذو خبرة في الطب العام والأمراض الداخلية.', 1, 'ar'),
+('Dr. Sarah Smith', 'Pediatrician', 'Pediatric specialist with expertise in child health.', 2, 'en'),
+('د. محمد خالد', 'أخصائي أطفال', 'طبيب مختص في صحة الأطفال.', 2, 'ar'),
+('Dr. Michael Johnson', 'Orthopedic Surgeon', 'Highly skilled orthopedic surgeon.', 3, 'en'),
+('د. أحمد مصطفى', 'جراح عظام', 'جراح عظام ذو خبرة عالية.', 3, 'ar'),
+('Dr. Emily Williams', 'Obstetrician-Gynecologist', 'Specialized in women s health and reproductive system.', 4, 'en'),
+('د. نورة عبدالله', 'نسائية وتوليد', 'خبيرة في صحة المرأة والجهاز التناسلي.', 4, 'ar'),
+('Dr. David Lee', 'Dermatologist', 'Dermatology specialist with expertise in skin conditions.', 5, 'en'),
+('د. عبدالرحمن السعيد', 'أخصائي أمراض جلدية', 'مختص في أمراض الجلد والأمراض المتعلقة بالجلد.', 5, 'ar');
+
 GO
 -- ===========================================================================================================================================================
+INSERT INTO DoctorVisitPrices (Price, PriceCurrency, DoctorId, PriceCategoryId, TypeVisitId)
+VALUES
+(100, 'USD', 1, 1, 1), -- DoctorId = 1, PriceCategoryId = 1, TypeVisitId = 1
+(80, 'USD', 1, 2, 2),  -- DoctorId = 1, PriceCategoryId = 2, TypeVisitId = 2
+(120, 'USD', 2, 1, 1), -- DoctorId = 2, PriceCategoryId = 1, TypeVisitId = 1
+(90, 'USD', 2, 2, 2),  -- DoctorId = 2, PriceCategoryId = 2, TypeVisitId = 2
+(150, 'USD', 3, 1, 1); -- DoctorId = 3, PriceCategoryId = 1, TypeVisitId = 1
+
 GO
 -- ===========================================================================================================================================================
+INSERT INTO SpecialtiesDoctors (DoctorId, MedicalSpecialtyId, CreateOn)
+VALUES 
+    (1, 1, GETDATE()),
+    (1, 2, GETDATE()),
+    (2, 1, GETDATE()),
+    (3, 2, GETDATE()),
+    (4, 4, GETDATE());
+
 GO
 -- ===========================================================================================================================================================
+INSERT INTO PeriodWorkDoctorClinic (HospitalId, ClinicId, DoctorId, WorkingPeriodId, OnDay)
+VALUES 
+    (1, 1, 1, 1, 1),
+    (2, 2, 2, 2, 2),
+    (1, 3, 3, 3, 3),
+    (2, 4, 4, 4, 4),
+    (1, 5, 5, 5, 5);
+
+GO
+-- ===========================================================================================================================================================
+-- Insert data into the Patients table
+INSERT INTO Patients (MedicalFileNumber, PhoneNumber, gender, BirthDate, MaritalStatus, SSN, NationalID, BloodType, PatientStatus, Photo, Religion, SSNTypeId, IsDeleted, NationalityId)
+VALUES
+    ('MFN12345', '123456789', 1, '1990-05-15', 2, 1, 1, 'A+', 0, 'photo1.jpg', 1, 1, 0,   1),
+    ('MFN67890', '987654321', 2, '1985-09-22', 1, 2, 2, 'B-', 0, 'photo2.jpg', 2, 2, 0,  2),
+    ('MFN98765', '555555555', 1, '1978-12-10', 3, 3, 3, 'O+', 1, 'photo3.jpg', 3, 3, 0, 3),
+    ('MFN54321', '111111111', 2, '2000-03-25', 1, 4, 4, 'AB+', 0, 'photo4.jpg', 4, 4, 0,   4),
+    ('MFN11111', '999999999', 1, '1995-08-05', 2, 5, 5, 'A-', 0, 'photo5.jpg', 5, 5, 0,  5);
+
+-- Insert data into the PatientTranslations table with Arabic and English names
+INSERT INTO PatientTranslations (FullName, Address, Occupation, Employer, RelationshipClient, PatientId, LangCode)
+VALUES
+    ('جون دو', '١٢٣ شارع الرئيسي', 'مهندس', 'شركة أي بي سي', 1,1, 'ar'),
+    ('جين سميث', '٤٥٦ شارع الدردار', 'طبيب', 'مستشفى أي بي سي',1, 2, 'ar'),
+    ('أحمد محمد', '٧٨٩ شارع البلوط', 'مدرس', 'مدرسة أي بي سي',1, 3, 'ar'),
+    ('فاطمة علي', '١١١ شارع الصنوبر', 'ممرضة', 'مستشفى أي بي سي',1, 4, 'ar'),
+    ('Michael Johnson', '222 Maple St', 'محامي', 'مكتب محاماة أي بي سي',1, 5, 'ar'),
+    ('John Doe', '123 Main St', 'Engineer', 'ABC Company',1, 1, 'en'),
+    ('Jane Smith', '456 Oak St', 'Doctor', 'ABC Hospital',1, 2, 'en'),
+    ('Ahmed Mohamed', '789 Pine St', 'Teacher', 'ABC School',1, 3, 'en'),
+    ('Fatima Ali', '111 Spruce St', 'Nurse', 'ABC Hospital',1, 4, 'en'),
+    ('Michael Johnson', '222 Maple St', 'Lawyer', 'ABC Law Firm',1, 5, 'en');
+GO
+-- ===========================================================================================================================================================
+-- Inserting data into BookingStatuses
+INSERT INTO BookingStatuses (CreateOn)
+VALUES (GETDATE()), -- Assuming current date and time for simplicity
+       (GETDATE()),
+       (GETDATE()),
+       (GETDATE()),
+       (GETDATE());
+
+-- Inserting translation data for the booking statuses (English and Arabic translations)
+-- Assuming BookingStatusId starts from 1 for the first row in BookingStatuses table
+INSERT INTO BookingStatusesTranslations (StatusName, BookingStatusId, LangCode)
+VALUES
+('Pending', 1, 'en'),
+('قيد الانتظار', 1, 'ar'),
+('Confirmed', 2, 'en'),
+('تم التأكيد', 2, 'ar'),
+('Cancelled', 3, 'en'),
+('تم الإلغاء', 3, 'ar'),
+-- Continue inserting translations for other booking statuses and languages.
+('Completed', 4, 'en'),
+('تم الانتهاء', 4, 'ar'),
+('In Progress', 5, 'en'),
+('جاري التنفيذ', 5, 'ar');
+GO
+GO
+-- ===========================================================================================================================================================
+
+GO
+-- ===========================================================================================================================================================
+
+GO
+-- ===========================================================================================================================================================
+
+GO
+-- ===========================================================================================================================================================
+
+GO
+-- ===========================================================================================================================================================
+
+GO
+-- ===========================================================================================================================================================
+
+GO
+-- ===========================================================================================================================================================
+
 GO
 -- ===========================================================================================================================================================

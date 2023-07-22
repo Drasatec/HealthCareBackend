@@ -24,6 +24,10 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<Booking> Bookings { get; set; }
 
+    public virtual DbSet<BookingStatus> BookingStatuses { get; set; }
+
+    public virtual DbSet<BookingStatusesTranslation> BookingStatusesTranslations { get; set; }
+
     public virtual DbSet<BuildingTranslation> BuildingTranslations { get; set; }
 
     public virtual DbSet<ClientGroup> ClientGroups { get; set; }

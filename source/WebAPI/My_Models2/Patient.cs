@@ -11,8 +11,6 @@ public partial class Patient
 
     public string? PhoneNumber { get; set; }
 
-    public string? Address { get; set; }
-
     public byte? Gender { get; set; }
 
     public DateTime? BirthDate { get; set; }
@@ -28,6 +26,8 @@ public partial class Patient
     public byte? PatientStatus { get; set; }
 
     public string? Photo { get; set; }
+
+    public byte? Religion { get; set; }
 
     public int? SsntypeId { get; set; }
 

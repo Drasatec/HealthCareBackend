@@ -10,25 +10,23 @@ public partial class Patient
 
     public string PhoneNumber { get; set; } = string.Empty;
 
-    //public string? Address { get; set; }  // delete this
-
     public byte? Gender { get; set; }
 
     public DateTime? BirthDate { get; set; }
 
     public byte? MaritalStatus { get; set; }
 
-    public byte? Ssn { get; set; } // delete this
+    public byte? Ssn { get; set; }
 
     public byte? NationalId { get; set; }
 
     public string? BloodType { get; set; }
-    
-    public byte? Religion { get; set; }
 
     public byte? PatientStatus { get; set; }
 
     public string? Photo { get; set; }
+
+    public byte? Religion { get; set; }
 
     public int? SsntypeId { get; set; }
 

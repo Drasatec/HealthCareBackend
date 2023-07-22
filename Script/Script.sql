@@ -725,7 +725,7 @@ GO
 CREATE TABLE DoctorVisitPrices --MM
 (
     Id INT IDENTITY(1,1),
-    Price SMALLINT,
+    Price INT,
     PriceCurrency VARCHAR(10),
 
     DoctorId INT,
@@ -1151,28 +1151,70 @@ CREATE TABLE ClientsSubscription --MM
 );
 GO
 ----------------
+CREATE TABLE BookingStatuses
+(
+    Id SMALLINT IDENTITY (1,1),
+	CreateOn DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_BookingStatuses PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE BookingStatusesTranslations --MM
+(
+    Id INT IDENTITY (1,1),
+    StatusName NVARCHAR(50) NOT NULL,
+    BookingStatusId SMALLINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_BookingStatusesTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_BookingStatusesTranslations_LangCode_BookingStatusId UNIQUE (BookingStatusId, LangCode),
+
+	CONSTRAINT FK_BookingStatusesTranslations_BookingStatusId
+    FOREIGN KEY (BookingStatusId)
+      REFERENCES BookingStatuses(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_BookingStatusesTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    INDEX IX_BookingStatusesTranslations_StatusName NONCLUSTERED (StatusName)
+);
+GO
+----------------
 CREATE TABLE Booking
 (
 	Id INT IDENTITY(1,1),
-    HospitalId INT,
-    PatientId INT,
-    DoctorId INT,
-    WorkingPeriodId int,
-	VisitingDate DATE, -- 12/‎04/‎2023
-	TypeVisitId INT, --اعادة
-	ClinicId INT, --(optional)
+    PatientId INT NOT NULL,
+    HospitalId INT NOT NULL,
+    SpecialtyId INT NOT NULL,
+    DoctorId INT NOT NULL,
+    WorkingPeriodId INT NOT NULL ,
+	TypeVisitId INT NOT NULL,
+	ClinicId INT, 
+    PriceCategoryId INT,
+    CurrencyId INT,
+    BookingStatusId SMALLINT,
+    Price INT,
+	VisitingDate DATE,
     CreateOn DATETIME DEFAULT GETDATE(),
 	
 	CONSTRAINT PK_Booking PRIMARY KEY (Id),
+
+	CONSTRAINT FK_Booking_PatientId
+    FOREIGN KEY (PatientId)
+      REFERENCES Patients(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
 	CONSTRAINT FK_Booking_HospitalId
     FOREIGN KEY (HospitalId)
       REFERENCES HospitalS(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	CONSTRAINT FK_Booking_PatientId
-    FOREIGN KEY (PatientId)
-      REFERENCES Patients(Id)
+	CONSTRAINT FK_Booking_SpecialtyId
+    FOREIGN KEY (SpecialtyId)
+      REFERENCES MedicalSpecialties(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
     
     CONSTRAINT FK_Booking_DoctorId
@@ -1193,6 +1235,21 @@ CREATE TABLE Booking
 	CONSTRAINT FK_Booking_ClinicId
     FOREIGN KEY (ClinicId)
       REFERENCES Clinics(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+    
+    CONSTRAINT FK_Booking_PriceCategoryId
+    FOREIGN KEY (PriceCategoryId)
+      REFERENCES PriceCategories(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    CONSTRAINT FK_Booking_CurrencyId
+    FOREIGN KEY (CurrencyId)
+      REFERENCES Currencies(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    CONSTRAINT FK_Booking_BookingStatusId
+    FOREIGN KEY (BookingStatusId)
+      REFERENCES BookingStatuses(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION
 );
 GO

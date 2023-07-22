@@ -19,6 +19,8 @@ public partial class MedicalSpecialty
 
     public string? Photo { get; set; }
 
+    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
     public virtual ICollection<Clinic> Clinics { get; set; } = new List<Clinic>();
 
     public virtual ICollection<MedicalSpecialtyTranslation> MedicalSpecialtyTranslations { get; set; } = new List<MedicalSpecialtyTranslation>();

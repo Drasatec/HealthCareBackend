@@ -1,5 +1,6 @@
 ﻿using DomainModel.Contracts;
 using DomainModel.Models;
+using DomainModel.Models.Bookings;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
@@ -19,14 +20,15 @@ public class BookingController : ControllerBase
     // ============================= post ============================= 
 
     [HttpPost("add", Order = 0801)]
-    public async Task<IActionResult> AddSingle([FromForm] Booking model)
+    public async Task<IActionResult> AddSingle([FromForm] BookingRequestDto model)
     {
-
         if (model == null)
         {
             return BadRequest(new Error("400", "model is requerd"));
         }
-        var res = await Data.Generic.GenericCreate(model);
+
+        var entity = (Booking)model;
+        var res = await Data.Generic.GenericCreate(entity);
         int id = 0;
 
         if (res.Success)
@@ -45,13 +47,13 @@ public class BookingController : ControllerBase
 
     // this method get data from DoctorRepository
     [HttpGet(Order = 0801)]
-    public async Task<IActionResult> Get([FromQuery] int? id, int? hosId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, string? lang)
+    public async Task<IActionResult> Get([FromQuery] int? id, int? hosId, int? specialtyId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, string? lang)
     {
         if (docId < 1 || ClinicId < 1 || typeVisitId < 1 || workingPeriodId < 1)
             return BadRequest(new Error("400", "can not assign 0"));
 
         if (lang != null)
-            return Ok(await Data.Appointments.ReadAllAppointments(id,hosId,ClinicId,docId, typeVisitId, workingPeriodId, patientId, lang));
+            return Ok(await Data.Appointments.ReadAllAppointments(id,hosId, specialtyId, ClinicId,docId, typeVisitId, workingPeriodId, patientId, bookStatusId , lang));
         else
             return BadRequest(new Error("400", "The lang field is required"));
     }

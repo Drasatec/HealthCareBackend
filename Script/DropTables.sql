@@ -1,5 +1,7 @@
 
 DROP TABLE Booking;
+DROP TABLE BookingStatusesTranslations;
+DROP TABLE BookingStatuses;
 DROP TABLE ClientsSubscription;
 DROP TABLE PatientTranslations;
 DROP TABLE Patients;

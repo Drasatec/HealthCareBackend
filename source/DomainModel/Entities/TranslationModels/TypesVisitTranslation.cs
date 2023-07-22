@@ -8,7 +8,7 @@ public partial class TypesVisitTranslation
 {
     public int Id { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public int? TypeVisitId { get; set; }
 

@@ -16,7 +16,7 @@ public class DoctorVisitPriceDto
 
     public string? PriceCurrency { get; set; }
 
-    public short? Price { get; set; }
+    public int? Price { get; set; }
 
 
 

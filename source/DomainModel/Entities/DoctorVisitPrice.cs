@@ -9,7 +9,7 @@ public partial class DoctorVisitPrice
 {
     public int Id { get; set; }
 
-    public short? Price { get; set; }
+    public int? Price { get; set; }
 
     public string? PriceCurrency { get; set; }
 

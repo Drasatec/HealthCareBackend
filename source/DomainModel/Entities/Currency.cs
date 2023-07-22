@@ -18,4 +18,7 @@ public partial class Currency
     public decimal? Longitude { get; set; }
 
     public decimal? Latitude { get; set; }
+
+    //public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
 }
