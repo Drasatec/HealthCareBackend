@@ -21,6 +21,12 @@ public partial class Booking
 
     public int? ClinicId { get; set; }
 
+
+    public string? PriceCurrency { get; set; }
+
+    public short? Price { get; set; }
+
+
     public DateTime? CreateOn { get; set; }
 
     public virtual Clinic? Clinic { get; set; }
