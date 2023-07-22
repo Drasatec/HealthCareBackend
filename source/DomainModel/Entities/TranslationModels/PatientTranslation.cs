@@ -10,8 +10,6 @@ public partial class PatientTranslation
 
     public string FullName { get; set; } = string.Empty;
 
-    public byte? Religion { get; set; }
-
     public string? Occupation { get; set; }
 
     [JsonIgnore]

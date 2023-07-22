@@ -23,6 +23,8 @@ public partial class Patient
     public byte? NationalId { get; set; }
 
     public string? BloodType { get; set; }
+    
+    public byte? Religion { get; set; }
 
     public byte? PatientStatus { get; set; }
 

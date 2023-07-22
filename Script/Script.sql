@@ -25,20 +25,55 @@ CREATE TABLE Weekdays
     LangCode VARCHAR(6) NOT NULL,
 
     CONSTRAINT PK_Weekdays PRIMARY KEY (Id),
-    CONSTRAINT UK_Weekdays_Id_LangCode UNIQUE (DayNumber, LangCode),
+    CONSTRAINT UK_Weekdays_DayNumber_LangCode UNIQUE (DayNumber, LangCode),
     CONSTRAINT CHECK_Weekdays_DayNumber CHECK(DayNumber between 1 and 7),
 
     CONSTRAINT FK_Weekdays_LangCode
     FOREIGN KEY (LangCode)
       REFERENCES Languages(Code)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
-	INDEX IX_Weekdays_Id NONCLUSTERED (DayNumber)
+	INDEX IX_Weekdays_DayNumber NONCLUSTERED (DayNumber)
 );
 GO
 INSERT INTO Weekdays VALUES(1,N'سبت','ar'),(1,'Saturday','en'),(1,'Samedi','fr'),(1,'saa','es');
 INSERT INTO Weekdays VALUES(2,N'الأحد','ar'),(2,'Sunday','en'),(2,'Dimanche','fr'),(2,'suu','es');
 INSERT INTO Weekdays VALUES(3,N'الإثنين','ar'),(3,'Monday','en'),(3,'Lundi','fr'),(3,'moo','es');
 INSERT INTO Weekdays VALUES(4,N'الثلاثاء','ar'),(5,N'الأربعاء','ar'),(6,N'الخميس','ar'),(7,N'الجمعة','ar')
+GO
+----------------
+CREATE TABLE Genders
+(
+    Id INT IDENTITY(1,1),
+    GenderNumber TINYINT NOT NULL,
+    GenderName NVARCHAR(20) NOT NULL,
+    LangCode VARCHAR(6) NOT NULL,
+
+    CONSTRAINT PK_Genders PRIMARY KEY (Id),
+    CONSTRAINT UK_Genders_GenderNumber_LangCode UNIQUE (GenderNumber, LangCode),
+    CONSTRAINT CHECK_Genders_GenderNumber CHECK(GenderNumber between 1 and 3),
+
+    CONSTRAINT FK_Genders_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+	INDEX IX_Genders_GenderNumber NONCLUSTERED (GenderNumber)
+);
+GO
+----------------
+CREATE TABLE Currencies
+(
+    Id INT IDENTITY(1,1),
+    CurrencyCode VARCHAR(3) NOT NULL ,-- USA
+    CurrencyName VARCHAR(50) NOT NULL, --US Dollar
+    Symbol VARCHAR(10) NOT NULL, -- $
+    country VARCHAR(50) NOT NULL, -- United States
+    Longitude DECIMAL(12, 9),
+    Latitude DECIMAL(12, 9),
+
+    CONSTRAINT PK_Currencies PRIMARY KEY (Id),
+    CONSTRAINT UK_Currencies_CurrencyCode UNIQUE (CurrencyCode),
+	INDEX IX_Currencies_CurrencyName NONCLUSTERED (CurrencyName)
+);
 GO
 ----------------
 CREATE TABLE Hospitals
@@ -567,7 +602,8 @@ GO
 ----------------
 CREATE TABLE DoctorsDegrees
 (
-    Id SMALLINT,
+    Id SMALLINT IDENTITY (1,1),
+	CreateOn DATETIME DEFAULT GETDATE(),
     CONSTRAINT PK_DoctorsDegrees PRIMARY KEY (Id),
 );
 GO
@@ -593,6 +629,38 @@ CREATE TABLE DoctorsDegreesTranslations --MM
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
     INDEX IX_DoctorsDegreesTranslations_DegreeName NONCLUSTERED (DegreeName)
+);
+GO
+----------------
+CREATE TABLE EmployeesStatus
+(
+    Id SMALLINT IDENTITY (1,1),
+	CreateOn DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_EmployeesStatus PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE EmployeesStatusTranslations --MM
+(
+    Id INT IDENTITY (1,1),
+    StatusName NVARCHAR(20),
+    EmployeeStatusId SMALLINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_EmployeesStatusTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_EmployeesStatusTranslations_LangCode_EmployeeStatusId UNIQUE (EmployeeStatusId, LangCode),
+
+	CONSTRAINT FK_EmployeesStatusTranslations_EmployeeStatusId
+    FOREIGN KEY (EmployeeStatusId)
+      REFERENCES EmployeesStatus(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_EmployeesStatusTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    INDEX IX_EmployeesStatusTranslations_StatusName NONCLUSTERED (StatusName)
 );
 GO
 ----------------
@@ -971,8 +1039,7 @@ CREATE TABLE Patients
 (
     Id INT IDENTITY (1,1),
     MedicalFileNumber VARCHAR(16) UNIQUE NOT NULL,
-    PhoneNumber VARCHAR(25) ,
-    Address NVARCHAR(50),
+    PhoneNumber VARCHAR(25),
     gender TINYINT,
     BirthDate DATE,
     MaritalStatus TINYINT, --(single - married - divorced - widower)
@@ -981,6 +1048,7 @@ CREATE TABLE Patients
     BloodType VARCHAR (10),
     PatientStatus TINYINT, -- active=0  inactive=1  attitude=2)
     Photo VARCHAR(55),
+    Religion TINYINT,
     SSNTypeId INT, --(ID card - passport - insurance card - job card - driver's license)
     IsDeleted BIT NOT NULL DEFAULT 0,
     ClientId INT,
@@ -1020,7 +1088,7 @@ CREATE TABLE PatientTranslations --MM
 (
     Id INT IDENTITY (1,1),
     FullName NVARCHAR(60),
-    Religion NVARCHAR(50),
+    Address NVARCHAR(50),
     Occupation NVARCHAR(50),
     Employer NVARCHAR(50),
     RelationshipClient TINYINT, --(father / mother / husband / wife / son / daughter / brother / sister / other) 
@@ -1166,13 +1234,13 @@ GO
 
 
 ---------------- insert
-insert into RoomTypes(CodeNumber,IsDeleted)values('room 1',0);
-insert into RoomTypes(CodeNumber,IsDeleted)values('room 2',0);
-insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'عيادة',1,'ar');
-insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'clinic',1,'en');
-insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'صيدلية',2,'ar');
-insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'farmasy',2,'en');
-Go
+-- insert into RoomTypes(CodeNumber,IsDeleted)values('room 1',0);
+-- insert into RoomTypes(CodeNumber,IsDeleted)values('room 2',0);
+-- insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'عيادة',1,'ar');
+-- insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'clinic',1,'en');
+-- insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'صيدلية',2,'ar');
+-- insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'farmasy',2,'en');
+-- Go
 --INSERT INTO [dbo].[MedicalSpecialtiesHospitals]([SpecialtyId],[HospitalId])VALUES(1,1)
 ----------------
 ----------------

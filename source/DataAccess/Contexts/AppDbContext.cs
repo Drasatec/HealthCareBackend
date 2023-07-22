@@ -1190,7 +1190,6 @@ public class AppDbContext : DbContext
                 .HasMaxLength(6)
                 .IsUnicode(false);
             entity.Property(e => e.Occupation).HasMaxLength(50);
-            entity.Property(e => e.Religion).HasMaxLength(50);
 
             //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.PatientTranslations)
             //    .HasForeignKey(d => d.LangCode)
