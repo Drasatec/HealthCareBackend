@@ -8,9 +8,9 @@ public partial class BookingStatusesTranslation
 
     public string StatusName { get; set; } = null!;
 
-    public short? BookingStatusId { get; set; }
+    public short BookingStatusId { get; set; }
 
-    public string? LangCode { get; set; }
+    public string LangCode { get; set; } = null!;
 
     [JsonIgnore]
 
