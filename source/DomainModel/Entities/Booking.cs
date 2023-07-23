@@ -5,7 +5,7 @@ namespace DomainModel.Entities;
 
 public partial class Booking
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     public int PatientId { get; set; }
 

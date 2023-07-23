@@ -9,7 +9,7 @@ namespace DomainModel.Models.Bookings;
 
 public class BookingResponseDto
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     public int PatientId { get; set; }
 

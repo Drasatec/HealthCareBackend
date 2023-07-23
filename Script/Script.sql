@@ -1185,7 +1185,7 @@ GO
 ----------------
 CREATE TABLE Booking
 (
-	Id INT IDENTITY(1,1),
+	Id BIGINT IDENTITY(1,1),
     PatientId INT NOT NULL,
     HospitalId INT NOT NULL,
     SpecialtyId INT NOT NULL,
@@ -1201,7 +1201,7 @@ CREATE TABLE Booking
     CreateOn DATETIME DEFAULT GETDATE(),
 	
 	CONSTRAINT PK_Booking PRIMARY KEY (Id),
-
+    
 	CONSTRAINT FK_Booking_PatientId
     FOREIGN KEY (PatientId)
       REFERENCES Patients(Id)
@@ -1286,24 +1286,3 @@ GO
 
 -- );
 ----------------
-
-
-
-
----------------- insert
--- insert into RoomTypes(CodeNumber,IsDeleted)values('room 1',0);
--- insert into RoomTypes(CodeNumber,IsDeleted)values('room 2',0);
--- insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'عيادة',1,'ar');
--- insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'clinic',1,'en');
--- insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'صيدلية',2,'ar');
--- insert into RoomTypeTranslations(Name,RoomTypeId,LangCode)values(N'farmasy',2,'en');
--- Go
---INSERT INTO [dbo].[MedicalSpecialtiesHospitals]([SpecialtyId],[HospitalId])VALUES(1,1)
-----------------
-----------------
-----------------
-----------------
-
--- INSERT INTO [dbo].[SpecialtiesDoctors]([DoctorId],[MedicalSpecialtyId])VALUES(3,1)
--- GO
--- INSERT INTO [dbo].[DoctorsWorkHospital]([DoctorId],[HospitalId])VALUES(3,2)

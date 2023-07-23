@@ -16,7 +16,6 @@ public class BookingController : ControllerBase
         Data = data;
     }
 
-
     // ============================= post ============================= 
 
     [HttpPost("add", Order = 0801)]
@@ -29,18 +28,17 @@ public class BookingController : ControllerBase
 
         var entity = (Booking)model;
         var res = await Data.Generic.GenericCreate(entity);
-        int id = 0;
+        long id = 0;
 
         if (res.Success)
         {
             if (res.Value is not null)
                 id = res.Value.Id;
-            var response = new ResponseId(res.Success, res.Message, id);
+            var response = new ResponseLongId(res.Success, res.Message, id);
             return Created("", response);
         }
         return BadRequest(res);
     }
-
 
     // ============================= get ============================= 
 
@@ -61,11 +59,11 @@ public class BookingController : ControllerBase
     // ============================= put ============================= 
 
     [HttpPut("edit", Order = 0820)]
-    public async Task<IActionResult> Update([FromForm] DoctorVisitPrice model)
+    public async Task<IActionResult> Update([FromForm] BookingRequestDto model)
     {
         Response response;
-
-        response = await Data.Generic.GenericUpdate(model, null);
+        var entity = (Booking)model;
+        response = await Data.Generic.GenericUpdate(entity, en=>en.PatientId,en=>en.HospitalId);
 
         if (!response.Success)
             return BadRequest(response);
@@ -76,12 +74,12 @@ public class BookingController : ControllerBase
     // ============================= delete ============================= 
 
     [HttpDelete(Order = 0830)]
-    public async Task<IActionResult> Delete([FromQuery] int? docId, [FromQuery] params int[] id)
+    public async Task<IActionResult> Delete([FromQuery] int? patientId, [FromQuery] params long[] id)
     {
-        Expression<Func<DoctorVisitPrice, bool>> expression;
+        Expression<Func<Booking, bool>> expression;
 
-        if (docId.HasValue)
-            expression = t => t.DoctorId.Equals(docId);
+        if (patientId.HasValue)
+            expression = t => t.PatientId.Equals(patientId.Value);
         else
             expression = t => id.Contains(t.Id);
 

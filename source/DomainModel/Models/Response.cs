@@ -40,6 +40,20 @@ public class ResponseId
     }
 }
 
+public class ResponseLongId
+{
+    public bool Success { get; set; }
+    public string? Message { get; set; } = null;
+    public long? Id { get; set; }
+    public ResponseLongId() { }
+    public ResponseLongId(bool success, string? message, long id)
+    {
+        Success = success;
+        Message = message;
+        Id = id;
+    }
+}
+
 public class PagedResponse<T>
 {
     public int Total { get; set; }

@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Attributes\**" />
+    <Compile Remove="Filter s\**" />
+    <Content Remove="Attributes\**" />
+    <Content Remove="Filter s\**" />
+    <EmbeddedResource Remove="Attributes\**" />
+    <EmbeddedResource Remove="Filter s\**" />
+    <None Remove="Attributes\**" />
+    <None Remove="Filter s\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
@@ -20,8 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Attributes\" />
-    <Folder Include="Filter s\" />
     <Folder Include="wwwroot\Files\" />
     <Folder Include="wwwroot\Images\" />
     <Folder Include="wwwroot\Images\medium\" />

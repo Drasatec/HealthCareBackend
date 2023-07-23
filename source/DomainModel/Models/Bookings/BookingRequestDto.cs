@@ -4,7 +4,7 @@ namespace DomainModel.Models.Bookings;
 
 public class BookingRequestDto
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     public int PatientId { get; set; }
 
@@ -35,18 +35,18 @@ public class BookingRequestDto
         var enity = new Booking
         {
             Id = arg.Id,
-            Price = arg.Price,
-            TypeVisitId = arg.TypeVisitId,
-            PriceCategoryId = arg.PriceCategoryId,
-            DoctorId = arg.DoctorId,
-            BookingStatusId = arg.BookingStatusId,
-            ClinicId = arg.ClinicId,
-            CurrencyId = arg.CurrencyId,
-            HospitalId = arg.HospitalId,
             PatientId = arg.PatientId,
+            HospitalId = arg.HospitalId,
             SpecialtyId = arg.SpecialtyId,
-            VisitingDate = arg.VisitingDate,
+            DoctorId = arg.DoctorId,
             WorkingPeriodId = arg.WorkingPeriodId,
+            TypeVisitId = arg.TypeVisitId,
+            ClinicId = arg.ClinicId,
+            PriceCategoryId = arg.PriceCategoryId,
+            CurrencyId = arg.CurrencyId,
+            BookingStatusId = arg.BookingStatusId,
+            VisitingDate = arg.VisitingDate,
+            Price = arg.Price,
         };
 
         return enity;

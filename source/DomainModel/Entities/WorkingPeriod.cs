@@ -8,7 +8,7 @@ public partial class WorkingPeriod
 {
     public int Id { get; set; }
 
-    public string? CodeNumber { get; set; }
+    public string CodeNumber { get; set; } = string.Empty;
 
     public TimeSpan? StartTime { get; set; }
 

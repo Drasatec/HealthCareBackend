@@ -111,6 +111,8 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                 query = query.Where(t => t.BookingStatusId.Equals(bookStatusId));
             }
         }
+        query = query.OrderByDescending(o => o.Id);
+
         return await query.ToListAsync();
     }
 }
