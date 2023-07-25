@@ -1267,16 +1267,17 @@ CREATE TABLE Booking
     DoctorId INT NOT NULL,
     WorkingPeriodId INT NOT NULL ,
 	TypeVisitId INT NOT NULL,
-	ClinicId INT, 
+	ClinicId INT NOT NULL, 
+    BookingStatusId SMALLINT NOT NULL DEFAULT 1,
     PriceCategoryId INT,
     CurrencyId INT,
-    BookingStatusId SMALLINT,
     Price INT,
     DayNumber TINYINT,
 	VisitingDate DATE,
     CreateOn DATETIME DEFAULT GETDATE(),
 	
 	CONSTRAINT PK_Booking PRIMARY KEY (Id),
+    CONSTRAINT UK_Booking_BookingNumber UNIQUE (BookingNumber),
     
 	CONSTRAINT FK_Booking_PatientId
     FOREIGN KEY (PatientId)

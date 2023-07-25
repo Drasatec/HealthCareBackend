@@ -63,38 +63,40 @@ public class BookingResponseDto
     public virtual string WorkingPeriod { get; set; } = null!;
 
 
-    public static implicit operator BookingResponseDto(Booking arg)
-    {
-        if (arg == null)
-            return null!;
+    //public static implicit operator BookingResponseDto(Booking arg)
+    //{
+    //    if (arg == null)
+    //        return null!;
 
-        return new BookingResponseDto
-        {
-            Id = arg.Id,
-            Price = arg.Price,
-            TypeVisitId = arg.TypeVisitId,
-            PriceCategoryId = arg.PriceCategoryId,
-            DoctorId = arg.DoctorId,
-            BookingStatusId = arg.BookingStatusId,
-            ClinicId = arg.ClinicId,
-            CreateOn = arg.CreateOn,
-            CurrencyId = arg.CurrencyId,
-            HospitalId = arg.HospitalId,
-            PatientId = arg.PatientId,
-            SpecialtyId = arg.SpecialtyId,
-            VisitingDate = arg.VisitingDate,
-            WorkingPeriodId = arg.WorkingPeriodId,
-        };
-    }
+    //    return new BookingResponseDto
+    //    {
+    //        Id = arg.Id,
+    //        Price = arg.Price,
+    //        TypeVisitId = arg.TypeVisitId,
+    //        PriceCategoryId = arg.PriceCategoryId,
+    //        DoctorId = arg.DoctorId,
+    //        BookingStatusId = arg.BookingStatusId,
+    //        ClinicId = arg.ClinicId,
+    //        CreateOn = arg.CreateOn,
+    //        CurrencyId = arg.CurrencyId,
+    //        HospitalId = arg.HospitalId,
+    //        PatientId = arg.PatientId,
+    //        SpecialtyId = arg.SpecialtyId,
+    //        VisitingDate = arg.VisitingDate,
+    //        WorkingPeriodId = arg.WorkingPeriodId,
+    //        BookingNumber = arg.BookingNumber,
+    //        DayNumber = arg.DayNumber,
+    //    };
+    //}
 
-    public static List<BookingResponseDto> ToList(IEnumerable<Booking> enList)
-    {
-        var listDto = new List<BookingResponseDto>(enList.Count());
-        foreach (var entity in enList)
-        {
-            var dto = (BookingResponseDto)entity;
-            listDto.Add(dto);
-        }
-        return listDto;
-    }
+    //public static List<BookingResponseDto> ToList(IEnumerable<Booking> enList)
+    //{
+    //    var listDto = new List<BookingResponseDto>(enList.Count());
+    //    foreach (var entity in enList)
+    //    {
+    //        var dto = (BookingResponseDto)entity;
+    //        listDto.Add(dto);
+    //    }
+    //    return listDto;
+    //}
 }

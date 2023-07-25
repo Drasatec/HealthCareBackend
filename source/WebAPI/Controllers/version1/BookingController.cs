@@ -20,7 +20,7 @@ public class BookingController : ControllerBase
     // ============================= post ============================= 
 
     [HttpPost("add", Order = 0801)]
-    public async Task<IActionResult> AddSingle([FromForm] BookingRequestDto model)
+    public async Task<IActionResult> AddSingle([FromForm] BookingRequestDto model, [FromQuery]int? clinicId , [FromQuery]  string? lang)
     {
         if (model == null)
         {
@@ -30,14 +30,22 @@ public class BookingController : ControllerBase
         var res = await Data.Appointments.CreateAppointments(model);
         long id = 0;
 
-        if (res.Success)
+        if (res != null && res.Success)
         {
-            if (res.Id.HasValue)
-                id = res.Id.Value;
-            var response = new ResponseLongId(res.Success, res.Message, id);
-            return Created("", response);
+            if (clinicId.HasValue && lang is not null)
+            {
+               return Ok( await Data.Clinics.ClinicByIdWithParentsNames(clinicId, lang));
+            }
+            else
+            {
+
+                if (res.Id.HasValue)
+                    id = res.Id.Value;
+                var response = new ResponseLongId(res.Success, res.Message, id);
+                return Created("", response);
+            }
         }
-        Data.Clinics.
+
         return BadRequest(res);
     }
 
@@ -52,13 +60,8 @@ public class BookingController : ControllerBase
         //    return BadRequest(new Error("400", "can not assign 0"));
 
         //if (lang != null)
-            return Ok(await Data.Appointments.ReadAllAppointments(id,hosId, specialtyId, ClinicId,docId, typeVisitId, workingPeriodId, patientId, bookStatusId, dayNumber, lang,page,pageSize));
+        return Ok(await Data.Appointments.ReadAllAppointments(id, hosId, specialtyId, ClinicId, docId, typeVisitId, workingPeriodId, patientId, bookStatusId, dayNumber, lang, page, pageSize));
 
-        //else
-        //{
-        //    return Ok( await Data.Generic.GenericReadAll<Booking>(null, null, page, pageSize));
-        //}
-        //return BadRequest(new Error("400", "The lang field is required"));
     }
 
     // ============================= put ============================= 
@@ -68,7 +71,7 @@ public class BookingController : ControllerBase
     {
         Response response;
         var entity = (Booking)model;
-        response = await Data.Generic.GenericUpdate(entity, en=>en.PatientId,en=>en.HospitalId);
+        response = await Data.Generic.GenericUpdate(entity, en => en.PatientId, en => en.HospitalId);
 
         if (!response.Success)
             return BadRequest(response);

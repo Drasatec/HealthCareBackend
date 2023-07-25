@@ -27,7 +27,7 @@ public partial class Booking
 
     public int? CurrencyId { get; set; }
 
-    public short? BookingStatusId { get; set; }
+    public short BookingStatusId { get; set; }
 
     public int? Price { get; set; }
 

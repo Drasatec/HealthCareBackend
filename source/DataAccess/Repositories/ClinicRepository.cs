@@ -121,33 +121,64 @@ internal class ClinicRepository : GenericRepository, IClinicRepository
 
     public async Task<NamesParentsClinicsDto?> ClinicByIdWithParentsNames(int? id, string? lang = null)
     {
-        IQueryable<Booking> query = Context.Bookings;
-
-        if (id.HasValue && lang != null)
+        if (!id.HasValue || lang == null)
         {
-            query = query.Where(i => i.Id.Equals(id));
-            query = (from h in query
+            return null;
+        }
+        // If the selected language does not exist in one of the translation fields for one of these join! The output will be null
+        var query = (from h in Context.Clinics
+                     where h.Id == id
 
                      join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
                      where hos.LangCode == lang
 
-                     join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
-                     where hos.LangCode == lang
+                     join b in Context.BuildingTranslations on h.BuildId equals b.BuildeingId
+                     where b.LangCode == lang
 
-                     join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
-                     where hos.LangCode == lang
+                     join f in Context.FloorTranslations on h.FloorId equals f.FloorId
+                     where f.LangCode == lang
 
-                     join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
-                     where hos.LangCode == lang
-
+                     join r in Context.RoomTranslations on h.RoomId equals r.RoomId
+                     where r.LangCode == lang
 
                      select new NamesParentsClinicsDto
                      {
-                         Id = h.Id,
-                         DoctorId = h.DoctorId,
+                         ClinicId = h.Id,
+                         HospitalId = h.HospitalId,
+                         BuildId = h.BuildId,
+                         FloorId = h.FloorId,
+                         RoomId = h.RoomId,
+
+                         HospitalName = hos.Name,
+                         BuildName = b.Name,
+                         FloorName = f.Name,
+                         RoomName = r.Name,
+                         WorkingHours = h.WorkingHours
                      });
+        var result = await query.FirstOrDefaultAsync();
+
+        // If the output was null, we select without any join
+        if (result == null)
+        {
+            query = (from h in Context.Clinics
+                     where h.Id == id
+                     select new NamesParentsClinicsDto
+                     {
+                         ClinicId = h.Id,
+                         HospitalId = h.HospitalId,
+                         BuildId = h.BuildId,
+                         FloorId = h.FloorId,
+                         RoomId = h.RoomId,
+                         WorkingHours = h.WorkingHours,
+
+                         HospitalName = "null",
+                         BuildName = "null",
+                         FloorName = "null",
+                         RoomName = "null",
+                     });
+            result = await query.FirstOrDefaultAsync();
         }
-        return null;
+        return result;
 
     }
 

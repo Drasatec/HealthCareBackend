@@ -56,16 +56,14 @@ public class ClinicController : ControllerBase
     }
 
     [HttpGet("parents-names-byId", Order = 0901)]
-    public async Task<IActionResult> GetByIdWithParentsNames([FromQuery] int id, [FromQuery] string? lang)
+    public async Task<IActionResult> GetByIdWithParentsNames([FromQuery] int id, string? lang)
     {
-        if (id < 1)
-            return BadRequest(new Error("400", "can not assign 0"));
+        if (id < 1 && lang == null)
+            return BadRequest(new Error("400", "can not assign 0 or lang = null"));
 
         var result = await Data.Clinics.ClinicByIdWithParentsNames(id, lang);
         return Ok(result);
     }
-
-
 
     [HttpGet("names", Order = 0911)]
     public async Task<IActionResult> GetAllNames([FromQuery] string? lang,int? hosId,  int? specialtyId, int? page, int? pageSize)

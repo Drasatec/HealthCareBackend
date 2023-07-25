@@ -19,13 +19,13 @@ public class NamesParentsClinicsDto
     public int SpecialtyId { get; set; }
 
 
-    public int HospitalName { get; set; }
+    public string HospitalName { get; set; } = string.Empty;
 
-    public int BuildName { get; set; }
+    public string BuildName { get; set; } = string.Empty;
 
-    public int FloorName { get; set; }
+    public string FloorName { get; set; } = string.Empty;
 
-    public int RoomName { get; set; }
+    public string RoomName { get; set; } = string.Empty;
 
-    public int SpecialtyName { get; set; }
+    public string SpecialtyName { get; set; } = string.Empty;
 }

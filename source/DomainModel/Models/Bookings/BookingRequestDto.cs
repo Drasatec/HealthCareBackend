@@ -26,7 +26,7 @@ public class BookingRequestDto
 
     public int? CurrencyId { get; set; }
 
-    public short? BookingStatusId { get; set; }
+    public short BookingStatusId { get; set; }
 
     public int? Price { get; set; }
 
@@ -51,6 +51,8 @@ public class BookingRequestDto
             BookingStatusId = arg.BookingStatusId,
             VisitingDate = arg.VisitingDate,
             Price = arg.Price,
+            DayNumber = arg.DayNumber,
+            
         };
 
         return enity;
