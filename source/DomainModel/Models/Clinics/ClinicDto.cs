@@ -1,6 +1,7 @@
 ﻿using DomainModel.Entities;
 using DomainModel.Entities.TranslationModels;
-namespace DomainModel.Models.Dtos;
+
+namespace DomainModel.Models.Clinics;
 
 public class ClinicDto
 {
@@ -45,7 +46,7 @@ public class ClinicDto
             CodeNumber = entity.CodeNumber,
             Photo = entity.Photo,
             Appearance = entity.Appearance,
-           // IsActive = entity.IsActive,
+            // IsActive = entity.IsActive,
             IsDeleted = entity.IsDeleted,
             Phone = entity.Phone,
             Reason = entity.Reason,
@@ -80,10 +81,10 @@ public class ClinicDto
             FloorId = dto.FloorId,
             RoomId = dto.RoomId,
             IsDeleted = dto.IsDeleted,
-            Reason= dto.Reason,
+            Reason = dto.Reason,
             SpecialtyId = dto.SpecialtyId,
             WorkingHours = dto.WorkingHours,
-            Phone   = dto.Phone,
+            Phone = dto.Phone,
             Appearance = dto.Appearance,
             //IsActive = dto.IsActive,
             ClinicTranslations = listTranc,

@@ -5,7 +5,7 @@ namespace WebAPI.My_Models2;
 
 public partial class Booking
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     public int PatientId { get; set; }
 

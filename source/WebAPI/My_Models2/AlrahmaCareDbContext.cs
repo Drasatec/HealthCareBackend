@@ -31,6 +31,8 @@ public partial class AlrahmaCareDbContext : DbContext
 
     public virtual DbSet<ClinicTranslation> ClinicTranslations { get; set; }
 
+    public virtual DbSet<ContactForm> ContactForms { get; set; }
+
     public virtual DbSet<Currency> Currencies { get; set; }
 
     public virtual DbSet<Doctor> Doctors { get; set; }
@@ -64,6 +66,10 @@ public partial class AlrahmaCareDbContext : DbContext
     public virtual DbSet<HosRoom> HosRooms { get; set; }
 
     public virtual DbSet<Hospital> Hospitals { get; set; }
+
+    public virtual DbSet<HospitalFeature> HospitalFeatures { get; set; }
+
+    public virtual DbSet<HospitalFeatureTranslation> HospitalFeatureTranslations { get; set; }
 
     public virtual DbSet<HospitalPhoneNumber> HospitalPhoneNumbers { get; set; }
 
@@ -354,6 +360,22 @@ public partial class AlrahmaCareDbContext : DbContext
             entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.ClinicTranslations)
                 .HasForeignKey(d => d.LangCode)
                 .HasConstraintName("FK_ClinicTranslations_LangCode");
+        });
+
+        modelBuilder.Entity<ContactForm>(entity =>
+        {
+            entity.ToTable("ContactForm");
+
+            entity.Property(e => e.ContactDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Subject).HasMaxLength(200);
+
+            entity.HasOne(d => d.Hospital).WithMany(p => p.ContactForms)
+                .HasForeignKey(d => d.HospitalId)
+                .HasConstraintName("FK_ContactForm_HospitalId");
         });
 
         modelBuilder.Entity<Currency>(entity =>
@@ -718,12 +740,51 @@ public partial class AlrahmaCareDbContext : DbContext
             entity.Property(e => e.Email)
                 .HasMaxLength(40)
                 .IsUnicode(false);
+            entity.Property(e => e.Latitude).HasColumnType("decimal(12, 9)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(12, 9)");
             entity.Property(e => e.Photo)
                 .HasMaxLength(55)
                 .IsUnicode(false);
             entity.Property(e => e.WhatsAppNumber)
                 .HasMaxLength(15)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<HospitalFeature>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Hospital__3214EC07FE0C2CF3");
+
+            entity.Property(e => e.CreateOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Photo)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Hospital).WithMany(p => p.HospitalFeatures)
+                .HasForeignKey(d => d.HospitalId)
+                .HasConstraintName("FK_HospitalFeatures_HospitalId");
+        });
+
+        modelBuilder.Entity<HospitalFeatureTranslation>(entity =>
+        {
+            entity.HasIndex(e => e.Name, "IX_HospitalFeatureTranslations_Name");
+
+            entity.HasIndex(e => new { e.FeatureId, e.LangCode }, "UK_HospitalFeatureTranslations_LangCode_FeatureId").IsUnique();
+
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Name).HasMaxLength(100);
+
+            entity.HasOne(d => d.Feature).WithMany(p => p.HospitalFeatureTranslations)
+                .HasForeignKey(d => d.FeatureId)
+                .HasConstraintName("FK_HospitalFeatureTranslations_FeatureId");
+
+            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.HospitalFeatureTranslations)
+                .HasForeignKey(d => d.LangCode)
+                .HasConstraintName("FK_HospitalFeatureTranslations_LangCode");
         });
 
         modelBuilder.Entity<HospitalPhoneNumber>(entity =>
@@ -885,7 +946,7 @@ public partial class AlrahmaCareDbContext : DbContext
 
             entity.HasIndex(e => e.PhoneNumber, "IX_Patients_PhoneNumber");
 
-            entity.HasIndex(e => e.MedicalFileNumber, "UQ__Patients__31851D9553403873").IsUnique();
+            entity.HasIndex(e => e.MedicalFileNumber, "UK_Patients_MedicalFileNumber").IsUnique();
 
             entity.Property(e => e.BirthDate).HasColumnType("date");
             entity.Property(e => e.BloodType)

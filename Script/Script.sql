@@ -1,12 +1,12 @@
 ﻿
-USE master;
-IF NOT EXISTS(SELECT name FROM sys.databases WHERE name = 'alrahma_care_db')
-BEGIN
-    CREATE DATABASE alrahma_care_db COLLATE Arabic_100_CI_AS_KS_WS_SC_UTF8;
-END
-GO
-use alrahma_care_db;
-GO
+-- USE master;
+-- IF NOT EXISTS(SELECT name FROM sys.databases WHERE name = 'alrahma_care_db')
+-- BEGIN
+--     CREATE DATABASE alrahma_care_db COLLATE Arabic_100_CI_AS_KS_WS_SC_UTF8;
+-- END
+-- GO
+-- use alrahma_care_db;
+--GO
 CREATE TABLE Languages
 (
     Code VARCHAR(6),
@@ -85,6 +85,8 @@ CREATE TABLE Hospitals
     WhatsAppNumber VARCHAR(15) ,
 	CreateOn DATETIME DEFAULT GETDATE(),
 	IsDeleted BIT NOT NULL DEFAULT 0,
+    Longitude DECIMAL(12, 9),
+    Latitude DECIMAL(12, 9),
 	CONSTRAINT PK_Hospital PRIMARY KEY (Id)
 );
 GO
@@ -126,6 +128,77 @@ CREATE TABLE HospitalTranslations --MM
 
 	INDEX IX_HospitalTranslations_Name NONCLUSTERED (Name)
 );
+GO
+CREATE TABLE ContactForm (
+    Id INT IDENTITY (1, 1),
+    Name NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100) NOT NULL,
+    Subject NVARCHAR(200) NOT NULL,
+    Message NVARCHAR(MAX) NOT NULL,
+    ContactDate DATETIME NOT NULL DEFAULT GETDATE(),
+    HospitalId INT,
+
+	CONSTRAINT PK_ContactForm PRIMARY KEY (Id),
+
+    CONSTRAINT FK_ContactForm_HospitalId
+    FOREIGN KEY (HospitalId)
+      REFERENCES Hospitals(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+);
+GO
+CREATE TABLE HospitalFeatures
+(
+    Id INT IDENTITY(1, 1) PRIMARY KEY,
+    Photo VARCHAR(255),
+    CreateOn DATETIME DEFAULT GETDATE(),
+    HospitalId INT,
+    CONSTRAINT FK_HospitalFeatures_HospitalId
+    FOREIGN KEY (HospitalId)
+      REFERENCES Hospitals(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+);
+CREATE TABLE HospitalFeatureTranslations --MM
+(
+    Id INT IDENTITY (1,1),
+    Name NVARCHAR(100),
+    Description NVARCHAR(500),
+    FeatureId INT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_HospitalFeatureTranslations PRIMARY KEY (Id),
+	CONSTRAINT UK_HospitalFeatureTranslations_LangCode_FeatureId UNIQUE (FeatureId, LangCode),
+
+	CONSTRAINT FK_HospitalFeatureTranslations_FeatureId
+    FOREIGN KEY (FeatureId)
+      REFERENCES HospitalFeatures(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_HospitalFeatureTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	INDEX IX_HospitalFeatureTranslations_Name NONCLUSTERED (Name)
+);
+
+-- CREATE TABLE HospitalCoordinates
+-- (
+--     Id INT IDENTITY(1,1),
+--     HospitalName NVARCHAR(100),
+--     Address NVARCHAR(200),
+--     PhoneNumber VARCHAR(25),
+--     Longitude DECIMAL(12, 9),
+--     Latitude DECIMAL(12, 9),
+
+--     CONSTRAINT PK_HospitalArrivalData PRIMARY KEY (Id),
+--     --CONSTRAINT UNQ_HospitalArrivalData_HospitalName_Address UNIQUE (HospitalName, Address)
+
+--     CONSTRAINT FK_HospitalTranslations_HospitalId
+--     FOREIGN KEY (HospitalId)
+--       REFERENCES Hospitals(Id)
+-- 		ON DELETE NO ACtion ON UPDATE NO ACTION,
+-- );
+
 GO
 ----------------
 CREATE TABLE HosBuildings
@@ -1038,7 +1111,7 @@ GO
 CREATE TABLE Patients
 (
     Id INT IDENTITY (1,1),
-    MedicalFileNumber VARCHAR(16) UNIQUE NOT NULL,
+    MedicalFileNumber VARCHAR(16) NOT NULL,
     PhoneNumber VARCHAR(25),
     gender TINYINT,
     BirthDate DATE,
@@ -1056,6 +1129,7 @@ CREATE TABLE Patients
     NationalityId INT,
 
 	CONSTRAINT PK_Patients PRIMARY KEY (Id),
+    CONSTRAINT UK_Patients_MedicalFileNumber UNIQUE (MedicalFileNumber),
     CONSTRAINT CHECK_PatientSex CHECK(gender between 1 and 4),
     CONSTRAINT CHECK_PatientsMaritalStatus CHECK(MaritalStatus between 1 and 4),
 
@@ -1186,6 +1260,7 @@ GO
 CREATE TABLE Booking
 (
 	Id BIGINT IDENTITY(1,1),
+    BookingNumber NVARCHAR(25) NOT NULL,
     PatientId INT NOT NULL,
     HospitalId INT NOT NULL,
     SpecialtyId INT NOT NULL,
@@ -1197,6 +1272,7 @@ CREATE TABLE Booking
     CurrencyId INT,
     BookingStatusId SMALLINT,
     Price INT,
+    DayNumber TINYINT,
 	VisitingDate DATE,
     CreateOn DATETIME DEFAULT GETDATE(),
 	

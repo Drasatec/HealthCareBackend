@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace DomainModel.Entities;
+﻿namespace DomainModel.Entities;
 public class Weekday
 {
     public int Id { get; set; }

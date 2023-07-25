@@ -52,9 +52,9 @@ insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, Curr
 GO
 -- ===========================================================================================================================================================
 -- Inserting data into the Hospitals table
-INSERT INTO Hospitals (Photo, CodeNumber, Email, WhatsAppNumber)
-VALUES ('hospital1.jpeg', 'CODE001', 'hospital1@example.com', '+123456789'),
-       ('hospital2.jpeg', 'CODE002', 'hospital2@example.com', '+987654321');
+INSERT INTO Hospitals (Photo, CodeNumber, Email, WhatsAppNumber,Longitude,Latitude)
+VALUES ('hospital1.jpeg', 'CODE001', 'hospital1@example.com', '+123456789', -60.61667, -26.73333),
+       ('hospital2.jpeg', 'CODE002', 'hospital2@example.com', '+987654321', 44.6917527, 40.2367283);
 
 -- Inserting data into the HospitalPhoneNumbers table
 INSERT INTO HospitalPhoneNumbers (TelephoneNumber, HospitalId)

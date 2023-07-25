@@ -1,8 +1,8 @@
 ﻿using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using System.Linq.Expressions;
-using DomainModel.Models.Dtos;
 using DomainModel.Contracts;
+using DomainModel.Models.Clinics;
 
 namespace WebAPI.Controllers.version1;
 
@@ -52,6 +52,16 @@ public class ClinicController : ControllerBase
             return BadRequest(new Error("400", "can not assign 0"));
 
         var result = await Data.Clinics.ReadById(id, lang);
+        return Ok(result);
+    }
+
+    [HttpGet("parents-names-byId", Order = 0901)]
+    public async Task<IActionResult> GetByIdWithParentsNames([FromQuery] int id, [FromQuery] string? lang)
+    {
+        if (id < 1)
+            return BadRequest(new Error("400", "can not assign 0"));
+
+        var result = await Data.Clinics.ClinicByIdWithParentsNames(id, lang);
         return Ok(result);
     }
 

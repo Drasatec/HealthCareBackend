@@ -20,6 +20,14 @@ public partial class Hospital
 
     public bool IsDeleted { get; set; }
 
+    public decimal? Longitude { get; set; }
+
+    public decimal? Latitude { get; set; }
+
+    public virtual ICollection<ContactForm> ContactForms { get; set; } = new List<ContactForm>();
+
+    public virtual ICollection<HospitalFeature> HospitalFeatures { get; set; } = new List<HospitalFeature>();
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual ICollection<Clinic> Clinics { get; set; } = new List<Clinic>();

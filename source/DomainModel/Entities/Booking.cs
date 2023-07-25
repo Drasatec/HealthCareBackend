@@ -7,6 +7,8 @@ public partial class Booking
 {
     public long Id { get; set; }
 
+    public string BookingNumber { get; set; } = null!;
+
     public int PatientId { get; set; }
 
     public int HospitalId { get; set; }
@@ -28,6 +30,8 @@ public partial class Booking
     public short? BookingStatusId { get; set; }
 
     public int? Price { get; set; }
+
+    public byte DayNumber { get; set; }
 
     public DateTime? VisitingDate { get; set; }
 

@@ -53,10 +53,13 @@ DROP TABLE FloorTranslations;
 DROP TABLE HosFloors;
 DROP TABLE BuildingTranslations;
 DROP TABLE HosBuildings;
-DROP TABLE HospitalTranslations;
 DROP TABLE HospitalPhoneNumbers;
+DROP TABLE HospitalTranslations;
+DROP TABLE HospitalFeatureTranslations;
+DROP TABLE HospitalFeatures;
+DROP TABLE ContactForm;
 DROP TABLE Hospitals;
 DROP TABLE Weekdays;
-DROP TABLE Genders
-DROP TABLE Currencies
+DROP TABLE Genders;
+DROP TABLE Currencies;
 DROP TABLE Languages;

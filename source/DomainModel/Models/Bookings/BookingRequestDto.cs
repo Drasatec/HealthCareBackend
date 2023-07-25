@@ -6,6 +6,8 @@ public class BookingRequestDto
 {
     public long Id { get; set; }
 
+    //public long BookingNumber { get; set; }
+
     public int PatientId { get; set; }
 
     public int HospitalId { get; set; }
@@ -27,6 +29,8 @@ public class BookingRequestDto
     public short? BookingStatusId { get; set; }
 
     public int? Price { get; set; }
+
+    public byte DayNumber { get; set; }
 
     public DateTime? VisitingDate { get; set; }
 

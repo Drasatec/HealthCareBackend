@@ -11,6 +11,8 @@ public class BookingResponseDto
 {
     public long Id { get; set; }
 
+    public string BookingNumber { get; set; } = string.Empty;
+
     public int PatientId { get; set; }
 
     public int HospitalId { get; set; }
@@ -34,6 +36,8 @@ public class BookingResponseDto
     public int? Price { get; set; }
 
     public DateTime? VisitingDate { get; set; }
+
+    public byte DayNumber { get; set; }
 
     public DateTime? CreateOn { get; set; }
 

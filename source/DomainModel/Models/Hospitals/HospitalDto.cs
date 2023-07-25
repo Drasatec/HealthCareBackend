@@ -12,6 +12,9 @@ public class HospitalDto
     public string? Email { get; set; }
     public string? WhatsAppNumber { get; set; }
     public bool IsDeleted { get; set; } = false;
+    public decimal? Longitude { get; set; }
+    public decimal? Latitude { get; set; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ICollection<HospitalPhoneNumber>? PhoneNumbers { get; set; } = null!;
     public ICollection<HospitalTranslation>? HospitalTrasnlations { get; set; } = null!;
@@ -33,6 +36,8 @@ public class HospitalDto
             WhatsAppNumber = entity.WhatsAppNumber,
             Photo = entity.Photo,
             PhoneNumbers = entity.HospitalPhoneNumbers,
+            Longitude = entity.Longitude,
+            Latitude = entity.Latitude,
             HospitalTrasnlations = entity.HospitalTranslations
         };
     }
@@ -58,6 +63,8 @@ public class HospitalDto
             Photo = dto.Photo,
             Email = dto.Email,
             WhatsAppNumber = dto.WhatsAppNumber,
+            Longitude = dto.Longitude,
+            Latitude = dto.Latitude,
             HospitalTranslations = listTranc
         };
 

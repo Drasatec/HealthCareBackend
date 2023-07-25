@@ -2,6 +2,7 @@
 using DomainModel.Models;
 using DomainModel.Models.Bookings;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 
 namespace WebAPI.Controllers.version1;
 
@@ -26,17 +27,17 @@ public class BookingController : ControllerBase
             return BadRequest(new Error("400", "model is requerd"));
         }
 
-        var entity = (Booking)model;
-        var res = await Data.Generic.GenericCreate(entity);
+        var res = await Data.Appointments.CreateAppointments(model);
         long id = 0;
 
         if (res.Success)
         {
-            if (res.Value is not null)
-                id = res.Value.Id;
+            if (res.Id.HasValue)
+                id = res.Id.Value;
             var response = new ResponseLongId(res.Success, res.Message, id);
             return Created("", response);
         }
+        Data.Clinics.
         return BadRequest(res);
     }
 
@@ -45,15 +46,19 @@ public class BookingController : ControllerBase
 
     // this method get data from DoctorRepository
     [HttpGet(Order = 0801)]
-    public async Task<IActionResult> Get([FromQuery] int? id, int? hosId, int? specialtyId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, string? lang)
+    public async Task<IActionResult> Get([FromQuery] int? id, int? hosId, int? specialtyId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, byte? dayNumber, string? lang, int? page, int? pageSize)
     {
-        if (docId < 1 || ClinicId < 1 || typeVisitId < 1 || workingPeriodId < 1)
-            return BadRequest(new Error("400", "can not assign 0"));
+        //if (docId < 1 || ClinicId < 1 || typeVisitId < 1 || workingPeriodId < 1)
+        //    return BadRequest(new Error("400", "can not assign 0"));
 
-        if (lang != null)
-            return Ok(await Data.Appointments.ReadAllAppointments(id,hosId, specialtyId, ClinicId,docId, typeVisitId, workingPeriodId, patientId, bookStatusId , lang));
-        else
-            return BadRequest(new Error("400", "The lang field is required"));
+        //if (lang != null)
+            return Ok(await Data.Appointments.ReadAllAppointments(id,hosId, specialtyId, ClinicId,docId, typeVisitId, workingPeriodId, patientId, bookStatusId, dayNumber, lang,page,pageSize));
+
+        //else
+        //{
+        //    return Ok( await Data.Generic.GenericReadAll<Booking>(null, null, page, pageSize));
+        //}
+        //return BadRequest(new Error("400", "The lang field is required"));
     }
 
     // ============================= put ============================= 

@@ -25,6 +25,8 @@ public partial class Language
 
     public virtual ICollection<Gender> Genders { get; set; } = new List<Gender>();
 
+    public virtual ICollection<HospitalFeatureTranslation> HospitalFeatureTranslations { get; set; } = new List<HospitalFeatureTranslation>();
+
     public virtual ICollection<HospitalTranslation> HospitalTranslations { get; set; } = new List<HospitalTranslation>();
 
     public virtual ICollection<MainServiceTranslation> MainServiceTranslations { get; set; } = new List<MainServiceTranslation>();

@@ -4,7 +4,8 @@ using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
-using DomainModel.Models.Dtos;
+using DomainModel.Models.Bookings;
+using DomainModel.Models.Clinics;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
@@ -43,7 +44,7 @@ internal class ClinicRepository : GenericRepository, IClinicRepository
         }
         catch (Exception ex)
         {
-            return new ResponseId(false, ex.Message+"____and____"+ ex.InnerException?.Message, 0);
+            return new ResponseId(false, ex.Message + "____and____" + ex.InnerException?.Message, 0);
         }
     }
     #endregion
@@ -117,6 +118,39 @@ internal class ClinicRepository : GenericRepository, IClinicRepository
             return null;
         }
     }
+
+    public async Task<NamesParentsClinicsDto?> ClinicByIdWithParentsNames(int? id, string? lang = null)
+    {
+        IQueryable<Booking> query = Context.Bookings;
+
+        if (id.HasValue && lang != null)
+        {
+            query = query.Where(i => i.Id.Equals(id));
+            query = (from h in query
+
+                     join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
+                     where hos.LangCode == lang
+
+                     join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
+                     where hos.LangCode == lang
+
+                     join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
+                     where hos.LangCode == lang
+
+                     join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
+                     where hos.LangCode == lang
+
+
+                     select new NamesParentsClinicsDto
+                     {
+                         Id = h.Id,
+                         DoctorId = h.DoctorId,
+                     });
+        }
+        return null;
+
+    }
+
 
 
     public async Task<PagedResponse<ClinicDto>?> ReadAll(int? baseid, bool? appearance, string? status, string? lang, int? pageSize, int? page)

@@ -1,9 +1,11 @@
-﻿using DomainModel.Models.Bookings;
+﻿using DomainModel.Models;
+using DomainModel.Models.Bookings;
 
 namespace DomainModel.Interfaces;
 
 public interface IAppointmentRepository : IGenericRepository
 {
-    Task<List<BookingResponseDto?>> ReadAllAppointments(int? id, int? hosId,int? specialtyId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, string? lang);
+    Task<ResponseLongId> CreateAppointments(BookingRequestDto dto);
+    Task<PagedResponse<BookingResponseDto>?> ReadAllAppointments(long? id, int? hosId,int? specialtyId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, byte? dayNumber, string? lang, int? page, int? pageSize);
 
 }

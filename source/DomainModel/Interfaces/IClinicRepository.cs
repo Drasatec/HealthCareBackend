@@ -1,5 +1,5 @@
 ﻿using DomainModel.Models;
-using DomainModel.Models.Dtos;
+using DomainModel.Models.Clinics;
 
 namespace DomainModel.Interfaces;
 

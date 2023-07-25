@@ -19,9 +19,15 @@ public partial class Hospital
 
     public bool IsDeleted { get; set; }
 
+    public decimal? Longitude { get; set; }
+
+    public decimal? Latitude { get; set; }
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual ICollection<Clinic> Clinics { get; set; } = new List<Clinic>();
+
+    public virtual ICollection<ContactForm> ContactForms { get; set; } = new List<ContactForm>();
 
     public virtual ICollection<DoctorsWorkHospital> DoctorsWorkHospitals { get; set; } = new List<DoctorsWorkHospital>();
 
@@ -30,6 +36,8 @@ public partial class Hospital
     public virtual ICollection<HosFloor> HosFloors { get; set; } = new List<HosFloor>();
 
     public virtual ICollection<HosRoom> HosRooms { get; set; } = new List<HosRoom>();
+
+    public virtual ICollection<HospitalFeature> HospitalFeatures { get; set; } = new List<HospitalFeature>();
 
     public virtual ICollection<HospitalPhoneNumber> HospitalPhoneNumbers { get; set; } = new List<HospitalPhoneNumber>();
 
