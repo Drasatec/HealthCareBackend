@@ -593,7 +593,7 @@ public class AppDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
-            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.SenderName).HasMaxLength(100);
             entity.Property(e => e.Subject).HasMaxLength(200);
 
             entity.HasOne(d => d.Hospital).WithMany(p => p.ContactForms)

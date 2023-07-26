@@ -131,11 +131,11 @@ CREATE TABLE HospitalTranslations --MM
 GO
 CREATE TABLE ContactForm (
     Id INT IDENTITY (1, 1),
-    Name NVARCHAR(100) NOT NULL,
+    SenderName NVARCHAR(100) NOT NULL,
     Email NVARCHAR(100) NOT NULL,
     Subject NVARCHAR(200) NOT NULL,
     Message NVARCHAR(MAX) NOT NULL,
-    ContactDate DATETIME NOT NULL DEFAULT GETDATE(),
+    ContactDate DATETIME DEFAULT GETDATE(),
     HospitalId INT,
 
 	CONSTRAINT PK_ContactForm PRIMARY KEY (Id),

@@ -12,7 +12,18 @@ public static class DataAccessImageService
     private const string medium = "medium";
     private const string small = "small";
     //private const string large = "large";
-    private static readonly  string path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot\\Images\\");
+    private static readonly string path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot\\Images\\");
+
+    public static async Task<string> SaveSingleImage(Stream image)
+    {
+        if (image != null)
+        {
+            var imageName = Helper.GenerateImageName();
+            _ = SaveSingleImage(image, imageName);
+            return imageName;
+        }
+        return null;
+    }
 
     public static async Task<string> SaveSingleImage(Stream image, string? name = null)
     {
@@ -20,13 +31,12 @@ public static class DataAccessImageService
         {
             name = Helper.GenerateImageName();
         }
+        using var imageResult = Image.Load(image);
+        CreateDirectories(path);
 
-            using var imageResult = Image.Load(image);
-            CreateDirectories(path);
-
-           // await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
-            await SaveImageInFileSystem(imageResult, name, path + medium, mediumSize);
-            await SaveImageInFileSystem(imageResult, name, path + small, smallSize);
+        // await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
+        await SaveImageInFileSystem(imageResult, name, path + medium, mediumSize);
+        await SaveImageInFileSystem(imageResult, name, path + small, smallSize);
 
         return await Task.FromResult(name);
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities;
 
@@ -7,7 +6,7 @@ public partial class ContactForm
 {
     public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string SenderName { get; set; } = null!;
 
     public string Email { get; set; } = null!;
 
@@ -15,9 +14,10 @@ public partial class ContactForm
 
     public string Message { get; set; } = null!;
 
-    public DateTime ContactDate { get; set; }
+    public DateTime? ContactDate { get; set; }
 
     public int? HospitalId { get; set; }
-
+    
+    [JsonIgnore]
     public virtual Hospital? Hospital { get; set; }
 }

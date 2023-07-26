@@ -1,6 +1,5 @@
 ﻿using DomainModel.Entities.TranslationModels;
-using System;
-using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities;
 
@@ -14,6 +13,7 @@ public partial class HospitalFeature
 
     public int? HospitalId { get; set; }
 
+    [JsonIgnore]
     public virtual Hospital? Hospital { get; set; }
 
     public virtual ICollection<HospitalFeatureTranslation> HospitalFeatureTranslations { get; set; } = new List<HospitalFeatureTranslation>();

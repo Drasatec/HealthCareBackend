@@ -5,6 +5,7 @@ using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
 using DomainModel.Models.Buildings;
+using DomainModel.Models.Clinics;
 using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
 namespace DataAccess.Repositories;
@@ -96,6 +97,48 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
             return respons = new(false, "can not duplicate langCode with the same hosId or ....." + ex.Message, null); ;
         }
     }
+
+
+    public async Task<Response<HospitalFeature?>> UpdateHospitalFeature(HospitalFeature entity, int id, Stream? image = null)
+    {
+        Response<HospitalFeature?> respons;
+        try
+        {
+            var current = Context.HospitalFeatures.Find(id);
+            if (current == null)
+                return respons = new(false, $"id: {id} is not found");
+            
+            var modfied = false;
+
+            if (image != null)
+            {
+                // if photo in database is null
+                if (string.IsNullOrEmpty(current.Photo))
+                {
+                    current.Photo = await DataAccessImageService.SaveSingleImage(image);
+                    modfied = true;
+                }
+                else
+                {
+                    _ = DataAccessImageService.UpdateSingleImage(image, current.Photo);
+                    modfied = false;
+                }
+            }
+
+            current.HospitalId = entity.HospitalId;
+            current.HospitalFeatureTranslations = entity.HospitalFeatureTranslations;
+            Context.Update(current).Property(propa => propa.Photo).IsModified = modfied;
+            Context.Entry(current).Property(p => p.CreateOn).IsModified = false;
+
+            await Context.SaveChangesAsync();
+            return respons = new(true, $"update on id: {id}", null);
+        }
+        catch (Exception ex)
+        {
+            return respons = new(false, "can not duplicate foreignKey with same Id ......." + ex.Message + ex.InnerException?.Message, null); ;
+        }
+    }
+
     #endregion
 
     #region Read

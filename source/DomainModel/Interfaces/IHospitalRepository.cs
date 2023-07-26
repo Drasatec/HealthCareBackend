@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities;
+using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using DomainModel.Models.Hospitals;
 
@@ -14,6 +15,7 @@ public interface IHospitalRepository : IGenericRepository
     Task<List<HospitalTranslation>> SearchByHospitalName(string name);
     Task<PagedResponse<HospitalDto>?> SearchByHospitalNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize);
     Task<Response<string?>> UpdateAnImage(Stream image, int id);
+    Task<Response<HospitalFeature?>> UpdateHospitalFeature(HospitalFeature entity, int id, Stream? image = null);
 
     //Task<Response> DeleteHospitalById(int id, bool isDeleted);
     //Task<Response<HospitalDto?>> AddTranslations(List<HospitalTranslation> dto, int id);
