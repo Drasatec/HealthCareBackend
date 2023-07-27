@@ -10,11 +10,11 @@ namespace WebAPI.Controllers.version1;
 [Route("api/DoctorWorkPeriod")]
 [ApiController]
 [ApiVersion("1.0")]
-public class PeriodWorkDoctorClinicController : ControllerBase
+public class DoctorWorkPeriodController : ControllerBase
 {
     private readonly IUnitOfWork Data;
 
-    public PeriodWorkDoctorClinicController(IUnitOfWork data)
+    public DoctorWorkPeriodController(IUnitOfWork data)
     {
         Data = data;
     }
@@ -24,7 +24,7 @@ public class PeriodWorkDoctorClinicController : ControllerBase
 
 
     [HttpPost("add", Order = 0801)]
-    public async Task<IActionResult> AddSingle([FromForm] PeriodWorkDoctorClinic model)
+    public async Task<IActionResult> AddSingle([FromForm] DoctorWorkPeriod model)
     {
         var res = await Data.Generic.GenericCreate(model);
 
@@ -59,7 +59,7 @@ public class PeriodWorkDoctorClinicController : ControllerBase
 
 
     [HttpPut("edit", Order = 0820)]
-    public async Task<IActionResult> Update([FromForm] PeriodWorkDoctorClinic model)
+    public async Task<IActionResult> Update([FromForm] DoctorWorkPeriod model)
     {
         Response response;
 
@@ -79,7 +79,7 @@ public class PeriodWorkDoctorClinicController : ControllerBase
     public async Task<IActionResult> Delete([FromQuery] int? id, int? hosId, int? docId, int? clinicId)
     {
         //Response res;
-        Expression<Func<PeriodWorkDoctorClinic, bool>> filter;
+        Expression<Func<DoctorWorkPeriod, bool>> filter;
         if (id.HasValue)
         {
             filter = f => f.Id.Equals(id);

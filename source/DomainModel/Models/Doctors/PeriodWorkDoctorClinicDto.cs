@@ -28,7 +28,7 @@ public class PeriodWorkDoctorClinicDto
 
 
 
-    public static implicit operator PeriodWorkDoctorClinicDto(PeriodWorkDoctorClinic arg)
+    public static implicit operator PeriodWorkDoctorClinicDto(DoctorWorkPeriod arg)
     {
         if (arg == null)
             return null!;
@@ -54,7 +54,7 @@ public class PeriodWorkDoctorClinicDto
     //    return enity;
     //}
 
-    public static List<PeriodWorkDoctorClinicDto> ToList(IEnumerable<PeriodWorkDoctorClinic> enList)
+    public static List<PeriodWorkDoctorClinicDto> ToList(IEnumerable<DoctorWorkPeriod> enList)
     {
         var listDto = new List<PeriodWorkDoctorClinicDto>(enList.Count());
         foreach (var entity in enList)

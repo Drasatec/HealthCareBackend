@@ -90,7 +90,7 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<PatientTranslation> PatientTranslations { get; set; }
 
-    public virtual DbSet<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; }
+    public virtual DbSet<DoctorWorkPeriod> PeriodWorkDoctorClinics { get; set; }
 
     public virtual DbSet<PriceCategory> PriceCategories { get; set; }
 
@@ -758,11 +758,9 @@ public class AppDbContext : DbContext
             //    .HasConstraintName("FK_Patients_SSNTypeId");
         });
 
-        modelBuilder.Entity<PeriodWorkDoctorClinic>(entity =>
+        modelBuilder.Entity<DoctorWorkPeriod>(entity =>
         {
-            entity.ToTable("PeriodWorkDoctorClinic");
-
-            entity.HasIndex(e => new { e.HospitalId, e.OnDay, e.DoctorId, e.ClinicId, e.WorkingPeriodId }, "UK_PeriodWorkDoctorClinic_AllProperty").IsUnique();
+            entity.ToTable("DoctorWorkPeriods");
 
             entity.HasIndex(e => e.DoctorId, "IX_PeriodWorkDoctorClinic_DoctorId");
 
@@ -770,35 +768,26 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => new { e.HospitalId, e.ClinicId, e.OnDay }, "IX_PeriodWorkDoctorClinic_Hospital_Clinic_OnDay");
 
-            //entity.HasOne(d => d.Build).WithMany(p => p.PeriodWorkDoctorClinics)
-            //    .HasForeignKey(d => d.BuildId)
-            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_BuildId");
+            entity.HasIndex(e => new { e.HospitalId, e.SpecialtyId, e.DoctorId, e.ClinicId, e.WorkingPeriodId, e.OnDay }, "UK_PeriodWorkDoctorClinic_AllProperty").IsUnique();
 
-            entity.HasOne(d => d.Clinic).WithMany(p => p.PeriodWorkDoctorClinics)
-                .HasForeignKey(d => d.ClinicId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PeriodWorkDoctorClinic_ClinicId");
+            //entity.HasOne(d => d.Clinic).WithMany(p => p.DoctorWorkPeriods)
+            //    .HasForeignKey(d => d.ClinicId)
+            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_ClinicId");
 
-            entity.HasOne(d => d.Doctor).WithMany(p => p.PeriodWorkDoctorClinics)
-                .HasForeignKey(d => d.DoctorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PeriodWorkDoctorClinic_DoctorId");
+            //entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorWorkPeriods)
+            //    .HasForeignKey(d => d.DoctorId)
+            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_DoctorId");
 
-            //entity.HasOne(d => d.Floor).WithMany(p => p.PeriodWorkDoctorClinics)
-            //    .HasForeignKey(d => d.FloorId)
-            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_FloorId");
+            //entity.HasOne(d => d.Hospital).WithMany(p => p.DoctorWorkPeriods)
+            //    .HasForeignKey(d => d.HospitalId)
+            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_HospitalId");
 
-            entity.HasOne(d => d.Hospital).WithMany(p => p.PeriodWorkDoctorClinics)
-                .HasForeignKey(d => d.HospitalId)
-                .HasConstraintName("FK_PeriodWorkDoctorClinic_HospitalId");
+            //entity.HasOne(d => d.MedicalSpecialty).WithMany(p => p.DoctorWorkPeriods)
+            //    .HasForeignKey(d => d.SpecialtyId)
+            //    .HasConstraintName("FK_DoctorWorkPeriods_SpecialtyId");
 
-            //entity.HasOne(d => d.Room).WithMany(p => p.PeriodWorkDoctorClinics)
-            //    .HasForeignKey(d => d.RoomId)
-            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_RoomId");
-
-            //entity.HasOne(d => d.WorkingPeriod).WithMany(p => p.PeriodWorkDoctorClinics)
+            //entity.HasOne(d => d.WorkingPeriod).WithMany(p => p.DoctorWorkPeriods)
             //    .HasForeignKey(d => d.WorkingPeriodId)
-            //    .OnDelete(DeleteBehavior.ClientSetNull)
             //    .HasConstraintName("FK_PeriodWorkDoctorClinic_WorkingPeriodId");
         });
 

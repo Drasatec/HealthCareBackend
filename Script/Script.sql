@@ -736,6 +736,7 @@ CREATE TABLE EmployeesStatusTranslations --MM
     INDEX IX_EmployeesStatusTranslations_StatusName NONCLUSTERED (StatusName)
 );
 GO
+-- ================================================================================= DOCTOR =================================================================================
 ----------------
 CREATE TABLE Doctors
 (
@@ -875,42 +876,48 @@ CREATE TABLE SpecialtiesDoctors --MM
 );
 GO
 ----------------
-CREATE TABLE PeriodWorkDoctorClinic --MM
+CREATE TABLE DoctorWorkPeriods --MM
 (
     Id INT IDENTITY(1,1),
-    HospitalId INT,
-    ClinicId INT,
-    DoctorId INT,
-    WorkingPeriodId INT,
-    OnDay TINYINT,
+    HospitalId INT NOT NULL,
+    SpecialtyId INT NOT NULL,
+    ClinicId INT NOT NULL,
+    DoctorId INT NOT NULL,
+    WorkingPeriodId INT NOT NULL,
+    OnDay TINYINT NOT NULL,
 
-    CONSTRAINT PK_PeriodWorkDoctorClinic PRIMARY KEY (Id),
-    CONSTRAINT UK_PeriodWorkDoctorClinic_AllProperty UNIQUE (HospitalId,DoctorId,ClinicId,WorkingPeriodId,OnDay),
-    CONSTRAINT CHECK_PeriodWorkDoctorClinic_OnDay CHECK(OnDay between 1 and 7),
+    CONSTRAINT PK_DoctorWorkPeriods PRIMARY KEY (Id),
+    CONSTRAINT UK_DoctorWorkPeriods_AllProperty UNIQUE (HospitalId,SpecialtyId,DoctorId,ClinicId,WorkingPeriodId,OnDay),
+    CONSTRAINT CHECK_DoctorWorkPeriods_OnDay CHECK(OnDay between 1 and 7),
 
-    CONSTRAINT FK_PeriodWorkDoctorClinic_HospitalId
+    CONSTRAINT FK_DoctorWorkPeriods_HospitalId
     FOREIGN KEY (HospitalId)
       REFERENCES Hospitals(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	CONSTRAINT FK_PeriodWorkDoctorClinic_DoctorId
+	CONSTRAINT FK_DoctorWorkPeriods_SpecialtyId
+	FOREIGN KEY (SpecialtyId)
+		REFERENCES MedicalSpecialties(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_DoctorWorkPeriods_DoctorId
     FOREIGN KEY (DoctorId)
       REFERENCES Doctors(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	CONSTRAINT FK_PeriodWorkDoctorClinic_ClinicId
+	CONSTRAINT FK_DoctorWorkPeriods_ClinicId
     FOREIGN KEY (ClinicId)
       REFERENCES Clinics(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	CONSTRAINT FK_PeriodWorkDoctorClinic_WorkingPeriodId
+	CONSTRAINT FK_DoctorWorkPeriods_WorkingPeriodId
     FOREIGN KEY (WorkingPeriodId)
       REFERENCES WorkingPeriod(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
     
-    INDEX IX_PeriodWorkDoctorClinic_Hospital_Clinic_OnDay NONCLUSTERED (HospitalId,ClinicId,OnDay),
-    INDEX IX_PeriodWorkDoctorClinic_DoctorId_OnDay NONCLUSTERED (DoctorId,OnDay),
-    INDEX IX_PeriodWorkDoctorClinic_DoctorId NONCLUSTERED (DoctorId)
+    INDEX IX_DoctorWorkPeriods_Hospital_Clinic_OnDay NONCLUSTERED (HospitalId,ClinicId,OnDay),
+    INDEX IX_DoctorWorkPeriods_DoctorId_OnDay NONCLUSTERED (DoctorId,OnDay),
+    INDEX IX_DoctorWorkPeriods_DoctorId NONCLUSTERED (DoctorId)
 );
 GO
 ---------------- 

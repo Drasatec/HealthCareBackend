@@ -16,7 +16,9 @@ public partial class WorkingPeriod
 
     //public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
-    // public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
 
     public virtual ICollection<WorkingPeriodTranslation> WorkingPeriodTranslations { get; set; } = new List<WorkingPeriodTranslation>();
+
+    //public virtual ICollection<DoctorWorkPeriod> DoctorWorkPeriods { get; set; } = new List<DoctorWorkPeriod>();
+
 }
