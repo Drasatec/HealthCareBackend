@@ -1,20 +1,12 @@
 ﻿using DataAccess.Contexts;
-using DomainModel.Entities.TranslationModels;
 using DomainModel.Entities;
+using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
-using DomainModel.Models.Dtos;
 using DomainModel.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DomainModel.Models.Doctors;
-using System.Diagnostics;
 using DomainModel.Services;
-using System.Net.Mail;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
 
@@ -55,7 +47,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             return new Response<DoctorDto>(false, ex.Message + "____and____" + ex.InnerException?.Message, null);
         }
     }
-    
+
     #endregion
 
 
@@ -102,7 +94,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         }
     }
 
-    public async Task<Response<DoctorDto?>> UpdateAttachment(DoctorAttachment docAttachmnet,string ext, Stream? file = null)
+    public async Task<Response<DoctorDto?>> UpdateAttachment(DoctorAttachment docAttachmnet, string ext, Stream? file = null)
     {
         Response<DoctorDto?> respons;
         try
@@ -359,7 +351,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
     {
         IQueryable<PeriodWorkDoctorClinicDto> query;
         if (lang == null)
-            query = Context.PeriodWorkDoctorClinics.Select((h) => new PeriodWorkDoctorClinicDto
+            query = Context.DoctorWorkPeriods.Select((h) => new PeriodWorkDoctorClinicDto
             {
                 Id = h.Id,
                 DoctorId = h.DoctorId,
@@ -369,7 +361,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                 OnDay = h.OnDay,
             });
         else
-            query = from h in Context.PeriodWorkDoctorClinics
+            query = from h in Context.DoctorWorkPeriods
 
                     join dt in Context.DoctorTranslations on h.DoctorId equals dt.DoctorId
                     where dt.LangCode == lang
@@ -435,6 +427,81 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         }
 
         return await query.OrderByDescending(h => h.Id).ToListAsync();
+    }
+
+
+    public async Task<PagedResponse<DoctorWorkPeriodDto>?> FindDoctor(int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
+    {
+        IQueryable<DoctorWorkPeriod> query = Context.DoctorWorkPeriods;
+        var totalCount = 0;
+
+        if (hosId.HasValue)
+        {
+            query = query.Where(d => d.HospitalId.Equals(hosId));
+        }
+        if (specialtyId.HasValue)
+        {
+            query = query.Where(d => d.SpecialtyId.Equals(specialtyId));
+        }
+        if (docId.HasValue)
+        {
+            query = query.Where(d => d.DoctorId.Equals(docId));
+        }
+
+        if (workingPeriodId.HasValue)
+        {
+            query = query.Where(d => d.WorkingPeriodId.Equals(workingPeriodId));
+        }
+        if (day.HasValue)
+        {
+            query = query.Where(d => d.OnDay.Equals(day));
+        }
+
+        if (doctorsDegreeId.HasValue)
+        {
+            query = query.Where(d => d.Doctor != null&&  d.Doctor.DoctorsDegreeId.Equals(doctorsDegreeId));
+        }
+        
+        if (gender.HasValue)
+        {
+            query = query.Where(d => d.Doctor != null&&  d.Doctor.Gender.Equals(gender));
+        }
+
+
+
+
+        query = query.OrderByDescending(o => o.Id);
+
+        totalCount = query.Count();
+        if (totalCount < 0)
+            return null;
+
+        // page size
+        GenericPagination(ref query, ref pageSize, ref page, totalCount);
+
+        // lang
+        if (lang is not null)
+        {
+            query = query.Include(d1 => d1.Doctor).ThenInclude(t=>t.DoctorTranslations.Where(l => l.LangCode == lang));
+        }
+        else
+        {
+            query = query.Include(d2 => d2.Doctor);
+        }
+
+        await query.ToListAsync();
+
+        var result = DoctorWorkPeriodDto.ToList(query);
+        var all = new PagedResponse<DoctorWorkPeriodDto>
+        {
+            Total = totalCount,
+            Page = page,
+            PageSize = pageSize,
+            Data = result.ToList()
+        };
+
+        return all;
+
     }
     #endregion
 

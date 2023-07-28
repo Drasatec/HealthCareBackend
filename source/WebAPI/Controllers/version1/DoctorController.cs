@@ -107,6 +107,18 @@ public class DoctorController : ControllerBase
     }
 
 
+    [HttpGet("find-doctor", Order = 0914)]
+    public async Task<IActionResult> FindDoctor([FromQuery] int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
+    {
+        var resutl = await Data.Doctors.FindDoctor(hosId, specialtyId, docId, workingPeriodId, day, doctorsDegreeId, gender, page, pageSize, lang);
+        if (resutl is null)
+        {
+            return Ok(new Response(true, "no content"));
+        }
+        return Ok(resutl);
+    }
+
+
     // ============================= put ============================= 
 
 

@@ -90,7 +90,7 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<PatientTranslation> PatientTranslations { get; set; }
 
-    public virtual DbSet<DoctorWorkPeriod> PeriodWorkDoctorClinics { get; set; }
+    public virtual DbSet<DoctorWorkPeriod> DoctorWorkPeriods { get; set; }
 
     public virtual DbSet<PriceCategory> PriceCategories { get; set; }
 
@@ -774,9 +774,9 @@ public class AppDbContext : DbContext
             //    .HasForeignKey(d => d.ClinicId)
             //    .HasConstraintName("FK_PeriodWorkDoctorClinic_ClinicId");
 
-            //entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorWorkPeriods)
-            //    .HasForeignKey(d => d.DoctorId)
-            //    .HasConstraintName("FK_PeriodWorkDoctorClinic_DoctorId");
+            entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorWorkPeriods)
+                .HasForeignKey(d => d.DoctorId)
+                .HasConstraintName("FK_PeriodWorkDoctorClinic_DoctorId");
 
             //entity.HasOne(d => d.Hospital).WithMany(p => p.DoctorWorkPeriods)
             //    .HasForeignKey(d => d.HospitalId)

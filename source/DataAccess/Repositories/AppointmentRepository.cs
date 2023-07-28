@@ -52,8 +52,6 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
     {
         try
         {
-
-
             IQueryable<Booking> query = Context.Bookings;
             IQueryable<BookingResponseDto> result;
 
@@ -185,9 +183,9 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                               BookingNumber = h.BookingNumber,
                           });
 
-            var totalCount = await query.CountAsync();
+            var totalCount = await result.CountAsync();
 
-            GenericPagination(ref query, ref pageSize, ref page, totalCount);
+            GenericPagination(ref result, ref pageSize, ref page, totalCount);
 
             var listDto = await result.OrderByDescending(h => h.Id)
                                      .ToListAsync();
