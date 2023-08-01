@@ -26,6 +26,8 @@ namespace DataAccess.UnitOfWorks
 
         public IAppointmentRepository Appointments { get; private set; }
 
+        public IUserRepository Users { get; private set; }
+
         public UnitOfWork(AppDbContext context )
         {
             Context = context;
@@ -43,6 +45,7 @@ namespace DataAccess.UnitOfWorks
             HosClients = new ClientRepository(context);
             Patients = new PatientRepository(context);
             Appointments = new AppointmentRepository(context);
+            Users = new UserRepository(context);
         }
 
 

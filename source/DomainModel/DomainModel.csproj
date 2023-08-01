@@ -10,4 +10,8 @@
     <None Remove="Models\Clinics\NamesParentsClinicsDto.cs~RF1bb0af2.TMP" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Twilio" Version="6.10.1" />
+  </ItemGroup>
+
 </Project>

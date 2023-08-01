@@ -433,6 +433,8 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
     public async Task<PagedResponse<DoctorWorkPeriodDto>?> FindDoctor(int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
     {
         IQueryable<DoctorWorkPeriod> query = Context.DoctorWorkPeriods;
+        IQueryable<DoctorWorkPeriodDto> result;
+
         var totalCount = 0;
 
         if (hosId.HasValue)
@@ -459,16 +461,13 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
 
         if (doctorsDegreeId.HasValue)
         {
-            query = query.Where(d => d.Doctor != null&&  d.Doctor.DoctorsDegreeId.Equals(doctorsDegreeId));
+            query = query.Where(d => d.Doctor != null && d.Doctor.DoctorsDegreeId.Equals(doctorsDegreeId));
         }
-        
+
         if (gender.HasValue)
         {
-            query = query.Where(d => d.Doctor != null&&  d.Doctor.Gender.Equals(gender));
+            query = query.Where(d => d.Doctor != null && d.Doctor.Gender.Equals(gender));
         }
-
-
-
 
         query = query.OrderByDescending(o => o.Id);
 
@@ -482,16 +481,57 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         // lang
         if (lang is not null)
         {
-            query = query.Include(d1 => d1.Doctor).ThenInclude(t=>t.DoctorTranslations.Where(l => l.LangCode == lang));
+            query = query.Include(d1 => d1.Doctor).ThenInclude(td => td.DoctorTranslations.Where(l => l.LangCode == lang));
+
+            result = from h in query
+
+                     join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
+                     where hos.LangCode == lang
+
+                     join wpt in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wpt.WorkingPeriodId
+                     where wpt.LangCode == lang
+
+                     select new DoctorWorkPeriodDto
+                     {
+                         doctorWorkPeriod = new PeriodWorkDoctorClinicDto
+                         {
+                             Id = h.Id,
+                             HospitalId = h.HospitalId,
+                             SpecialtyId = h.SpecialtyId,
+                             ClinicId = h.ClinicId,
+                             DoctorId = h.DoctorId,
+                             WorkingPeriodId = h.WorkingPeriodId,
+                             OnDay = h.OnDay,
+                             WorkingPeriod = wpt.Name,
+                             Hospital = hos.Name
+                         },
+                         Doctor = h.Doctor
+                     };
         }
         else
         {
             query = query.Include(d2 => d2.Doctor);
+
+            result = from h in query
+                     select new DoctorWorkPeriodDto
+                     {
+                         doctorWorkPeriod = new PeriodWorkDoctorClinicDto
+                         {
+                             Id = h.Id,
+                             HospitalId = h.HospitalId,
+                             SpecialtyId = h.SpecialtyId,
+                             ClinicId = h.ClinicId,
+                             DoctorId = h.DoctorId,
+                             WorkingPeriodId = h.WorkingPeriodId,
+                             OnDay = h.OnDay,
+                         },
+                         Doctor = h.Doctor
+                     };
         }
 
         await query.ToListAsync();
 
-        var result = DoctorWorkPeriodDto.ToList(query);
+        //result = DoctorWorkPeriodDto.ToList(query);
         var all = new PagedResponse<DoctorWorkPeriodDto>
         {
             Total = totalCount,

@@ -29,5 +29,6 @@ public partial class DoctorWorkPeriod
     [JsonIgnore]
    public virtual Doctor? Doctor { get; set; } = null!;
 
-    //public virtual WorkingPeriod? WorkingPeriod { get; set; } = null!;
+    [JsonIgnore]
+    public virtual WorkingPeriod? WorkingPeriod { get; set; } = null!;
 }

@@ -7,10 +7,59 @@
 -- GO
 -- use alrahma_care_db;
 --GO
+ CREATE TABLE Users(
+	[Id] [nvarchar](450) NOT NULL,
+	[FullName] [nvarchar](100) NOT NULL,
+	[UserName] [nvarchar](256) NULL,
+	[NormalizedUserName] [nvarchar](256) NULL,
+	[Email] [nvarchar](256) NULL,
+	[NormalizedEmail] [nvarchar](256) NULL,
+	[EmailConfirmed] [bit] NOT NULL,
+	[PasswordHash] [nvarchar](max) NULL,
+	[SecurityStamp] [nvarchar](max) NULL,
+	[ConcurrencyStamp] [nvarchar](max) NULL,
+	[PhoneNumber] [nvarchar](max) NULL,
+	[PhoneNumberConfirmed] [bit] NOT NULL,
+	[TwoFactorEnabled] [bit] NOT NULL,
+	[LockoutEnd] [datetimeoffset](7) NULL,
+	[LockoutEnabled] [bit] NOT NULL,
+	[AccessFailedCount] [int] NOT NULL,
+
+	CONSTRAINT PK_Users PRIMARY KEY (Id),
+);
+GO
+CREATE TABLE Roles(
+	[Id] [nvarchar](450) NOT NULL,
+	[Name] [nvarchar](256) NULL,
+	[ConcurrencyStamp] [nvarchar](max) NULL,
+
+	CONSTRAINT PK_Roles PRIMARY KEY (Id),
+);
+GO
+CREATE TABLE UserRoles(
+	[Id] [BIGINT] IDENTITY(1,1),
+	[UserId] [nvarchar](450) NOT NULL,
+	[RoleId] [nvarchar](450) NOT NULL,
+	[CreateOn] DATETIME DEFAULT GETDATE(),
+
+	CONSTRAINT PK_UserRoles PRIMARY KEY (Id),
+
+	CONSTRAINT FK_UserRoles_UserId
+    FOREIGN KEY (UserId)
+      REFERENCES Users(Id)
+		ON DELETE CASCADE,
+
+    CONSTRAINT FK_UserRoles_RoleId
+    FOREIGN KEY (RoleId)
+      REFERENCES Roles(Id)
+		ON DELETE CASCADE,
+);
+GO
+----------------
 CREATE TABLE Languages
 (
-    Code VARCHAR(6),
-    LanguageName NVARCHAR(20),
+    [Code] VARCHAR(6),
+    [LanguageName] NVARCHAR(20),
 	CONSTRAINT PK_Language PRIMARY KEY (Code)
 );
 GO
@@ -19,10 +68,10 @@ GO
 ----------------
 CREATE TABLE Weekdays
 (
-    Id INT IDENTITY(1,1),
-    DayNumber TINYINT NOT NULL,
-    WeekdayName NVARCHAR(20) NOT NULL,
-    LangCode VARCHAR(6) NOT NULL,
+    [Id] INT IDENTITY(1,1),
+    [DayNumber] TINYINT NOT NULL,
+    [WeekdayName] NVARCHAR(20) NOT NULL,
+    [LangCode] VARCHAR(6) NOT NULL,
 
     CONSTRAINT PK_Weekdays PRIMARY KEY (Id),
     CONSTRAINT UK_Weekdays_DayNumber_LangCode UNIQUE (DayNumber, LangCode),
@@ -43,10 +92,10 @@ GO
 ----------------
 CREATE TABLE Genders
 (
-    Id INT IDENTITY(1,1),
-    GenderNumber TINYINT NOT NULL,
-    GenderName NVARCHAR(20) NOT NULL,
-    LangCode VARCHAR(6) NOT NULL,
+    [Id] INT IDENTITY(1,1),
+    [GenderNumber] TINYINT NOT NULL,
+    [GenderName] NVARCHAR(20) NOT NULL,
+    [LangCode] VARCHAR(6) NOT NULL,
 
     CONSTRAINT PK_Genders PRIMARY KEY (Id),
     CONSTRAINT UK_Genders_GenderNumber_LangCode UNIQUE (GenderNumber, LangCode),
@@ -62,13 +111,13 @@ GO
 ----------------
 CREATE TABLE Currencies
 (
-    Id INT IDENTITY(1,1),
-    CurrencyCode VARCHAR(3) NOT NULL ,-- USA
-    CurrencyName VARCHAR(50) NOT NULL, --US Dollar
-    Symbol VARCHAR(10) NOT NULL, -- $
-    country VARCHAR(50) NOT NULL, -- United States
-    Longitude DECIMAL(12, 9),
-    Latitude DECIMAL(12, 9),
+    [Id] INT IDENTITY(1,1),
+    [CurrencyCode] VARCHAR(3) NOT NULL ,-- USA
+    [CurrencyName] VARCHAR(50) NOT NULL, --US Dollar
+    [Symbol] VARCHAR(10) NOT NULL, -- $
+    [country] VARCHAR(50) NOT NULL, -- United States
+    [Longitude] DECIMAL(12, 9),
+    [Latitude] DECIMAL(12, 9),
 
     CONSTRAINT PK_Currencies PRIMARY KEY (Id),
     CONSTRAINT UK_Currencies_CurrencyCode UNIQUE (CurrencyCode),

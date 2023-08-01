@@ -1,17 +1,20 @@
+using DomainModel.Interfaces.Services;
+using DomainModel.Models.AppSettings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using WebApi.Startup;
+using WebAPI.Services;
 using WebAPI.Startup;
 //  Scaffold-DbContext 'Data Source=pcFawzy\SQLEXPRESS; Initial Catalog=alrahma_care_db;Trusted_Connection=true; TrustServerCertificate=true;' Microsoft.EntityFrameworkCore.SqlServer -OutputDir My_Models2
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.RegisterServices();
 builder.Services.RegisterDbContext(builder.Configuration);
-
-// Add services to the container.
-//builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-
+builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
 
 builder.Services.AddApiVersioning(config =>
 {
@@ -34,22 +37,27 @@ builder.Services.AddVersionedApiExplorer(conf =>
     conf.SubstituteApiVersionInUrl = true;
 });
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o =>
+{
+    o.RequireHttpsMetadata = false;
+    o.SaveToken = false;
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!))
+    };
+});
 var app = builder.Build();
 app.UseStaticFiles();
 app.UseCors(w => w.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.AppUsingPoints();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-
-//app.UseHttpsRedirection();
-
-//app.UseAuthorization();
-
-//app.MapControllers();
-
-//app.Run();

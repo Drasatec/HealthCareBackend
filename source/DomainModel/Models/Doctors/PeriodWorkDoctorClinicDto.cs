@@ -7,6 +7,9 @@ public class PeriodWorkDoctorClinicDto
 
     public int? HospitalId { get; set; }
 
+    public int? SpecialtyId { get; set; }
+
+
     public int ClinicId { get; set; }
 
     public int DoctorId { get; set; }
@@ -39,6 +42,7 @@ public class PeriodWorkDoctorClinicDto
             DoctorId = arg.DoctorId,
             ClinicId = arg.ClinicId,
             HospitalId = arg.HospitalId,
+            SpecialtyId = arg.SpecialtyId,
             WorkingPeriodId = arg.WorkingPeriodId,
         };
     }

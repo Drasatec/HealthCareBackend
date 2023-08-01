@@ -1,5 +1,6 @@
 ﻿using DomainModel.Entities;
 using DomainModel.Entities.TranslationModels;
+using DomainModel.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Contexts;
@@ -12,6 +13,14 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options): base(options){}
 
     #region DbSets
+
+    public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserRole> UserRoles { get; set; }
+
+
     public virtual DbSet<ContactForm> ContactForms { get; set; }
 
     public virtual DbSet<HospitalFeature> HospitalFeatures { get; set; }
@@ -133,6 +142,40 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("Arabic_100_CI_AS_KS_WS_SC_UTF8");
+
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.Property(e => e.Name).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.UserName).HasMaxLength(256);
+            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.Property(e => e.CreateOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.RoleId).HasMaxLength(450);
+            entity.Property(e => e.UserId).HasMaxLength(450);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.HosUserRoles)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK_UserRoles_RoleId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.HosUserRoles)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_UserRoles_UserId");
+        });
+
+
 
         modelBuilder.Entity<Booking>(entity =>
         {

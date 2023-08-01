@@ -63,3 +63,6 @@ DROP TABLE Weekdays;
 DROP TABLE Genders;
 DROP TABLE Currencies;
 DROP TABLE Languages;
+DROP TABLE UserRoles;
+DROP TABLE Roles;
+DROP TABLE Users;

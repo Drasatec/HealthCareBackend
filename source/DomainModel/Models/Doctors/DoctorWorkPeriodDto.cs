@@ -4,7 +4,11 @@ using DomainModel.Entities;
 namespace DomainModel.Models.Doctors;
 public class DoctorWorkPeriodDto
 {
-    public DoctorWorkPeriod? DoctorWorkPeriod { get; set; }
+    public PeriodWorkDoctorClinicDto? doctorWorkPeriod { get; set; }
+
+    //public DoctorWorkPeriod? DoctorWorkPeriod { get; set; }
+
+    //public WorkingPeriod? WorkingPeriod { get; set; } = null!;
 
     public DoctorDto? Doctor { get; set; }
 
@@ -18,8 +22,11 @@ public class DoctorWorkPeriodDto
 
         return new DoctorWorkPeriodDto
         {
-            DoctorWorkPeriod = arg,
+            //DoctorWorkPeriod = arg,
+            //WorkingPeriodId = arg.WorkingPeriodId,
+            //doctorWorkPeriod = (PeriodWorkDoctorClinicDto)arg.WorkingPeriod,
             Doctor = (DoctorDto)arg.Doctor,
+            //WorkingPeriod = arg.WorkingPeriod,
 
         };
     }

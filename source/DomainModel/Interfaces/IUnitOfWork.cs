@@ -28,6 +28,7 @@ namespace DomainModel.Interfaces
         IClientRepository HosClients { get; }
         IPatientRepository Patients { get; }
         IAppointmentRepository Appointments { get; }
+        IUserRepository Users { get; }
 
         int Complete();
     }
