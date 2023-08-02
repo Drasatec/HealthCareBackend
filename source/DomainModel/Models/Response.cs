@@ -3,7 +3,7 @@
 public class Response<TRes>
 {
     public bool Success { get; set; }
-    public string? Message { get; set; } = null;
+    public string? Message { get; set; } = string.Empty;
     public TRes? Value { get; set; }
     public Response() { }
     public Response(bool success, string? message, TRes? value = default)

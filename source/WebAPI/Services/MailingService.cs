@@ -1,4 +1,5 @@
-﻿using DomainModel.Interfaces.Services;
+﻿using DomainModel.Helpers;
+using DomainModel.Interfaces.Services;
 using DomainModel.Models.AppSettings;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -16,7 +17,76 @@ public class MailingService : IMailingService
         _mailSettings = mailSettings.Value;
     }
 
-    public async Task SendEmailAsync(string mailTo, string subject, string body, IList<Stream> attachments = null)
+    public async Task SendEmailAsync(string mailTo, string subject, string body, IList<Stream>? attachments = null)
+    {
+        await SendEmail(mailTo, subject, body, attachments);
+    }
+
+    public async Task SendEmailAsync(string mailTo, string subject, string body)
+    {
+        await SendEmail(mailTo, subject, body);
+    }
+
+    public async Task<string?> SendVerificationCodeAsync(string mailTo, string? verificationCode, string userFullName = "", string? lang = null)
+    {
+        if (string.IsNullOrEmpty(mailTo))
+        {
+            return null;
+        }
+        if (verificationCode is null)
+        {
+            verificationCode = Helper.VerificationCode();
+        }
+
+        string subject = "Email Verification Code - Please Confirm Your Account";
+        string body = $@"Dear {userFullName},
+
+                        Thank you for registering with our service! To complete your account registration and ensure the security of your account, we require you to verify your email address.
+
+                        *Verification Code*: {verificationCode}
+
+                        To verify your email address, please follow these steps:
+                        1. Open our website/app and log in to your account.
+                        2. Go to the verification page or click on the verification link provided.
+                        3. Enter the above verification code when prompted.
+
+                        If you did not initiate this registration, please disregard this email.
+
+                        Thank you for being a part of our community!
+
+                        Best regards,
+                        Drasat Team";
+
+        await SendEmailAsync(mailTo, subject, body);
+        return verificationCode;
+    }
+
+    private async Task SendEmail(string mailTo, string subject, string body)
+    {
+        var email = new MimeMessage
+        {
+            Sender = MailboxAddress.Parse(_mailSettings.Email),
+            Subject = subject
+        };
+
+        email.To.Add(MailboxAddress.Parse(mailTo));
+
+        var builder = new BodyBuilder
+        {
+            HtmlBody = body
+        };
+        email.Body = builder.ToMessageBody();
+        email.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Email));
+
+        using var smtp = new SmtpClient();
+        smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+        smtp.Authenticate(_mailSettings.Email, _mailSettings.Password);
+        await smtp.SendAsync(email);
+
+        smtp.Disconnect(true);
+    }
+
+    private async Task SendEmail(string mailTo, string subject, string body, IList<Stream>? attachments = null)
     {
         var email = new MimeMessage
         {
@@ -52,7 +122,6 @@ public class MailingService : IMailingService
         smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
         smtp.Authenticate(_mailSettings.Email, _mailSettings.Password);
         await smtp.SendAsync(email);
-
         smtp.Disconnect(true);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using DomainModel.Interfaces.Services;
 using DomainModel.Models.AppSettings;
 using DomainModel.Models.Users;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,29 +14,41 @@ public class AuthService : IAuthService
 {
     private readonly JWTSettings Jwt;
     private readonly IUnitOfWork Data;
+    private readonly IUserRepository userRepository;
+    private readonly IPasswordHasher passwordHasher;
 
-    public AuthService(IUnitOfWork data, IOptions<JWTSettings> jwt)
+    public AuthService(IUnitOfWork data, IUserRepository userRepository, IOptions<JWTSettings> jwt, IPasswordHasher passwordHasher)
     {
         Jwt = jwt.Value;
         Data = data;
+        this.userRepository = userRepository;
+        this.passwordHasher = passwordHasher;
     }
 
     public string TestAuth()
     {
-        return Data.Users.Test() + Jwt.Audience;
+        return userRepository.Test() + Jwt.Audience;
     }
 
 
-    public async Task<AuthModel> RegisterAsync()
+    public async Task<AuthModel> RegisterAsync(UserRegisterDto userDto)
     {
-        
-        var model = new ApplicationUser
+        var user = await userRepository.CreateAsync(userDto);
+
+        if (!user.Success)
         {
-            Id = Guid.NewGuid().ToString(),
-            UserName = "username",
-            Email = "email",
-            FullName = "full name",
-        };
+            return new AuthModel { Message = user?.Message };
+        }
+
+        ApplicationUser model = new ApplicationUser();
+        if (user.Value != null)
+        {
+            model.Id = Guid.NewGuid().ToString();
+            model.FullName = user.Value.FullName;
+            model.UserName = user.Value.Username;
+            model.Email = user.Value.Email;
+        }
+
 
         var jwtSecurityToken = await CreateJwtToken(model);
 
@@ -45,6 +58,43 @@ public class AuthService : IAuthService
             ExpiresOn = jwtSecurityToken.ValidTo,
             IsAuthenticated = true,
             Roles = new List<string> { "User" },
+            Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+            Username = model.UserName
+        };
+    }
+
+
+    public async Task<AuthModel> LoginAsync(UserRegisterDto userDto)
+    {
+        var authModel = new AuthModel();
+
+        var user = await userRepository.FindByEmailAsync(userDto.Email);
+
+        if (user is null || !await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
+        {
+            authModel.Message = "Email or Password is incorrect!";
+            return authModel;
+        }
+
+        ApplicationUser model = new ApplicationUser();
+        if (user != null)
+        {
+            model.Id = user.Id;
+            model.FullName = user.FullName;
+            model.UserName = user.UserName;
+            model.Email = user.Email;
+        }
+
+        var jwtSecurityToken = await CreateJwtToken(model);
+        //var rolesList = await _userManager.GetRolesAsync(user);
+
+
+        return new AuthModel
+        {
+            Email = model.Email,
+            ExpiresOn = jwtSecurityToken.ValidTo,
+            IsAuthenticated = true,
+            Roles = new List<string> { "User", "Patient" },
             Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
             Username = model.UserName
         };

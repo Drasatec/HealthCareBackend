@@ -7,23 +7,27 @@ public partial class User
 
     public string FullName { get; set; } = null!;
 
-    public string? UserName { get; set; }
+    public string UserName { get; set; } = string.Empty!;
 
     public string? NormalizedUserName { get; set; }
 
-    public string? Email { get; set; }
+    public string Email { get; set; } = string.Empty!;
 
     public string? NormalizedEmail { get; set; }
 
     public bool EmailConfirmed { get; set; }
 
-    public string? PasswordHash { get; set; }
+    public string PasswordHash { get; set; } = null!;
 
     public string? SecurityStamp { get; set; }
 
     public string? ConcurrencyStamp { get; set; }
 
     public string? PhoneNumber { get; set; }
+
+    public string? VerificationCode { get; set; }
+
+    public DateTime? ExpirationTime { get; set; }
 
     public bool PhoneNumberConfirmed { get; set; }
 
@@ -35,5 +39,7 @@ public partial class User
 
     public int AccessFailedCount { get; set; }
 
-    public virtual ICollection<UserRole> HosUserRoles { get; set; } = new List<UserRole>();
+
+
+    public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }

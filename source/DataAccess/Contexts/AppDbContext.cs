@@ -166,11 +166,11 @@ public class AppDbContext : DbContext
             entity.Property(e => e.RoleId).HasMaxLength(450);
             entity.Property(e => e.UserId).HasMaxLength(450);
 
-            entity.HasOne(d => d.Role).WithMany(p => p.HosUserRoles)
+            entity.HasOne(d => d.Role).WithMany(p => p.UserRoles)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK_UserRoles_RoleId");
 
-            entity.HasOne(d => d.User).WithMany(p => p.HosUserRoles)
+            entity.HasOne(d => d.User).WithMany(p => p.UserRoles)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("FK_UserRoles_UserId");
         });

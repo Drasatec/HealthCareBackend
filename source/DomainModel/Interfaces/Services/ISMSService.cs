@@ -4,5 +4,6 @@ namespace DomainModel.Interfaces.Services;
 
 public interface ISMSService
 {
-    MessageResource Send(string mobileNumber, string body);
+    Task<MessageResource> Send(string mobileNumber, string body);
+    Task<MessageResource?> SendVerificationCodeAsync(string mobileNumber, string? verificationCode, string? lang = null);
 }

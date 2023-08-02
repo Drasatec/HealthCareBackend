@@ -8,5 +8,5 @@ public partial class Role
 
     public string? ConcurrencyStamp { get; set; }
 
-    public virtual ICollection<UserRole> HosUserRoles { get; set; } = new List<UserRole>();
+    public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }

@@ -18,4 +18,9 @@ public static class Helper
     {
         return  (page - 1) * pageSize;
     }
+    
+    public static string VerificationCode()
+    {
+        return new Random().Next(100000, 999999).ToString();
+    }
 }

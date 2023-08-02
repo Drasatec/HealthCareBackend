@@ -1,4 +1,6 @@
 ﻿using DataAccess.Contexts;
+using DataAccess.Repositories;
+using DataAccess.Services;
 using DataAccess.UnitOfWorks;
 using DomainModel.Interfaces.Services;
 using DomainModel.Models.AppSettings;
@@ -25,13 +27,13 @@ public static class DependencyInjectionSetup
             c.SwaggerDoc("v2", new OpenApiInfo { Title = "DrasatHeathApi", Version = "v2" });
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "DrasatHeathApi", Version = "v1" });
         });
+
         Services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
         Services.AddScoped<IAuthService, AuthService>();
         Services.AddTransient<IMailingService, MailingService>();
         Services.AddTransient<ISMSService, SMSService>();
-
-        // Services.AddTransient(typeof(IHospitalRepository), typeof(HospitalRepository));
-        //Services.AddTransient(typeof(IBaseRepository<HospitalDto>), typeof(HospitalRepository));
+        Services.AddScoped<IPasswordHasher, PasswordHasher>();
+        Services.AddScoped<IUserRepository, UserRepository>();
 
         return Services;
     }

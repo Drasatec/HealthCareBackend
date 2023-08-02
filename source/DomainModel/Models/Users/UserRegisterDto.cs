@@ -1,23 +1,32 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DomainModel.Entities.Users;
 
 namespace DomainModel.Models.Users;
-
-
-public class RegisterModel
+public class UserRegisterDto
 {
-    [Required, StringLength(100)]
-    public string FirstName { get; set; }
+    public string FullName { get; set; } = null!;
 
-    [Required, StringLength(100)]
-    public string LastName { get; set; }
+    public string Username { get; set; } = string.Empty;
 
-    [Required, StringLength(50)]
-    public string Username { get; set; }
+    public string Email { get; set; } = null!;
 
-    [Required, StringLength(128)]
-    public string Email { get; set; }
+    public string Password { get; set; } = null!;
 
-    [Required, StringLength(256)]
-    public string Password { get; set; }
+    public string PhoneNumber { get; set; } = string.Empty;
+
+
+    public static implicit operator User(UserRegisterDto dto)
+    {
+        return  new User()
+        {
+            Id = Guid.NewGuid().ToString(),
+            FullName = dto.FullName,
+            Email = dto.Email,
+            NormalizedEmail = dto.Email.ToLower(),
+            //UserName = dto.Username,
+            PhoneNumber = dto.PhoneNumber,
+            
+
+        };
+    }
 }
 
