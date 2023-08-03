@@ -24,5 +24,8 @@ namespace DomainModel.Interfaces
         Task<Response> GenericUpdate<TEntity>(TEntity entity, params Expression<Func<TEntity, object>>[]? propertiesNotModified) where TEntity : class;
         Task<Response> GenericDelete<TEntity>(Expression<Func<TEntity, bool>> expression, params int[] ids) where TEntity : class;
         Task<PagedResponse<TEntity>?> GenericReadAllWihInclude<TEntity>(Expression<Func<TEntity, bool>>? filter, Expression<Func<TEntity, object>>? orderBy, Expression<Func<TEntity, object>>? include, int? page, int? pageSize) where TEntity : class;
+        Task<TResult?> GenericReadSingle<TEntity, TResult>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TResult>>? selectExpression)
+            where TEntity : class
+            where TResult : class;
     }
 }

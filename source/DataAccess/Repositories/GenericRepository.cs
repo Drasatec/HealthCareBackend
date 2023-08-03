@@ -160,7 +160,6 @@ public class GenericRepository : IGenericRepository
         }
     }
 
-
     // read
     public async Task<PagedResponse<TEntity>?> GenericReadAllWihInclude<TEntity>(
        Expression<Func<TEntity, bool>>? filter,
@@ -216,6 +215,19 @@ public class GenericRepository : IGenericRepository
             query = query.Include(include);
 
         return await query.FirstOrDefaultAsync();
+    }
+    
+    public async Task<TResult?> GenericReadSingle<TEntity,TResult>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TResult>>? selectExpression) where TEntity : class where TResult: class
+    {
+        IQueryable<TEntity> query = Context.Set<TEntity>();
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+        if (selectExpression != null)
+            return await query.Select(selectExpression).FirstOrDefaultAsync();
+        return null;
     }
 
     // filter and select used in get names

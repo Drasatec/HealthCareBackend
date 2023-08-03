@@ -20,8 +20,7 @@ public class UserRegisterDto
         {
             Id = Guid.NewGuid().ToString(),
             FullName = dto.FullName,
-            Email = dto.Email,
-            NormalizedEmail = dto.Email.ToLower(),
+            Email = dto.Email.ToLower(),
             //UserName = dto.Username,
             PhoneNumber = dto.PhoneNumber,
             

@@ -1,13 +1,12 @@
 ﻿using DomainModel.Interfaces.Services;
+using DomainModel.Models;
 using DomainModel.Models.AppSettings;
 using DomainModel.Models.Users;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
 namespace WebAPI.Services;
 
 public class AuthService : IAuthService
@@ -29,7 +28,6 @@ public class AuthService : IAuthService
     {
         return userRepository.Test() + Jwt.Audience;
     }
-
 
     public async Task<AuthModel> RegisterAsync(UserRegisterDto userDto)
     {
@@ -64,7 +62,7 @@ public class AuthService : IAuthService
     }
 
 
-    public async Task<AuthModel> LoginAsync(UserRegisterDto userDto)
+    public async Task<AuthModel> LoginAsync(UserLoginDto userDto)
     {
         var authModel = new AuthModel();
 
@@ -100,6 +98,34 @@ public class AuthService : IAuthService
         };
     }
 
+    public async Task<Response> VerificationEmail(string email, string code)
+    {
+        Response res;
+        var user = await userRepository.FindByEmailAsync(email);
+        // if expierd?
+        if (user != null && user.VerificationCode.Equals(code))
+        {
+            user.EmailConfirmed = true;
+            res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.EmailConfirmed);
+            res.Message = null;
+            return res;
+        }
+        return res= new Response(false,"error");
+    }
+    
+    public async Task<Response> VerificationPhone(string userId, string code)
+    {
+        Response res;
+        var user = await userRepository.FindById(userId);
+        if (user != null && user.VerificationCode.Equals(code))
+        {
+            user.PhoneNumberConfirmed = true;
+            res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PhoneNumberConfirmed);
+            res.Message = null;
+            return res;
+        }
+        return res= new Response(false,"error");
+    }
     private async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
     {
         // var userClaims = await _userManager.GetClaimsAsync(user);
@@ -111,12 +137,12 @@ public class AuthService : IAuthService
 
         var claims = new[]
         {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("uid", user.Id),
-                new Claim("roles", "User")
-            };
+            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim("uid", user.Id),
+            new Claim("roles", "User")
+        };
         //.Union(userClaims)
         //.Union(roleClaims);
 
@@ -133,3 +159,5 @@ public class AuthService : IAuthService
         return jwtSecurityToken;
     }
 }
+
+

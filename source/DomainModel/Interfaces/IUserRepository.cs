@@ -13,5 +13,6 @@ public interface IUserRepository: IGenericRepository
 {
     Task<Response<UserRegisterDto>> CreateAsync(UserRegisterDto model);
     Task<User?> FindByEmailAsync(string email);
+    Task<User?> FindById(string userId);
     public string Test();
 }

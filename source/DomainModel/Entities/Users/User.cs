@@ -25,7 +25,7 @@ public partial class User
 
     public string? PhoneNumber { get; set; }
 
-    public string? VerificationCode { get; set; }
+    public string VerificationCode { get; set; } = string.Empty;
 
     public DateTime? ExpirationTime { get; set; }
 

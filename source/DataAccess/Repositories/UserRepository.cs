@@ -6,6 +6,8 @@ using DomainModel.Interfaces;
 using DomainModel.Interfaces.Services;
 using DomainModel.Models;
 using DomainModel.Models.Users;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DataAccess.Repositories;
 
@@ -51,12 +53,12 @@ public class UserRepository : GenericRepository, IUserRepository
                 if (true)
                 {
                     // IsEmail?
-                    _ = mailingService.SendVerificationCodeAsync(model.Email, verificationCode);
+                   // _ = mailingService.SendVerificationCodeAsync(model.Email, verificationCode);
                 }
                 //else
                 {
                     // IsSMS?
-                    _ = smsService.SendVerificationCodeAsync(model.PhoneNumber, verificationCode);
+                   // _ = smsService.SendVerificationCodeAsync(model.PhoneNumber, verificationCode);
                 }
 
                 // (4) seve code & expiration_time  in database
@@ -95,13 +97,38 @@ public class UserRepository : GenericRepository, IUserRepository
 
     public async Task<User?> FindByEmailAsync(string email)
     {
-        return await GenericReadById<User>(u => u.NormalizedEmail == email.ToLower(), null);
+        try
+        {
+            return await Context.Users.Where(x => x.Email == email.ToLower()).FirstOrDefaultAsync();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        //
+        //return await GenericReadById<User>(u => u.Email.Equals(email), null);
     }
 
     public async Task<User?> FindById(string userId)
     {
+        
         return await GenericReadById<User>(u => u.Id == userId, null);
+
     }
+
+    public async Task<UserVerificationEmailModel?> ReadVerificationCode(string userId)
+    {
+        Expression<Func<User, bool>> filter = u => u.Id == userId;
+
+        return await GenericReadSingle(filter, (u) => new UserVerificationEmailModel
+        {
+            Email = u.Id,
+            VerificationCode = u.VerificationCode,
+            ExpirationTime = u.ExpirationTime,
+
+        });
+    }
+
 
     //public virtual Task<User?> FindByNameAsync(string userId)
     //{
