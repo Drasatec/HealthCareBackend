@@ -8,6 +8,7 @@ using DomainModel.Models;
 using DomainModel.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using r = Twilio.TwiML.Voice;
 
 namespace DataAccess.Repositories;
 
@@ -29,70 +30,60 @@ public class UserRepository : GenericRepository, IUserRepository
         return "done";
     }
 
-    public async Task<Response<UserRegisterDto>> CreateAsync(UserRegisterDto model)
+    public async Task<Response> CreateAsync(User entity, string password)
     {
-        Response<UserRegisterDto> result;
-
+        Response result;
         try
         {
-            if (IsEmailExist(model.Email))
+            // hash password
+            entity.PasswordHash = passwordHasher.HashPassword(password);
+
+            // ExpirationTime
+            entity.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
+
+            // add rols
+            // write cod for and rols
+
+
+            var entityEntry = await Context.Users.AddAsync(entity);
+            if (entityEntry.State == EntityState.Added)
             {
-                result = new Response<UserRegisterDto>(false, "email is exist", model);
+                result = new Response(true, entity.Id);
+                await Context.SaveChangesAsync();
             }
             else
             {
-                User entity = model;
-
-                // (1) hash password
-                entity.PasswordHash = passwordHasher.HashPassword(model.Password);
-
-                // (2) Get what will be confirmed
-
-                // (3) send code verificaiton
-                var verificationCode = Helper.VerificationCode();
-                if (true)
-                {
-                    // IsEmail?
-                   // _ = mailingService.SendVerificationCodeAsync(model.Email, verificationCode);
-                }
-                //else
-                {
-                    // IsSMS?
-                   // _ = smsService.SendVerificationCodeAsync(model.PhoneNumber, verificationCode);
-                }
-
-                // (4) seve code & expiration_time  in database
-                entity.VerificationCode = verificationCode;
-                entity.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
-
-                // (5) add rols
-                //entity.UserRoles.Add(new UserRole() { });
-
-                var entityEntry = await Context.Users.AddAsync(entity);
-                if (entityEntry.State == Microsoft.EntityFrameworkCore.EntityState.Added)
-                {
-                    result = new Response<UserRegisterDto>(true, null, model);
-                    await Context.SaveChangesAsync();
-                }
-                else
-                {
-                    return new Response<UserRegisterDto>(false, entityEntry.State.ToString(), model);
-                }
+                return new Response(false, entityEntry.State.ToString());
             }
+
             return result;
         }
         catch (Exception ex)
         {
             var exceptionMasseage = $"Message:{ex.Message} \n InnerException: {ex.InnerException?.Message}";
-            return new Response<UserRegisterDto>(false, exceptionMasseage, null);
+            return new Response(false, exceptionMasseage);
         }
     }
 
-   
 
-    public Task<bool> IsEmailExistAsync(string email)
+    public async Task<bool> SendVerificaitonCodeToEmail(string email)
     {
-        return Task.FromResult(IsEmailExist(email));
+        var user = await FindByEmailAsync(email);
+        if (user != null)
+        {
+            var verificationCode = Helper.VerificationCode();
+            user.VerificationCode = verificationCode;
+            user.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
+
+            await UpdateVerificationCode(user);
+            await mailingService.SendVerificationCodeAsync(email, verificationCode);
+        }
+        return true;
+    }
+
+    public async Task<User?> FindById(string userId)
+    {
+        return await GenericReadById<User>(u => u.Id == userId, null);
     }
 
     public async Task<User?> FindByEmailAsync(string email)
@@ -105,15 +96,21 @@ public class UserRepository : GenericRepository, IUserRepository
         {
             return null;
         }
-        //
-        //return await GenericReadById<User>(u => u.Email.Equals(email), null);
     }
 
-    public async Task<User?> FindById(string userId)
+    public async Task<User?> ReadUserIdByEmailAsync(string email)
     {
-        
-        return await GenericReadById<User>(u => u.Id == userId, null);
-
+        try
+        {
+            return await Context.Users
+                .Where(x => x.Email == email.ToLower())
+                .Select((user) => new User { Id = user.Id, FullName = user.FullName })
+                .FirstOrDefaultAsync();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public async Task<UserVerificationEmailModel?> ReadVerificationCode(string userId)
@@ -129,23 +126,34 @@ public class UserRepository : GenericRepository, IUserRepository
         });
     }
 
+    public async Task<bool> UpdateVerificationCode(User user)
+    {
+        user.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
+        Context.Attach(user);
+        Context.Entry(user).Property(vc => vc.VerificationCode).IsModified = true;
+        Context.Entry(user).Property(et => et.ExpirationTime).IsModified = true;
 
-    //public virtual Task<User?> FindByNameAsync(string userId)
-    //{
+        return await Context.SaveChangesAsync() > 0 ? true : false;
+    }
 
-    //}
+
 
     public async Task<bool> CheckPassword(string password, string hashedPassword)
     {
         return await Task.FromResult(passwordHasher.VerifyPassword(password, hashedPassword));
     }
 
+    public Task<bool> IsEmailExistAsync(string email) => Context.Users.AnyAsync(e => e.Email == email.ToLower());
 
     // private methods
-    private bool IsEmailExist(string email)
-    {
-        return Context.Users.Any(e => e.NormalizedEmail == email.ToLower());
-    }
+    private bool IsEmailExist(string email) => Context.Users.Any(e => e.Email == email.ToLower());
+
+
+
+    //public virtual Task<User?> FindByNameAsync(string userId)
+    //{
+
+    //}
 
     //public virtual async Task<IdentityResult> ConfirmEmailAsync(TUser user, string token)
     //{

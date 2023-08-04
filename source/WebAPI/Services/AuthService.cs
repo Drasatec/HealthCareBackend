@@ -1,4 +1,6 @@
-﻿using DomainModel.Interfaces.Services;
+﻿using DomainModel.Entities.Users;
+using DomainModel.Helpers;
+using DomainModel.Interfaces.Services;
 using DomainModel.Models;
 using DomainModel.Models.AppSettings;
 using DomainModel.Models.Users;
@@ -14,13 +16,17 @@ public class AuthService : IAuthService
     private readonly JWTSettings Jwt;
     private readonly IUnitOfWork Data;
     private readonly IUserRepository userRepository;
+    private readonly IMailingService mailingService;
+    private readonly ISMSService smsService;
     private readonly IPasswordHasher passwordHasher;
 
-    public AuthService(IUnitOfWork data, IUserRepository userRepository, IOptions<JWTSettings> jwt, IPasswordHasher passwordHasher)
+    public AuthService(IUnitOfWork data, IUserRepository userRepository, IMailingService mailingService, ISMSService smsService, IOptions<JWTSettings> jwt, IPasswordHasher passwordHasher)
     {
         Jwt = jwt.Value;
         Data = data;
         this.userRepository = userRepository;
+        this.mailingService = mailingService;
+        this.smsService = smsService;
         this.passwordHasher = passwordHasher;
     }
 
@@ -29,38 +35,60 @@ public class AuthService : IAuthService
         return userRepository.Test() + Jwt.Audience;
     }
 
-    public async Task<AuthModel> RegisterAsync(UserRegisterDto userDto)
+    public async Task<AuthModel> RegisterAsync(UserRegisterDto userDto, string verification)
     {
-        var user = await userRepository.CreateAsync(userDto);
 
+        // Ensure that the email does not already exist
+        if (await userRepository.IsEmailExistAsync(userDto.Email))
+        {
+            return new AuthModel("email is exist");
+        }
+
+        User entity = userDto;
+
+        // Send the verification code to the mail or phone
+        if (!string.IsNullOrEmpty(verification))
+        {
+            if (verification.Equals("email"))
+            {
+                entity.VerificationCode = Helper.VerificationCode();
+                _ = mailingService.SendVerificationCodeAsync(entity.Email, entity.VerificationCode, entity.FullName);
+            }
+            else if (verification.Equals("sms") && entity.PhoneNumber != null)
+            {
+                entity.VerificationCode = Helper.VerificationCode();
+                _ = smsService.SendVerificationCodeAsync(entity.PhoneNumber, entity.VerificationCode);
+            }
+        }
+
+        // insert new user in database
+        var user = await userRepository.CreateAsync(entity, userDto.Password);
         if (!user.Success)
         {
             return new AuthModel { Message = user?.Message };
         }
 
-        ApplicationUser model = new ApplicationUser();
-        if (user.Value != null)
-        {
-            model.Id = Guid.NewGuid().ToString();
-            model.FullName = user.Value.FullName;
-            model.UserName = user.Value.Username;
-            model.Email = user.Value.Email;
-        }
 
+        //ApplicationUser model = new()
+        //{
+        //    Id = entity.Id,
+        //    FullName = entity.FullName,
+        //    UserName = entity.UserName,
+        //    Email = entity.Email
+        //};
 
-        var jwtSecurityToken = await CreateJwtToken(model);
+        var jwtSecurityToken = await CreateJwtToken(entity);
 
         return new AuthModel
         {
-            Email = model.Email,
+            Email = entity.Email,
             ExpiresOn = jwtSecurityToken.ValidTo,
             IsAuthenticated = true,
             Roles = new List<string> { "User" },
             Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            Username = model.UserName
+            Username = entity.UserName
         };
     }
-
 
     public async Task<AuthModel> LoginAsync(UserLoginDto userDto)
     {
@@ -74,27 +102,27 @@ public class AuthService : IAuthService
             return authModel;
         }
 
-        ApplicationUser model = new ApplicationUser();
-        if (user != null)
-        {
-            model.Id = user.Id;
-            model.FullName = user.FullName;
-            model.UserName = user.UserName;
-            model.Email = user.Email;
-        }
+        //ApplicationUser model = new ApplicationUser();
+        //if (user != null)
+        //{
+        //    model.Id = user.Id;
+        //    model.FullName = user.FullName;
+        //    model.UserName = user.UserName;
+        //    model.Email = user.Email;
+        //}
 
-        var jwtSecurityToken = await CreateJwtToken(model);
+        var jwtSecurityToken = await CreateJwtToken(user);
         //var rolesList = await _userManager.GetRolesAsync(user);
 
 
         return new AuthModel
         {
-            Email = model.Email,
+            Email = user.Email,
             ExpiresOn = jwtSecurityToken.ValidTo,
             IsAuthenticated = true,
             Roles = new List<string> { "User", "Patient" },
             Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            Username = model.UserName
+            Username = user.UserName
         };
     }
 
@@ -103,30 +131,59 @@ public class AuthService : IAuthService
         Response res;
         var user = await userRepository.FindByEmailAsync(email);
         // if expierd?
-        if (user != null && user.VerificationCode.Equals(code))
+
+        if (user != null)
         {
-            user.EmailConfirmed = true;
-            res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.EmailConfirmed);
-            res.Message = null;
-            return res;
+            if (user.ExpirationTime < DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
+            {
+
+                user.EmailConfirmed = true;
+                res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.EmailConfirmed);
+                res.Message = null;
+                return res;
+            }
         }
-        return res= new Response(false,"error");
+        return res = new Response(false, "error");
     }
-    
+
+    public async Task<Response> RenewEmailVerificationCode(string email)
+    {
+        Response res;
+        var user = await userRepository.ReadUserIdByEmailAsync(email);
+        if (user != null)
+        {
+            user.VerificationCode = Helper.VerificationCode();
+            _ = mailingService.SendVerificationCodeAsync(email, user.VerificationCode, user.FullName);
+            var isUpdated = await userRepository.UpdateVerificationCode(user);
+            if (isUpdated)
+                res = new Response(true, null);
+            else
+                res = new Response(false, "Something went wrong with the database");
+        }
+        else
+            res = new Response(false, "email not found");
+        return res;
+    }
+
     public async Task<Response> VerificationPhone(string userId, string code)
     {
         Response res;
         var user = await userRepository.FindById(userId);
-        if (user != null && user.VerificationCode.Equals(code))
+
+        if (user != null)
         {
-            user.PhoneNumberConfirmed = true;
-            res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PhoneNumberConfirmed);
-            res.Message = null;
-            return res;
+            if (user.ExpirationTime >= DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
+            {
+                user.PhoneNumberConfirmed = true;
+                res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PhoneNumberConfirmed);
+                res.Message = null;
+                return res;
+            }
         }
-        return res= new Response(false,"error");
+        return res = new Response(false, "error");
     }
-    private async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
+
+    private async Task<JwtSecurityToken> CreateJwtToken(User user)
     {
         // var userClaims = await _userManager.GetClaimsAsync(user);
         //var roles = await _userManager.GetRolesAsync(user);
@@ -159,5 +216,3 @@ public class AuthService : IAuthService
         return jwtSecurityToken;
     }
 }
-
-

@@ -23,7 +23,6 @@ public class UserRegisterDto
             Email = dto.Email.ToLower(),
             //UserName = dto.Username,
             PhoneNumber = dto.PhoneNumber,
-            
 
         };
     }
