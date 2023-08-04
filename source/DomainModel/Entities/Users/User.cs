@@ -9,11 +9,11 @@ public partial class User
 
     public string UserName { get; set; } = string.Empty!;
 
-    public string? NormalizedUserName { get; set; }
+    //public string? NormalizedUserName { get; set; }
 
     public string Email { get; set; } = string.Empty!;
 
-    public string? NormalizedEmail { get; set; }
+    //public string? NormalizedEmail { get; set; }
 
     public bool EmailConfirmed { get; set; }
 

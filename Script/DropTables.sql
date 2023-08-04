@@ -18,7 +18,7 @@ DROP TABLE SecondaryServices;
 DROP TABLE MainServiceTranslations;
 DROP TABLE MainServices;
 
-DROP TABLE PeriodWorkDoctorClinic
+DROP TABLE DoctorWorkPeriods;
 DROP TABLE DoctorVisitPrices;
 DROP TABLE TypesVisitTranslations;
 DROP TABLE TypesVisit;

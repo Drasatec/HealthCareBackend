@@ -152,10 +152,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.Property(e => e.Email).HasMaxLength(256);
-            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            //entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.UserName).HasMaxLength(256);
-            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+            //entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
         });
 
         modelBuilder.Entity<UserRole>(entity =>
