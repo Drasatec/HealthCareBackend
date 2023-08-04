@@ -7,6 +7,8 @@ using DomainModel.Models;
 using DomainModel.Models.Doctors;
 using DomainModel.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace DataAccess.Repositories;
 
@@ -161,6 +163,28 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         }
     }
 
+    public async Task<List<DoctorTranslation>> ReadDoctorsNames(int? hosId, int? specialtyId, string lang, int? page, int? pageSize)
+    {
+        IQueryable<DoctorTranslation> query = Context.DoctorTranslations;
+        query = query.Where(l => l.LangCode == lang);
+        
+        if (hosId.HasValue)
+        {
+            query = query.Where(s => s.Doctor != null && s.Doctor.DoctorsWorkHospitals.Any(i => i.HospitalId == hosId));
+        }
+
+        if (specialtyId.HasValue)
+        {
+            query = query.Where(f => f.Doctor != null && f.Doctor.SpecialtiesDoctors.Any(s => s.MedicalSpecialtyId == specialtyId));
+        }
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            GenericPagination(ref query, ref pageSize, ref page);
+        }
+
+        return await query.ToListAsync();
+    }
 
     public async Task<PagedResponse<DoctorDto>?> ReadAll(int? hosId, int? specialtyId, bool? appearance, string? status, string? lang, int? pageSize, int? page)
     {

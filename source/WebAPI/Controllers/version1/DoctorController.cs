@@ -58,20 +58,26 @@ public class DoctorController : ControllerBase
     }
 
     [HttpGet("names", Order = 0911)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? specialtyId, [FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] int? hosId, int? specialtyId, string? lang, int? page, int? pageSize)
     {
-        Expression<Func<DoctorTranslation, bool>> filterExpression;
-        if (specialtyId.HasValue)
+        if (lang == null)
         {
-            filterExpression = f =>
-            f.LangCode == lang &&
-            f.Doctor != null &&
-            f.Doctor.SpecialtiesDoctors.Any(s => s.MedicalSpecialtyId == specialtyId);
+            return BadRequest(new Error("400", "lang is requied"));
         }
-        else
-            filterExpression = f => f.LangCode == lang;
 
-        var result = await Data.Doctors.GenericReadAll(filterExpression, null!, page, pageSize);
+        var result = await Data.Doctors.ReadDoctorsNames(hosId, specialtyId, lang, page, pageSize);
+        //Expression<Func<DoctorTranslation, bool>> filterExpression;
+        //if (specialtyId.HasValue)
+        //{
+        //    filterExpression = f =>
+        //    f.LangCode == lang &&
+        //    f.Doctor != null &&
+        //    f.Doctor.SpecialtiesDoctors.Any(s => s.MedicalSpecialtyId == specialtyId);
+        //}
+        //else
+        //    filterExpression = f => f.LangCode == lang;
+
+        //var result = await Data.Doctors.GenericReadAll(filterExpression, null!, page, pageSize);
         return Ok(result);
     }
 
