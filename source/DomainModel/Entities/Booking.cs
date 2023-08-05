@@ -36,6 +36,9 @@ public partial class Booking
     public DateTime? VisitingDate { get; set; }
 
     public DateTime? CreateOn { get; set; }
+    
+    public string? BookingReason { get; set; }
+
 
     public virtual BookingStatus? BookingStatus { get; set; }
 

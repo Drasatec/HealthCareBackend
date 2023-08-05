@@ -3,7 +3,6 @@ using DataAccess.Repositories;
 using DataAccess.Services;
 using DataAccess.UnitOfWorks;
 using DomainModel.Interfaces.Services;
-using DomainModel.Models.AppSettings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using WebAPI.Services;

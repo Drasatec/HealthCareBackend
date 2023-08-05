@@ -20,7 +20,7 @@ public class BookingController : ControllerBase
     // ============================= post ============================= 
 
     [HttpPost("add", Order = 0801)]
-    public async Task<IActionResult> AddSingle([FromForm] BookingRequestDto model, [FromQuery]int? clinicId , [FromQuery]  string? lang)
+    public async Task<IActionResult> AddSingle([FromForm] BookingRequestDto model, [FromQuery] int? clinicId, [FromQuery] string? lang)
     {
         if (model == null)
         {
@@ -34,7 +34,7 @@ public class BookingController : ControllerBase
         {
             if (clinicId.HasValue && lang is not null)
             {
-               return Ok( await Data.Clinics.ClinicByIdWithParentsNames(clinicId, lang));
+                return Ok(await Data.Clinics.ClinicByIdWithParentsNames(clinicId, lang));
             }
             else
             {
@@ -51,10 +51,8 @@ public class BookingController : ControllerBase
 
     // ============================= get ============================= 
 
-
-    // this method get data from DoctorRepository
     [HttpGet(Order = 0801)]
-    public async Task<IActionResult> Get([FromQuery] int? id, int? hosId, int? specialtyId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, byte? dayNumber, string? lang, int? page, int? pageSize)
+    public async Task<IActionResult> Get([FromQuery] long? id, int? hosId, int? specialtyId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, byte? dayNumber, string? lang, int? page, int? pageSize)
     {
         //if (docId < 1 || ClinicId < 1 || typeVisitId < 1 || workingPeriodId < 1)
         //    return BadRequest(new Error("400", "can not assign 0"));
@@ -78,6 +76,19 @@ public class BookingController : ControllerBase
 
         return Created("", response);
     }
+
+    [HttpPut("edit-status", Order = 0925)]
+    public async Task<IActionResult> EditSingleProp([FromQuery] long? bookingId, short? statusId)
+    {
+        if (!bookingId.HasValue || !statusId.HasValue)
+        {
+            return BadRequest(new Response(false, "id field is requerd"));
+        }
+
+        Booking entity = new() { Id = bookingId.Value, BookingStatusId = statusId.Value };
+        return Ok(await Data.Clinics.GenericUpdateSinglePropertyById((int)bookingId.Value, entity, p => p.BookingStatusId));
+    }
+
 
     // ============================= delete ============================= 
 

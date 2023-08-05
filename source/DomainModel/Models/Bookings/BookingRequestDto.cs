@@ -33,6 +33,7 @@ public class BookingRequestDto
     public byte DayNumber { get; set; }
 
     public DateTime? VisitingDate { get; set; }
+    public string? BookingReason { get; set; }
 
     public static implicit operator Booking(BookingRequestDto arg)
     {
@@ -52,6 +53,7 @@ public class BookingRequestDto
             VisitingDate = arg.VisitingDate,
             Price = arg.Price,
             DayNumber = arg.DayNumber,
+            BookingReason = arg.BookingReason,
             
         };
 

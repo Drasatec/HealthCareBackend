@@ -1330,6 +1330,7 @@ CREATE TABLE Booking
     Price INT,
     DayNumber TINYINT,
 	VisitingDate DATE,
+    BookingReason NVARCHAR(500),
     CreateOn DATETIME DEFAULT GETDATE(),
 	
 	CONSTRAINT PK_Booking PRIMARY KEY (Id),

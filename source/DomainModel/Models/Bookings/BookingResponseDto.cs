@@ -40,7 +40,7 @@ public class BookingResponseDto
     public byte DayNumber { get; set; }
 
     public DateTime? CreateOn { get; set; }
-
+    public string? BookingReason { get; set; }
 
     public virtual string? BookingStatus { get; set; }
 

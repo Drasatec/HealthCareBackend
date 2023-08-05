@@ -122,13 +122,13 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                           where doc.LangCode == lang
 
                           join tv in Context.TypesVisitTranslations on h.TypeVisitId equals tv.TypeVisitId
-                          where tv.LangCode == lang
+                          where tv.LangCode == lang 
 
                           join wp in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wp.WorkingPeriodId
                           where wp.LangCode == lang
 
-                          join pati in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals pati.WorkingPeriodId
-                          where pati.LangCode == lang
+                          join pati in Context.PatientTranslations on h.PatientId equals pati.PatientId
+                          where pati.LangCode == lang //|| pati.LangCode == "ar"
 
                           join bstat in Context.BookingStatusesTranslations on h.BookingStatusId equals bstat.BookingStatusId
                           where bstat.LangCode == lang
@@ -150,6 +150,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                               Price = h.Price,
                               PriceCategoryId = h.PriceCategoryId,
                               DayNumber = h.DayNumber,
+                              BookingReason = h.BookingReason,
 
 
                               Hospital = hos.Name,
@@ -158,7 +159,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                               Doctor = doc.FullName,
                               TypeVisit = tv.Name,
                               WorkingPeriod = wp.Name,
-                              Patient = pati.Name,
+                              Patient = pati.FullName,
                               BookingStatus = bstat.StatusName,
 
                               CreateOn = h.CreateOn,
@@ -181,6 +182,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                               Price = h.Price,
                               VisitingDate = h.VisitingDate,
                               BookingNumber = h.BookingNumber,
+                              BookingReason = h.BookingReason,
                           });
 
             var totalCount = await result.CountAsync();

@@ -186,6 +186,8 @@ public class AppDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.VisitingDate).HasColumnType("date");
 
+            entity.Property(e => e.BookingReason).HasMaxLength(500);
+
             entity.HasOne(d => d.Clinic).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.ClinicId)
                 .HasConstraintName("FK_Booking_ClinicId");
