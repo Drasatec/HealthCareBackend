@@ -2,6 +2,7 @@
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using DomainModel.Models.Patients;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
@@ -20,17 +21,13 @@ public class PatientController : ControllerBase
 
     // ============================= post ============================= 
 
-
+    
     [HttpPost("add", Order = 0901)]
-    public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] PatientDto model)
+    public async Task<IActionResult> AddSingleFromAdmin([FromForm] IFormFile? file, [FromForm] PatientDto model)
     {
 
         ResponseId response;
 
-        if (model == null)
-        {
-            return BadRequest(new Error("400", "clinic is requerd"));
-        }
         if (file == null)
         {
             response = await Data.Patients.CreateWithImage(model);
@@ -41,9 +38,19 @@ public class PatientController : ControllerBase
         return Created("fawzy", response);
     }
 
+    [Authorize(Roles = "User")]
+    [HttpPost("add-patient-data", Order = 0901)]
+    public async Task<IActionResult> AddSingleFromPatient([FromForm] PatientDto model , [FromForm] string? userId )
+    {
+        if(userId == null)
+        {
+            userId = User.FindFirst("uid")?.Value;
+        }
+
+        return Created("fawzy", await Data.Patients.CreateFromPatient(model, userId));
+    }
 
     // ============================= get ============================= 
-
 
     [HttpGet(Order = 0901)]
     public async Task<IActionResult> GetById([FromQuery] int id, [FromQuery] string? lang)
@@ -54,7 +61,6 @@ public class PatientController : ControllerBase
         var result = await Data.Patients.ReadById(id, lang);
         return Ok(result);
     }
-
 
 
     [HttpGet("names", Order = 0911)]
@@ -77,7 +83,7 @@ public class PatientController : ControllerBase
         {
             filterExpression = f =>
             f.LangCode == lang && f.Patient != null;
-            
+
         }
         else
             filterExpression = f => f.LangCode == lang;
@@ -85,7 +91,6 @@ public class PatientController : ControllerBase
         var result = await Data.Patients.GenericReadAll(filterExpression, null!, page, pageSize);
         return Ok(result);
     }
-
 
 
     [HttpGet("all", Order = 0912)]
@@ -160,24 +165,17 @@ public class PatientController : ControllerBase
 
 
 
-    [HttpPut("deactivate", Order = 0925)]
-    public async Task<IActionResult> EditSingleProp([FromQuery] int? id, [FromQuery] string status)
+    [HttpPut("edit-status", Order = 0925)]
+    public async Task<IActionResult> EditSingleProp([FromQuery] int patientId, [FromQuery] byte patientStatus)
     {
-        if (!id.HasValue)
+        if (patientId < 1 || patientStatus < 1 )
         {
-            return BadRequest(new Response(false, "id field is requerd"));
+            return BadRequest(new Response(false, "id field is requerd and value > 0"));
         }
-        bool isDeleted;
-        if (status == "active")
-            isDeleted = false;
-        else if (status == "inactive")
-            isDeleted = true;
-        else
-        {
-            return BadRequest(new Response(false, "The status field in this context allows the values 'active' or 'inactive' "));
-        }
-        Patient entity = new() { Id = id.Value, IsDeleted = isDeleted };
-        return Ok(await Data.Patients.GenericUpdateSinglePropertyById(id.Value, entity, p => p.IsDeleted));
+
+        Patient entity = new() { Id = patientId, PatientStatus = patientStatus };
+
+        return Ok(await Data.Patients.GenericUpdateSinglePropertyById(patientId, entity, p => p.PatientStatus!));
     }
 
 

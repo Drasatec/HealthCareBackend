@@ -217,7 +217,7 @@ public class GenericRepository : IGenericRepository
         return await query.FirstOrDefaultAsync();
     }
     
-    public async Task<TResult?> GenericReadSingle<TEntity,TResult>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TResult>>? selectExpression) where TEntity : class where TResult: class
+    public async Task<TResult?> GenericReadSingle<TEntity,TResult>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TResult?>>? selectExpression) where TEntity : class where TResult: class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 

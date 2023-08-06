@@ -8,7 +8,7 @@ public class PatientDto
 {
     public int Id { get; set; }
 
-    public string MedicalFileNumber { get; set; } = null!;
+    public string MedicalFileNumber { get; set; } = string.Empty;
 
     public string PhoneNumber { get; set; } = string.Empty;
 
@@ -22,11 +22,15 @@ public class PatientDto
 
     public string? Photo { get; set; }
 
+    public int? NationalityId { get; set; }
+
+    public byte? PatientStatus { get; set; }
+
+
     //public byte? Ssn { get; set; }
 
     //public byte? NationalId { get; set; }
 
-    //public byte? PatientStatus { get; set; }
 
     //public int? SsntypeId { get; set; }
 
@@ -36,12 +40,11 @@ public class PatientDto
 
     //public int? ClientGroupId { get; set; }
 
-    public int? NationalityId { get; set; }
 
     public ICollection<PatientTranslation> PatientTranslations { get; set; } = new List<PatientTranslation>();
 
 
-    public static implicit operator PatientDto(Patient arg)
+    public static implicit operator PatientDto(Patient? arg)
     {
         if (arg == null)
             return null!;
@@ -58,10 +61,10 @@ public class PatientDto
             Gender = arg.Gender,
             MedicalFileNumber   = arg.MedicalFileNumber,
             PhoneNumber = arg.PhoneNumber,
+            PatientStatus = arg.PatientStatus,
 
             //Ssn = arg.Ssn,
            // NationalId = arg.NationalId,
-           // PatientStatus = arg.PatientStatus,
            // ClientGroupId = arg.ClientGroupId,
            // ClientId = arg.ClientId,
             //IsDeleted   = arg.IsDeleted,

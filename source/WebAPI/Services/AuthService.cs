@@ -68,15 +68,6 @@ public class AuthService : IAuthService
             return new AuthModel { Message = user?.Message };
         }
 
-
-        //ApplicationUser model = new()
-        //{
-        //    Id = entity.Id,
-        //    FullName = entity.FullName,
-        //    UserName = entity.UserName,
-        //    Email = entity.Email
-        //};
-
         var jwtSecurityToken = await CreateJwtToken(entity);
 
         return new AuthModel
@@ -90,6 +81,7 @@ public class AuthService : IAuthService
         };
     }
 
+
     public async Task<AuthModel> LoginAsync(UserLoginDto userDto)
     {
         var authModel = new AuthModel();
@@ -101,30 +93,30 @@ public class AuthService : IAuthService
             authModel.Message = "Email or Password is incorrect!";
             return authModel;
         }
+        var auth = new AuthModel();
 
-        //ApplicationUser model = new ApplicationUser();
-        //if (user != null)
-        //{
-        //    model.Id = user.Id;
-        //    model.FullName = user.FullName;
-        //    model.UserName = user.UserName;
-        //    model.Email = user.Email;
-        //}
+        // IsCompletData?
+        var userId = await Data.Patients.FindByUserId(user.Id);
+        if (userId is not null)
+        {
+            auth.IsCompletData = true;
+        }
+
+        // isConfirmed? Email or phone
+        auth.EmailConfirmed = user.EmailConfirmed ? true : false;
+        auth.PhoneNumberConfirmed = user.PhoneNumberConfirmed ? true : false;
 
         var jwtSecurityToken = await CreateJwtToken(user);
-        //var rolesList = await _userManager.GetRolesAsync(user);
-
-
-        return new AuthModel
-        {
-            Email = user.Email,
-            ExpiresOn = jwtSecurityToken.ValidTo,
-            IsAuthenticated = true,
-            Roles = new List<string> { "User", "Patient" },
-            Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            Username = user.UserName
-        };
+        auth.UserId = user.Id;
+        auth.Email = user.Email;
+        auth.ExpiresOn = jwtSecurityToken.ValidTo;
+        auth.IsAuthenticated = true;
+        auth.Roles = new List<string> { "User", "Patient" };
+        auth.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        auth.Username = user.UserName;
+        return auth;
     }
+
 
     public async Task<Response> VerificationEmail(string email, string code)
     {

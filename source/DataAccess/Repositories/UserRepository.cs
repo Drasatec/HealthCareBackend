@@ -85,7 +85,11 @@ public class UserRepository : GenericRepository, IUserRepository
     {
         return await GenericReadById<User>(u => u.Id == userId, null);
     }
-
+    /// <summary>
+    /// this method return all property in user by email
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
     public async Task<User?> FindByEmailAsync(string email)
     {
         try

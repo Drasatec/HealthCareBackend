@@ -31,10 +31,37 @@ public class PatientRepository : GenericRepository, IPatientRepository
             else
                 entity.Photo = null;
 
-            var result = await Context.Patients.AddAsync(entity);
-
             if (string.IsNullOrEmpty(entity.MedicalFileNumber))
                 entity.MedicalFileNumber = "patient-" + Context.Patients.Count().ToString();
+            entity.PatientStatus = 1;
+            var result = await Context.Patients.AddAsync(entity);
+            var row = await Context.SaveChangesAsync();
+            if (row > 0)
+            {
+                return new ResponseId(true, "created ", result.Entity.Id);
+            }
+            return new ResponseId(false, "No row effected ", 0);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseId(false, ex.Message + "____and____" + ex.InnerException?.Message, 0);
+        }
+    }
+
+    public async Task<ResponseId> CreateFromPatient(PatientDto dto, string userId)
+    {
+        var entity = (Patient)dto;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return new ResponseId(false, "user id in requierd", 0);
+        }
+        try
+        {
+            entity.UserId = userId;
+            entity.Photo = null;
+            entity.MedicalFileNumber = "patient-" + Context.Patients.Count().ToString();
+            entity.PatientStatus = 0;
+            var result = await Context.Patients.AddAsync(entity);
             var row = await Context.SaveChangesAsync();
             if (row > 0)
             {
@@ -108,14 +135,17 @@ public class PatientRepository : GenericRepository, IPatientRepository
         }
         try
         {
-            var entity = await _context
-                .SingleOrDefaultAsync();
-            return entity!;
+            return (await _context.SingleOrDefaultAsync());
         }
         catch (Exception)
         {
             return null;
         }
+    }
+
+    public async Task<string?> FindByUserId(string userId)
+    {
+        return await GenericReadSingle<Patient, string>(uId => uId.UserId == userId, (user) => user.UserId);
     }
 
 

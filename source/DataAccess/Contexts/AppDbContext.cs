@@ -797,10 +797,10 @@ public class AppDbContext : DbContext
                 .HasForeignKey(d => d.ClientId)
                 .HasConstraintName("FK_Patients_ClientId");
 
-            entity.HasOne(d => d.User)
-                .WithOne()
-                .HasForeignKey<User>(d => d.Id)
-                .HasConstraintName("FK_Patients_UserId");
+            //entity.HasOne(d => d.User)
+            //    .WithOne(u=>u.Patient)
+            //    .HasForeignKey<User>(d => d.Id)
+            //    .HasConstraintName("FK_Patients_UserId");
 
             //entity.HasOne(d => d.Nationality).WithMany(p => p.Patients)
             //    .HasForeignKey(d => d.NationalityId)
