@@ -1,5 +1,5 @@
 ﻿using DomainModel.Contracts;
-using DomainModel.Entities;
+using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using System.Linq.Expressions;

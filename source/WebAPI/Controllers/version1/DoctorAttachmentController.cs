@@ -1,4 +1,5 @@
 ﻿using DomainModel.Contracts;
+using DomainModel.Entities.DoctorEntities;
 using DomainModel.Helpers;
 using DomainModel.Models;
 using DomainModel.Models.Doctors;

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using DomainModel.Entities.DoctorEntities;
 using DomainModel.Entities.TranslationModels;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.HospitalBody;
 
 public partial class Hospital
 {

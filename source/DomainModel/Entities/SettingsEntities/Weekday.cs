@@ -1,4 +1,4 @@
-﻿namespace DomainModel.Entities;
+﻿namespace DomainModel.Entities.SettingsEntities;
 public class Weekday
 {
     public int Id { get; set; }

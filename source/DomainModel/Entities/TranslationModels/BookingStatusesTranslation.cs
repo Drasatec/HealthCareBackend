@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using DomainModel.Entities.SettingsEntities;
 
 namespace DomainModel.Entities.TranslationModels;
 

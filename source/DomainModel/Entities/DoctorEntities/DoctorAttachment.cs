@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.DoctorEntities;
 
 public partial class DoctorAttachment
 {
@@ -21,6 +21,6 @@ public partial class DoctorAttachment
 
     public int DoctorId { get; set; }
 
-   // [JsonIgnore]
-   // public virtual Doctor? Doctor { get; set; }
+    // [JsonIgnore]
+    // public virtual Doctor? Doctor { get; set; }
 }

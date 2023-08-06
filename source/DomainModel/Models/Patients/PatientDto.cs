@@ -12,23 +12,21 @@ public class PatientDto
 
     public string PhoneNumber { get; set; } = string.Empty;
 
-    //public string? Address { get; set; }
-
     public byte? Gender { get; set; }
 
     public DateTime? BirthDate { get; set; }
 
     public byte? MaritalStatus { get; set; }
 
+    public string? BloodType { get; set; }
+
+    public string? Photo { get; set; }
+
     //public byte? Ssn { get; set; }
 
     //public byte? NationalId { get; set; }
 
-    public string? BloodType { get; set; }
-
     //public byte? PatientStatus { get; set; }
-
-    public string? Photo { get; set; }
 
     //public int? SsntypeId { get; set; }
 
@@ -53,20 +51,20 @@ public class PatientDto
             Id = arg.Id,
             PatientTranslations = arg.PatientTranslations,
             NationalityId = arg.NationalityId,
-            //Address = arg.Address,
             BirthDate = arg.BirthDate,
             MaritalStatus = arg.MaritalStatus,
-            //Ssn = arg.Ssn,
-           // NationalId = arg.NationalId,
             BloodType = arg.BloodType,
-           // PatientStatus = arg.PatientStatus,
             Photo = arg.Photo,
-           // ClientGroupId = arg.ClientGroupId,
-           // ClientId = arg.ClientId,
             Gender = arg.Gender,
-            //IsDeleted   = arg.IsDeleted,
             MedicalFileNumber   = arg.MedicalFileNumber,
             PhoneNumber = arg.PhoneNumber,
+
+            //Ssn = arg.Ssn,
+           // NationalId = arg.NationalId,
+           // PatientStatus = arg.PatientStatus,
+           // ClientGroupId = arg.ClientGroupId,
+           // ClientId = arg.ClientId,
+            //IsDeleted   = arg.IsDeleted,
             //SsntypeId = arg.SsntypeId
         };
     }
@@ -87,20 +85,21 @@ public class PatientDto
             Id = arg.Id,
             PatientTranslations = listTranc,
             NationalityId = arg.NationalityId,
-            //Address = arg.Address,
             BirthDate = arg.BirthDate,
             MaritalStatus = arg.MaritalStatus,
-            //Ssn = arg.Ssn,
-            //NationalId = arg.NationalId,
             BloodType = arg.BloodType,
-            // PatientStatus = arg.PatientStatus,
             Photo = arg.Photo,
-            // ClientGroupId = arg.ClientGroupId,
-            // ClientId = arg.ClientId,
             Gender = arg.Gender,
-            //IsDeleted   = arg.IsDeleted,
             MedicalFileNumber = arg.MedicalFileNumber,
             PhoneNumber = arg.PhoneNumber,
+
+            //Address = arg.Address,
+            //Ssn = arg.Ssn,
+            //NationalId = arg.NationalId,
+            // PatientStatus = arg.PatientStatus,
+            // ClientGroupId = arg.ClientGroupId,
+            // ClientId = arg.ClientId,
+            //IsDeleted   = arg.IsDeleted,
             //SsntypeId = arg.SsntypeId
 
         };

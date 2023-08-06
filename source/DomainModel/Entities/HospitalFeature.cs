@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.HospitalBody;
+using DomainModel.Entities.TranslationModels;
 using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities;

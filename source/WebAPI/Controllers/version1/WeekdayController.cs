@@ -1,4 +1,5 @@
 ﻿using DomainModel.Contracts;
+using DomainModel.Entities.SettingsEntities;
 using DomainModel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

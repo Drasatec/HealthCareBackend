@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using DomainModel.Entities.TranslationModels;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.SettingsEntities;
 
 public partial class WorkingPeriod
 {

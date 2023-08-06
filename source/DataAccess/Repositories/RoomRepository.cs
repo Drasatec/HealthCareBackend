@@ -1,5 +1,5 @@
 ﻿using DataAccess.Contexts;
-using DomainModel.Entities;
+using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;

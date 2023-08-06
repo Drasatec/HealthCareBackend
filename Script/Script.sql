@@ -1180,9 +1180,10 @@ CREATE TABLE Patients
     Religion TINYINT,
     SSNTypeId INT, --(ID card - passport - insurance card - job card - driver's license)
     IsDeleted BIT NOT NULL DEFAULT 0,
-    ClientId INT,
+    ClientId INT NULL,
     ClientGroupId INT,
     NationalityId INT,
+    UserId nvarchar (450) NULL
 
 	CONSTRAINT PK_Patients PRIMARY KEY (Id),
     CONSTRAINT UK_Patients_MedicalFileNumber UNIQUE (MedicalFileNumber),
@@ -1207,6 +1208,11 @@ CREATE TABLE Patients
 	CONSTRAINT FK_Patients_NationalityId
     FOREIGN KEY (NationalityId)
       REFERENCES Nationalities(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    CONSTRAINT FK_Patients_UserId
+    FOREIGN KEY (UserId)
+      REFERENCES Users(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
 	INDEX IX_Patients_MedicalFileNumber NONCLUSTERED (MedicalFileNumber),

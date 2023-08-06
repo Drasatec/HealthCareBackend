@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities;
+﻿using DomainModel.Entities.DoctorEntities;
+
 namespace DomainModel.Models.Doctors;
 
 public class PeriodWorkDoctorClinicDto

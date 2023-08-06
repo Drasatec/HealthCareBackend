@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.SettingsEntities;
 
 public partial class RoomType
 {
@@ -11,7 +12,7 @@ public partial class RoomType
 
     public string CodeNumber { get; set; } = string.Empty;
 
-    public DateTime? CreateOn { get;}
+    public DateTime? CreateOn { get; }
 
     public bool IsDeleted { get; set; }
 

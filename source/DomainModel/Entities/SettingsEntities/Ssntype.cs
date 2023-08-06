@@ -1,9 +1,8 @@
-﻿
-using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.TranslationModels;
 using System;
 using System.Collections.Generic;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.SettingsEntities;
 
 public partial class Ssntype
 {

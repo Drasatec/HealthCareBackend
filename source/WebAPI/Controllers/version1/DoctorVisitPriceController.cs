@@ -1,4 +1,5 @@
 ﻿using DomainModel.Contracts;
+using DomainModel.Entities.DoctorEntities;
 using DomainModel.Models;
 using System.Linq.Expressions;
 

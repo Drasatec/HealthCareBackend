@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using DomainModel.Entities.TranslationModels;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.SettingsEntities;
 
 public partial class Nationality
 {
@@ -14,5 +14,5 @@ public partial class Nationality
 
     //public virtual ICollection<Patient> Patients { get; set; } = new List<Patient>();
 
-   // public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
+    // public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
 }

@@ -41,7 +41,7 @@ public static class DependencyInjectionSetup
     {
         // LocalDb ||| SomeeDb
         Services.AddDbContext<AppDbContext>(options => options
-        .UseSqlServer(Configuration.GetConnectionString("SomeeDb"))
+        .UseSqlServer(Configuration.GetConnectionString("LocalDb"))
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
         return Services;
     }

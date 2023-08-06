@@ -6,6 +6,7 @@ using DomainModel.Contracts;
 using DomainModel.Models.Doctors;
 using DomainModel.Services;
 using DomainModel.Helpers;
+using DomainModel.Entities.DoctorEntities;
 
 namespace WebAPI.Controllers.version1;
 

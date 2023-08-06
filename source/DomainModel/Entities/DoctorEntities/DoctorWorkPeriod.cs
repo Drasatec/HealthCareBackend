@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using DomainModel.Entities.SettingsEntities;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.DoctorEntities;
 
 public partial class DoctorWorkPeriod
 {
@@ -27,7 +28,7 @@ public partial class DoctorWorkPeriod
     // public virtual Clinic? Clinic { get; set; } = null!;
 
     [JsonIgnore]
-   public virtual Doctor? Doctor { get; set; } = null!;
+    public virtual Doctor? Doctor { get; set; } = null!;
 
     [JsonIgnore]
     public virtual WorkingPeriod? WorkingPeriod { get; set; } = null!;

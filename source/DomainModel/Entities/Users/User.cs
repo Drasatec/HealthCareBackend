@@ -39,6 +39,7 @@ public partial class User
 
     public int AccessFailedCount { get; set; }
 
+    //public virtual Patient? Patient { get; set; }
 
 
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();

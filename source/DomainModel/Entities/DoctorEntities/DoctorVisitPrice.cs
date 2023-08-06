@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DomainModel.Entities.SettingsEntities;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.DoctorEntities;
 public partial class DoctorVisitPrice
 {
     public int Id { get; set; }

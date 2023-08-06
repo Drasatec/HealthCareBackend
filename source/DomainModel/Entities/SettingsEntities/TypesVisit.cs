@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using DomainModel.Entities.TranslationModels;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.SettingsEntities;
 
 public partial class TypesVisit
 {
@@ -18,6 +18,6 @@ public partial class TypesVisit
     [JsonIgnore]
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
-    
+
     public virtual ICollection<TypesVisitTranslation> TypesVisitTranslations { get; set; } = new List<TypesVisitTranslation>();
 }

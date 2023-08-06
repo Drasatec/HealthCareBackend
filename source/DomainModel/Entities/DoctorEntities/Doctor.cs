@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.DoctorEntities;
 
 public partial class Doctor
 {
@@ -25,7 +26,7 @@ public partial class Doctor
     public string? PhoneNumber { get; set; }
 
     public bool PhoneNumberAppearance { get; set; }
-    
+
     public bool VisitPriceAppearance { get; set; }
 
     public bool IsDeleted { get; set; }

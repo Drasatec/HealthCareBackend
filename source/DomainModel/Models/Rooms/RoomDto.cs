@@ -1,5 +1,4 @@
 ﻿using DomainModel.Entities.TranslationModels;
-using DomainModel.Entities;
 using DomainModel.Models.Floors;
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
+using DomainModel.Entities.HospitalBody;
 
 namespace DomainModel.Models.Rooms;
 

@@ -1,4 +1,7 @@
 ﻿using DomainModel.Entities;
+using DomainModel.Entities.DoctorEntities;
+using DomainModel.Entities.HospitalBody;
+using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Entities.Users;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +11,9 @@ namespace DataAccess.Contexts;
 public class AppDbContext : DbContext
 {
 
-    public AppDbContext(){}
+    public AppDbContext() { }
 
-    public AppDbContext(DbContextOptions<AppDbContext> options): base(options){}
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     #region DbSets
 
@@ -106,7 +109,7 @@ public class AppDbContext : DbContext
     public virtual DbSet<PriceCategoryTranslation> PriceCategoryTranslations { get; set; }
 
     public virtual DbSet<DoctorVisitPrice> DoctorVisitPrices { get; set; }
-    
+
     public virtual DbSet<DoctorAttachment> DoctorAttachments { get; set; }
 
     public virtual DbSet<RoomTranslation> RoomTranslations { get; set; }
@@ -794,6 +797,11 @@ public class AppDbContext : DbContext
                 .HasForeignKey(d => d.ClientId)
                 .HasConstraintName("FK_Patients_ClientId");
 
+            entity.HasOne(d => d.User)
+                .WithOne()
+                .HasForeignKey<User>(d => d.Id)
+                .HasConstraintName("FK_Patients_UserId");
+
             //entity.HasOne(d => d.Nationality).WithMany(p => p.Patients)
             //    .HasForeignKey(d => d.NationalityId)
             //    .HasConstraintName("FK_Patients_NationalityId");
@@ -1313,7 +1321,7 @@ public class AppDbContext : DbContext
                 .HasForeignKey(d => d.SsntypeId)
                 .HasConstraintName("FK_SSNTypesTranslations_SSNTypeId");
         });
-        
+
         modelBuilder.Entity<Weekday>(entity =>
         {
             entity.ToTable("Weekdays");
@@ -1327,6 +1335,6 @@ public class AppDbContext : DbContext
 
         //OnModelCreatingPartial(modelBuilder);
     }
-    
+
     //partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

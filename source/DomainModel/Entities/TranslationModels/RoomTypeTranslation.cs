@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using DomainModel.Entities.SettingsEntities;
 
 namespace DomainModel.Entities.TranslationModels;
 

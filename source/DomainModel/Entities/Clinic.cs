@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using DomainModel.Entities.DoctorEntities;
+using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities;

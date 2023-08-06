@@ -1,4 +1,6 @@
-﻿using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.SettingsEntities;
+using DomainModel.Entities.TranslationModels;
+using DomainModel.Entities.Users;
 
 namespace DomainModel.Entities;
 
@@ -38,9 +40,13 @@ public partial class Patient
 
     public int? NationalityId { get; set; }
 
+    public string? UserId { get; set; } = string.Empty;
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual HosClient? Client { get; set; }
+
+    public virtual User? User { get; set; }
 
     public virtual ClientGroup? ClientGroup { get; set; }
 

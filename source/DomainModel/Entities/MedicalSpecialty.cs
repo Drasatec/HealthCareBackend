@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.HospitalBody;
+using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities;
 public partial class MedicalSpecialty

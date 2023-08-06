@@ -1,4 +1,4 @@
-﻿using DomainModel.Entities;
+﻿using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Models.Floors;

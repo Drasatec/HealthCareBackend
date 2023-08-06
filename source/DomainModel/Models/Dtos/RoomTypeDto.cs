@@ -1,5 +1,5 @@
 ﻿using DomainModel.Entities.TranslationModels;
-using DomainModel.Entities;
+using DomainModel.Entities.SettingsEntities;
 
 namespace DomainModel.Models.Dtos;
 

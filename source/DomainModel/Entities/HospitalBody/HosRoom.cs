@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.HospitalBody;
 
 public partial class HosRoom
 {
@@ -10,7 +11,7 @@ public partial class HosRoom
 
     public string? Photo { get; set; }
 
-    public string CodeNumber { get; set; } =string.Empty;
+    public string CodeNumber { get; set; } = string.Empty;
 
     public string? Kind { get; set; }
 

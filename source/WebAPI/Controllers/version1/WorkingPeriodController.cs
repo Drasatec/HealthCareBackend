@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 using DomainModel.Contracts;
+using DomainModel.Entities.SettingsEntities;
 
 namespace WebAPI.Controllers.version1;
 

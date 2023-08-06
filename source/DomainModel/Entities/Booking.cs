@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using DomainModel.Entities.DoctorEntities;
+using DomainModel.Entities.HospitalBody;
+using DomainModel.Entities.SettingsEntities;
 
 namespace DomainModel.Entities;
 

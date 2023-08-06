@@ -1,5 +1,4 @@
 ﻿using DataAccess.Contexts;
-using DomainModel.Entities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
@@ -9,6 +8,7 @@ using DomainModel.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Linq;
+using DomainModel.Entities.DoctorEntities;
 
 namespace DataAccess.Repositories;
 

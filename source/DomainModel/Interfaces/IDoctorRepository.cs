@@ -1,5 +1,4 @@
-﻿
-using DomainModel.Entities;
+﻿using DomainModel.Entities.DoctorEntities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using DomainModel.Models.Doctors;
