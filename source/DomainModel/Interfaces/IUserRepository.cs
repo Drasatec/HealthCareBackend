@@ -13,8 +13,21 @@ public interface IUserRepository: IGenericRepository
     /// <returns></returns>
     Task<User?> FindByEmailAsync(string email);
     Task<User?> FindById(string userId);
+    //Task<User?> FindByPhoneNumberAsync(string email);
     Task<bool> IsEmailExistAsync(string email);
+    Task<bool> IsPhoneExistAsync(string email);
+    /// <summary>
+    /// select userId, email, Full name properties in user by email
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
     Task<User?> ReadUserIdByEmailAsync(string email);
+    /// <summary>
+    /// select userId, phone, Full name properties in user by phone
+    /// </summary>
+    /// <param name="phone"></param>
+    /// <returns></returns>
+    Task<User?> ReadUserIdByPhoneAsync(string phone);
     public string Test();
     Task<bool> UpdateVerificationCode(User user);
 }

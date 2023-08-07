@@ -16,7 +16,7 @@
 	[PhoneNumber] [nvarchar](max) NULL,
 	[PhoneNumberConfirmed] [bit] NOT NULL,
     [VerificationCode] VARCHar(8), -- new
-    [ExpirationTime] DateTime, -- new
+    [ExpirationTime] datetimeoffset(7), -- new
 	[PasswordHash] [nvarchar](max) NULL,
 	[SecurityStamp] [nvarchar](max) NULL,
 	[ConcurrencyStamp] [nvarchar](max) NULL,
@@ -35,6 +35,7 @@ CREATE TABLE Roles(
 
 	CONSTRAINT PK_Roles PRIMARY KEY (Id),
 );
+
 GO
 CREATE TABLE UserRoles(
 	[Id] [BIGINT] IDENTITY(1,1),
@@ -53,6 +54,15 @@ CREATE TABLE UserRoles(
     FOREIGN KEY (RoleId)
       REFERENCES Roles(Id)
 		ON DELETE CASCADE,
+);
+GO
+----------------
+CREATE TABLE ConfirmationOptions(
+	[Id] [varchar](450) NOT NULL,
+	[OptionName] [nvarchar](112) NULL,
+	[Chosen] [BIT] NOT NULL DEFAULT 0,
+
+	CONSTRAINT PK_ConfirmationOptions PRIMARY KEY (Id),
 );
 GO
 ----------------

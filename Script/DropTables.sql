@@ -66,3 +66,4 @@ DROP TABLE Languages;
 DROP TABLE UserRoles;
 DROP TABLE Roles;
 DROP TABLE Users;
+DROP TABLE ConfirmationOptions;

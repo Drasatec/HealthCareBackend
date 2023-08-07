@@ -149,7 +149,7 @@ public class PatientRepository : GenericRepository, IPatientRepository
     }
 
 
-    public async Task<PagedResponse<PatientDto>?> ReadAll(int? baseid, bool? appearance, string? status, string? lang, int? pageSize, int? page)
+    public async Task<PagedResponse<PatientDto>?> ReadAll(int? baseid, bool? appearance, byte? status, string? lang, int? pageSize, int? page)
     {
 
         IQueryable<Patient> query = Context.Patients;
@@ -157,15 +157,7 @@ public class PatientRepository : GenericRepository, IPatientRepository
         var totalCount = 0;
         if (status is not null)
         {
-
-            if (status.Equals("inactive"))
-            {
-                query = query.Where(h => h.IsDeleted);
-            }
-            else if (status.Equals("active"))
-            {
-                query = query.Where(h => !h.IsDeleted);
-            }
+            query = query.Where(h => h.PatientStatus.Equals(status));
         }
 
         query = query.OrderByDescending(o => o.Id);
@@ -212,23 +204,24 @@ public class PatientRepository : GenericRepository, IPatientRepository
                     {
                         Id = h.Id,
                         Photo = h.Photo,
-                        // IsDeleted = h.IsDeleted,
                         NationalityId = h.NationalityId,
-                        //  Address = h.Address,
                         BirthDate = h.BirthDate,
                         MaritalStatus = h.MaritalStatus,
+                        BloodType = h.BloodType,
+                        Gender = h.Gender,
+                        MedicalFileNumber = h.MedicalFileNumber,
+                        PhoneNumber = h.PhoneNumber,
+                        PatientStatus = h.PatientStatus,
+                        PatientTranslations = new List<PatientTranslation> { t }
+                        // IsDeleted = h.IsDeleted,
+                        //  Address = h.Address,
                         // Ssn = h.Ssn,
                         //NationalId = h.NationalId,
-                        BloodType = h.BloodType,
                         //PatientStatus = h.PatientStatus,
                         //PatientStatus = h.PatientStatus,
                         // ClientGroupId = h.ClientGroupId,
                         // ClientId = h.ClientId,
-                        Gender = h.Gender,
-                        MedicalFileNumber = h.MedicalFileNumber,
-                        PhoneNumber = h.PhoneNumber,
                         //SsntypeId = h.SsntypeId,
-                        PatientTranslations = new List<PatientTranslation> { t }
                     };
 
         var totalCount = await query.CountAsync();

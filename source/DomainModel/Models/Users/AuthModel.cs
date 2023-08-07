@@ -3,7 +3,6 @@
 public class AuthModel
 {
     public string? UserId { get; set; } 
-
     
     public string Email { get; set; } = string.Empty;
 
@@ -17,6 +16,8 @@ public class AuthModel
 
     public string Username { get; set; } = string.Empty;
 
+    public bool Success { get; set; }
+
     public string? Message { get; set; } = string.Empty;
 
     public List<string>? Roles { get; set; }
@@ -25,9 +26,10 @@ public class AuthModel
 
     public DateTime ExpiresOn { get; set; }
 
-    public AuthModel(string message)
+    public AuthModel(bool success, string? message)
     {
         Message = message;
+        Success = success;
     }
     public AuthModel()
     {

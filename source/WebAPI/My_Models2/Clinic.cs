@@ -39,11 +39,11 @@ public partial class Clinic
 
     public virtual ICollection<ClinicTranslation> ClinicTranslations { get; set; } = new List<ClinicTranslation>();
 
+    public virtual ICollection<DoctorWorkPeriod> DoctorWorkPeriods { get; set; } = new List<DoctorWorkPeriod>();
+
     public virtual HosFloor Floor { get; set; } = null!;
 
     public virtual Hospital Hospital { get; set; } = null!;
-
-    public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
 
     public virtual HosRoom Room { get; set; } = null!;
 

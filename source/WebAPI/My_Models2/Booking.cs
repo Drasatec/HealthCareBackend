@@ -7,6 +7,8 @@ public partial class Booking
 {
     public long Id { get; set; }
 
+    public string BookingNumber { get; set; } = null!;
+
     public int PatientId { get; set; }
 
     public int HospitalId { get; set; }
@@ -19,23 +21,27 @@ public partial class Booking
 
     public int TypeVisitId { get; set; }
 
-    public int? ClinicId { get; set; }
+    public int ClinicId { get; set; }
+
+    public short BookingStatusId { get; set; }
 
     public int? PriceCategoryId { get; set; }
 
     public int? CurrencyId { get; set; }
 
-    public short? BookingStatusId { get; set; }
-
     public int? Price { get; set; }
+
+    public byte? DayNumber { get; set; }
 
     public DateTime? VisitingDate { get; set; }
 
+    public string? BookingReason { get; set; }
+
     public DateTime? CreateOn { get; set; }
 
-    public virtual BookingStatus? BookingStatus { get; set; }
+    public virtual BookingStatus BookingStatus { get; set; } = null!;
 
-    public virtual Clinic? Clinic { get; set; }
+    public virtual Clinic Clinic { get; set; } = null!;
 
     public virtual Currency? Currency { get; set; }
 

@@ -66,30 +66,25 @@ public class UserRepository : GenericRepository, IUserRepository
     }
 
 
-    public async Task<bool> SendVerificaitonCodeToEmail(string email)
-    {
-        var user = await FindByEmailAsync(email);
-        if (user != null)
-        {
-            var verificationCode = Helper.VerificationCode();
-            user.VerificationCode = verificationCode;
-            user.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
+    //public async Task<bool> SendVerificaitonCodeToEmail(string email)
+    //{
+    //    var user = await FindByEmailAsync(email);
+    //    if (user != null)
+    //    {
+    //        var verificationCode = Helper.VerificationCode();
+    //        user.VerificationCode = verificationCode;
+    //        user.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
 
-            await UpdateVerificationCode(user);
-            await mailingService.SendVerificationCodeAsync(email, verificationCode);
-        }
-        return true;
-    }
+    //        await UpdateVerificationCode(user);
+    //        await mailingService.SendVerificationCodeAsync(email, verificationCode);
+    //    }
+    //    return true;
+    //}
 
     public async Task<User?> FindById(string userId)
     {
         return await GenericReadById<User>(u => u.Id == userId, null);
     }
-    /// <summary>
-    /// this method return all property in user by email
-    /// </summary>
-    /// <param name="email"></param>
-    /// <returns></returns>
     public async Task<User?> FindByEmailAsync(string email)
     {
         try
@@ -102,13 +97,40 @@ public class UserRepository : GenericRepository, IUserRepository
         }
     }
 
+    //public async Task<User?> FindByPhoneNumberAsync(string phone)
+    //{
+    //    try
+    //    {
+    //        return await Context.Users.Where(x => x.PhoneNumber == phone.ToLower()).FirstOrDefaultAsync();
+    //    }
+    //    catch (Exception)
+    //    {
+    //        return null;
+    //    }
+    //}
+
     public async Task<User?> ReadUserIdByEmailAsync(string email)
     {
         try
         {
             return await Context.Users
                 .Where(x => x.Email == email.ToLower())
-                .Select((user) => new User { Id = user.Id, FullName = user.FullName })
+                .Select((user) => new User { Id = user.Id, Email = user.Email, VerificationCode = user.VerificationCode, ExpirationTime = user.ExpirationTime, FullName = user.FullName })
+                .FirstOrDefaultAsync();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public async Task<User?> ReadUserIdByPhoneAsync(string phone)
+    {
+        try
+        {
+            return await Context.Users
+                .Where(x => x.PhoneNumber == phone.ToLower())
+                .Select((user) => new User { Id = user.Id, PhoneNumber = user.PhoneNumber, VerificationCode = user.VerificationCode, ExpirationTime = user.ExpirationTime, FullName = user.FullName })
                 .FirstOrDefaultAsync();
         }
         catch (Exception)
@@ -148,6 +170,7 @@ public class UserRepository : GenericRepository, IUserRepository
     }
 
     public Task<bool> IsEmailExistAsync(string email) => Context.Users.AnyAsync(e => e.Email == email.ToLower());
+    public Task<bool> IsPhoneExistAsync(string email) => Context.Users.AnyAsync(e => e.PhoneNumber == email.ToLower());
 
     // private methods
     private bool IsEmailExist(string email) => Context.Users.Any(e => e.Email == email.ToLower());

@@ -19,11 +19,11 @@ public partial class User
 
     public string? ConcurrencyStamp { get; set; }
 
-    public string? PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; } = string.Empty!;
 
     public string VerificationCode { get; set; } = string.Empty;
 
-    public DateTime? ExpirationTime { get; set; }
+    public DateTimeOffset? ExpirationTime { get; set; }
 
     public bool PhoneNumberConfirmed { get; set; }
 

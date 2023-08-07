@@ -21,7 +21,7 @@ public class PatientController : ControllerBase
 
     // ============================= post ============================= 
 
-    
+
     [HttpPost("add", Order = 0901)]
     public async Task<IActionResult> AddSingleFromAdmin([FromForm] IFormFile? file, [FromForm] PatientDto model)
     {
@@ -40,9 +40,9 @@ public class PatientController : ControllerBase
 
     [Authorize(Roles = "User")]
     [HttpPost("add-patient-data", Order = 0901)]
-    public async Task<IActionResult> AddSingleFromPatient([FromForm] PatientDto model , [FromForm] string? userId )
+    public async Task<IActionResult> AddSingleFromPatient([FromForm] PatientDto model, [FromForm] string? userId)
     {
-        if(userId == null)
+        if (userId == null)
         {
             userId = User.FindFirst("uid")?.Value;
         }
@@ -94,16 +94,15 @@ public class PatientController : ControllerBase
 
 
     [HttpGet("all", Order = 0912)]
-    public async Task<IActionResult> GetAll([FromQuery(Name = "specialtyId")] int? parentId, [FromQuery] bool? appearance, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
+    public async Task<IActionResult> GetAll([FromQuery(Name = "specialtyId")] int? parentId, bool? appearance, byte? patientStatus, int? pageSize, int? page, string? lang)
     {
-        var resutl = await Data.Patients.ReadAll(parentId, appearance, status, lang, pageSize, page);
+        var resutl = await Data.Patients.ReadAll(parentId, appearance, patientStatus, lang, pageSize, page);
         if (resutl is null)
         {
             return Ok(new Response(true, "no content"));
         }
         return Ok(resutl);
     }
-
 
 
     [HttpGet("search", Order = 0914)]
@@ -168,7 +167,7 @@ public class PatientController : ControllerBase
     [HttpPut("edit-status", Order = 0925)]
     public async Task<IActionResult> EditSingleProp([FromQuery] int patientId, [FromQuery] byte patientStatus)
     {
-        if (patientId < 1 || patientStatus < 1 )
+        if (patientId < 1 || patientStatus < 1)
         {
             return BadRequest(new Response(false, "id field is requerd and value > 0"));
         }

@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+
 namespace WebAPI.Services;
 
 public class AuthService : IAuthService
@@ -41,7 +42,13 @@ public class AuthService : IAuthService
         // Ensure that the email does not already exist
         if (await userRepository.IsEmailExistAsync(userDto.Email))
         {
-            return new AuthModel("email is exist");
+            return new AuthModel(false, "email is exist");
+        }
+
+        // Ensure that the Phone Number does not already exist
+        if (await userRepository.IsPhoneExistAsync(userDto.PhoneNumber))
+        {
+            return new AuthModel(false, "Phone Number is exist");
         }
 
         User entity = userDto;
@@ -65,7 +72,7 @@ public class AuthService : IAuthService
         var user = await userRepository.CreateAsync(entity, userDto.Password);
         if (!user.Success)
         {
-            return new AuthModel { Message = user?.Message };
+            return new AuthModel(false, user?.Message);
         }
 
         var jwtSecurityToken = await CreateJwtToken(entity);
@@ -75,6 +82,7 @@ public class AuthService : IAuthService
             Email = entity.Email,
             ExpiresOn = jwtSecurityToken.ValidTo,
             IsAuthenticated = true,
+            Success = true,
             Roles = new List<string> { "User" },
             Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
             Username = entity.UserName
@@ -91,6 +99,7 @@ public class AuthService : IAuthService
         if (user is null || !await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
         {
             authModel.Message = "Email or Password is incorrect!";
+            authModel.Success = false;
             return authModel;
         }
         var auth = new AuthModel();
@@ -107,9 +116,11 @@ public class AuthService : IAuthService
         auth.PhoneNumberConfirmed = user.PhoneNumberConfirmed ? true : false;
 
         var jwtSecurityToken = await CreateJwtToken(user);
+
         auth.UserId = user.Id;
         auth.Email = user.Email;
         auth.ExpiresOn = jwtSecurityToken.ValidTo;
+        authModel.Success = true;
         auth.IsAuthenticated = true;
         auth.Roles = new List<string> { "User", "Patient" };
         auth.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
@@ -121,22 +132,46 @@ public class AuthService : IAuthService
     public async Task<Response> VerificationEmail(string email, string code)
     {
         Response res;
-        var user = await userRepository.FindByEmailAsync(email);
+        var user = await userRepository.ReadUserIdByEmailAsync(email);
         // if expierd?
 
         if (user != null)
         {
-            if (user.ExpirationTime < DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
+            if (user.ExpirationTime >= DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
             {
-
                 user.EmailConfirmed = true;
                 res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.EmailConfirmed);
                 res.Message = null;
                 return res;
             }
+            else
+                return new Response(false, "Expired Time");
         }
         return res = new Response(false, "error");
     }
+
+
+    public async Task<Response> VerificationPhone(string phoneNumber, string code)
+    {
+        Response res;
+        var user = await userRepository.ReadUserIdByPhoneAsync(phoneNumber);
+
+        if (user != null)
+        {
+            if (user.ExpirationTime >= DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
+            {
+                user.PhoneNumberConfirmed = true;
+                res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PhoneNumberConfirmed);
+                res.Message = null;
+                return res;
+            }
+            else
+                return new Response(false, "Expired Time");
+        }
+        return res = new Response(false, "user not found");
+    }
+
+
 
     public async Task<Response> RenewEmailVerificationCode(string email)
     {
@@ -157,23 +192,27 @@ public class AuthService : IAuthService
         return res;
     }
 
-    public async Task<Response> VerificationPhone(string userId, string code)
+    public async Task<Response> RenewSmsVerificationCode(string phone)
     {
         Response res;
-        var user = await userRepository.FindById(userId);
-
+        var user = await userRepository.ReadUserIdByPhoneAsync(phone);
         if (user != null)
         {
-            if (user.ExpirationTime >= DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
-            {
-                user.PhoneNumberConfirmed = true;
-                res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PhoneNumberConfirmed);
-                res.Message = null;
-                return res;
-            }
+            user.VerificationCode = Helper.VerificationCode();
+            _ = smsService.SendVerificationCodeAsync(phone, user.VerificationCode);
+
+            var isUpdated = await userRepository.UpdateVerificationCode(user);
+            if (isUpdated)
+                res = new Response(true, null);
+            else
+                res = new Response(false, "Something went wrong with the database");
         }
-        return res = new Response(false, "error");
+        else
+            res = new Response(false, "pnone number is not found not found");
+
+        return res;
     }
+
 
     private async Task<JwtSecurityToken> CreateJwtToken(User user)
     {

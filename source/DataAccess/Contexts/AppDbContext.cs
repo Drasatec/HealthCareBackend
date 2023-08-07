@@ -16,7 +16,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     #region DbSets
-
+    public virtual DbSet<ConfirmationOption> ConfirmationOptions { get; set; }
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -146,6 +146,14 @@ public class AppDbContext : DbContext
     {
         modelBuilder.UseCollation("Arabic_100_CI_AS_KS_WS_SC_UTF8");
 
+
+        modelBuilder.Entity<ConfirmationOption>(entity =>
+        {
+            entity.Property(e => e.Id)
+                .HasMaxLength(450)
+                .IsUnicode(false);
+            entity.Property(e => e.OptionName).HasMaxLength(112);
+        });
 
         modelBuilder.Entity<Role>(entity =>
         {

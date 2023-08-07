@@ -39,6 +39,8 @@ public partial class Patient
 
     public int? NationalityId { get; set; }
 
+    public string? UserId { get; set; }
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual HosClient? Client { get; set; }
@@ -50,4 +52,6 @@ public partial class Patient
     public virtual ICollection<PatientTranslation> PatientTranslations { get; set; } = new List<PatientTranslation>();
 
     public virtual Ssntype? Ssntype { get; set; }
+
+    public virtual User? User { get; set; }
 }
