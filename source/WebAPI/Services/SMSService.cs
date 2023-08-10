@@ -46,14 +46,16 @@ public class SMSService : ISMSService
                         Thank you for using our service!";
 
         TwilioClient.Init(twilio.AccountSID,twilio.AuthToken);
-        var messageOptions = new CreateMessageOptions(new PhoneNumber("+201093052427"))
+        var messageOptions = new CreateMessageOptions(new PhoneNumber(mobileNumber))
         {
-            From = new PhoneNumber("+12184323339"),
+            From = new PhoneNumber(twilio.TwilioPhoneNumber),
             Body = smsMessage
         };
 
         var message = await MessageResource.CreateAsync(messageOptions);
-        Console.WriteLine(message.Body);
+        await Console.Out.WriteLineAsync(message.Body);
+        await Console.Out.WriteLineAsync(mobileNumber);
+        await Console.Out.WriteLineAsync(twilio.TwilioPhoneNumber);
 
         return message;
     }

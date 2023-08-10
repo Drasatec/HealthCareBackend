@@ -18,7 +18,8 @@ public class MailingController : ControllerBase
     [HttpPost("send")]
     public async Task<IActionResult> SendMail(IFormFileCollection files, [FromForm] MailRequestDto dto)
     {
-        await _mailingService.SendEmailAsync(dto.ToEmail, dto.Subject, dto.Body, null!);
+
+        await _mailingService.SendVerificationCodeAsync(dto.ToEmail,null,"mohamed fawzy", null!);
         return Ok();
     }
 

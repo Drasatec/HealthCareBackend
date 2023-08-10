@@ -25,6 +25,8 @@ public partial class User
 
     public DateTimeOffset? ExpirationTime { get; set; }
 
+    public DateTimeOffset? CreateOn { get; set; }
+
     public bool PhoneNumberConfirmed { get; set; }
 
     public bool TwoFactorEnabled { get; set; }

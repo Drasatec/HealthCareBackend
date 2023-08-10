@@ -7,46 +7,57 @@ VALUES
     (2, N'أنثى', 'ar'),
     (2, 'Female', 'en');
 GO
+INSERT INTO Users
+(Id,FullName,Email,PhoneNumber,EmailConfirmed,PhoneNumberConfirmed)
+     VALUES
+	 ('19322255-1692-4eeb-aaa0-c1a3e7dff0b9','mai 1','mai1@gmail.com','+201234567891',1,0),
+     ('3e2fe885-5041-47ee-93cd-d4ff264450b3','mai 2','mai2@gmail.com','+201234567892',0,1),
+     ('3f430285-c46e-4af0-8b34-7f2d6af64d59','mai 3','mai3@gmail.com','+201234567893',1,1),
+     ('528b2b93-53c7-4f39-a2a1-056b92abad9d','mai 4','mai4@gmail.com','+201234567894',0,0),
+     ('5a44d741-312a-4604-a8c4-f6a903de44d5','mai 5','mai5@gmail.com','+201234567895',1,1);
+GO
 --  Currencies
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('AMD', '¥', 'Armenia', 44.6917527, 40.2367283, 'Dram');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('ARS', '£', 'Argentina', -60.61667, -26.73333, 'Peso');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('BOB', '€', 'Bolivia', -65.267799, -19.156561, 'Boliviano');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('BRL', '£', 'Brazil', -35.4551534, -7.8794782, 'Real');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('CAD', '¥', 'Canada', -63.0886099, 46.215926, 'Dollar');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('CNY', '€', 'China', 117.002933, 35.302488, 'Yuan Renminbi');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('COP', '$', 'Colombia', -77.3439283, 1.2296124, 'Peso');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('CUP', '€', 'Cuba', -75.9869609, 20.2218201, 'Peso');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('CZK', '£', 'Czech Republic', 15.4833007, 49.2908708, 'Koruna');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('DOP', '$', 'Dominican Republic', -71.0790048, 19.5403533, 'Peso');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('EGP', '£', 'Egypt', 30.734995, 28.4233602, 'Pound');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('EUR', '£', 'France', 5.8978018, 43.4945737, 'Euro');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('GMD', '£', 'Gambia', -14.769285, 13.449097, 'Dalasi');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('GTQ', '$', 'Guatemala', -91.4656296, 14.5802198, 'Quetzal');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('HRK', '¥', 'Croatia', 15.5854843, 45.1150317, 'Kuna');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('IDR', '$', 'Indonesia', 110.8171082, -6.4712737, 'Rupiah');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('JPY', '¥', 'Japan', 139.707963, 36.1219748, 'Yen');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('MGA', '£', 'Madagascar', 47.8402601, -22.3539973, 'Ariary');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('MKD', '$', 'Macedonia', 21.3421041, 41.9950451, 'Denar');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('MNT', '£', 'Mongolia', 106.9211984, 47.9195813, 'Tugrik');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('MXN', '£', 'Mexico', -100.9185477, 28.4943597, 'Peso');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('NAD', '¥', 'Namibia', 15.9523622, -21.4206681, 'Dollar');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('NGN', '€', 'Nigeria', 5.3102505, 9.2394244, 'Naira');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('NOK', '¥', 'Norway', 11.5610075, 60.8818611, 'Krone');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('NZD', '¥', 'New Zealand', 175.8087485, -38.9898711, 'Dollar');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('PHP', '¥', 'Philippines', 123.4675853, 9.8318931, 'Peso');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('PKR', '£', 'Pakistan', 72.4275483, 31.8917453, 'Rupee');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('PLN', '$', 'Poland', 18.3991666, 53.8514527, 'Zloty');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('RUB', '¥', 'Russia', 101.7805781, 56.3041802, 'Ruble');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('SEK', '$', 'Sweden', 17.9509504, 59.3245933, 'Krona');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('SOS', '£', 'Somalia', 49.8739267, 11.4720137, 'Shilling');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('THB', '$', 'Thailand', 100.3477801, 17.7116584, 'Baht');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('UAH', '$', 'Ukraine', 23.6611306, 49.7821352, 'Hryvnia');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('UGX', '¥', 'Uganda', 33.9303991, 1.1016277, 'Shilling');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('USD', '£', 'United States', -104.7099999, 40.42, 'Dollar');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('XAF', '$', 'Cameroon', 10.4284178, 5.4807517, 'Franc');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('XOF', '$', 'Burkina Faso', -4.3051542, 11.1649219, 'Franc');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('XPF', '¥', 'New Caledonia', 164.991636, -20.692675, 'Franc');
-insert into Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) values ('ZAR', '$', 'South Africa', 30.18109, -29.56225, 'Rand');
+INSERT INTO Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) 
+VALUES
+    ('AMD', '¥', 'Armenia', 44.6917527, 40.2367283, 'Dram'),
+    ('ARS', '£', 'Argentina', -60.61667, -26.73333, 'Peso'),
+    ('BOB', '€', 'Bolivia', -65.267799, -19.156561, 'Boliviano'),
+    ('BRL', '£', 'Brazil', -35.4551534, -7.8794782, 'Real'),
+    ('CAD', '¥', 'Canada', -63.0886099, 46.215926, 'Dollar'),
+    ('CNY', '€', 'China', 117.002933, 35.302488, 'Yuan Renminbi'),
+    ('COP', '$', 'Colombia', -77.3439283, 1.2296124, 'Peso'),
+    ('CUP', '€', 'Cuba', -75.9869609, 20.2218201, 'Peso'),
+    ('CZK', '£', 'Czech Republic', 15.4833007, 49.2908708, 'Koruna'),
+    ('DOP', '$', 'Dominican Republic', -71.0790048, 19.5403533, 'Peso'),
+    ('EGP', '£', 'Egypt', 30.734995, 28.4233602, 'Pound'),
+    ('EUR', '£', 'France', 5.8978018, 43.4945737, 'Euro'),
+    ('GMD', '£', 'Gambia', -14.769285, 13.449097, 'Dalasi'),
+    ('GTQ', '$', 'Guatemala', -91.4656296, 14.5802198, 'Quetzal'),
+    ('HRK', '¥', 'Croatia', 15.5854843, 45.1150317, 'Kuna'),
+    ('IDR', '$', 'Indonesia', 110.8171082, -6.4712737, 'Rupiah'),
+    ('JPY', '¥', 'Japan', 139.707963, 36.1219748, 'Yen'),
+    ('MGA', '£', 'Madagascar', 47.8402601, -22.3539973, 'Ariary'),
+    ('MKD', '$', 'Macedonia', 21.3421041, 41.9950451, 'Denar'),
+    ('MNT', '£', 'Mongolia', 106.9211984, 47.9195813, 'Tugrik'),
+    ('MXN', '£', 'Mexico', -100.9185477, 28.4943597, 'Peso'),
+    ('NAD', '¥', 'Namibia', 15.9523622, -21.4206681, 'Dollar'),
+    ('NGN', '€', 'Nigeria', 5.3102505, 9.2394244, 'Naira'),
+    ('NOK', '¥', 'Norway', 11.5610075, 60.8818611, 'Krone'),
+    ('NZD', '¥', 'New Zealand', 175.8087485, -38.9898711, 'Dollar'),
+    ('PHP', '¥', 'Philippines', 123.4675853, 9.8318931, 'Peso'),
+    ('PKR', '£', 'Pakistan', 72.4275483, 31.8917453, 'Rupee'),
+    ('PLN', '$', 'Poland', 18.3991666, 53.8514527, 'Zloty'),
+    ('RUB', '¥', 'Russia', 101.7805781, 56.3041802, 'Ruble'),
+    ('SEK', '$', 'Sweden', 17.9509504, 59.3245933, 'Krona'),
+    ('SOS', '£', 'Somalia', 49.8739267, 11.4720137, 'Shilling'),
+    ('THB', '$', 'Thailand', 100.3477801, 17.7116584, 'Baht'),
+    ('UAH', '$', 'Ukraine', 23.6611306, 49.7821352, 'Hryvnia'),
+    ('UGX', '¥', 'Uganda', 33.9303991, 1.1016277, 'Shilling'),
+    ('USD', '£', 'United States', -104.7099999, 40.42, 'Dollar'),
+    ('XAF', '$', 'Cameroon', 10.4284178, 5.4807517, 'Franc'),
+    ('XOF', '$', 'Burkina Faso', -4.3051542, 11.1649219, 'Franc'),
+    ('XPF', '¥', 'New Caledonia', 164.991636, -20.692675, 'Franc'),
+    ('ZAR', '$', 'South Africa', 30.18109, -29.56225, 'Rand');
 
 --select * from currencies
 GO
@@ -885,7 +896,7 @@ VALUES
     ('جين سميث', '٤٥٦ شارع الدردار', 'طبيب', 'مستشفى أي بي سي',1, 2, 'ar'),
     ('أحمد محمد', '٧٨٩ شارع البلوط', 'مدرس', 'مدرسة أي بي سي',1, 3, 'ar'),
     ('فاطمة علي', '١١١ شارع الصنوبر', 'ممرضة', 'مستشفى أي بي سي',1, 4, 'ar'),
-    ('Michael Johnson', '222 Maple St', 'محامي', 'مكتب محاماة أي بي سي',1, 5, 'ar'),
+    ('ميشيل جيسون', '222 Maple St', 'محامي', 'مكتب محاماة أي بي سي',1, 5, 'ar'),
     ('John Doe', '123 Main St', 'Engineer', 'ABC Company',1, 1, 'en'),
     ('Jane Smith', '456 Oak St', 'Doctor', 'ABC Hospital',1, 2, 'en'),
     ('Ahmed Mohamed', '789 Pine St', 'Teacher', 'ABC School',1, 3, 'en'),

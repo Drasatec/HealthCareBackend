@@ -27,5 +27,6 @@ namespace DomainModel.Interfaces
         Task<TResult?> GenericReadSingle<TEntity, TResult>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TResult?>>? selectExpression)
             where TEntity : class
             where TResult : class;
+        Task<IEnumerable<TResult>> GenericSelectionReadAll<TEntity, TResult>(Expression<Func<TEntity, bool>>? filter, Expression<Func<TEntity, TResult>> selectExpression, Expression<Func<TEntity, object>>? order, int? page, int? pageSize) where TEntity : class;
     }
 }

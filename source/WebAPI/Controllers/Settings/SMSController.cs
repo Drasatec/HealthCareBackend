@@ -22,17 +22,34 @@ public class SMSController : ControllerBase
     [HttpPost("send")]
     public IActionResult Mai([FromQuery] string mobileNumber, string body)
     {
+
         var accountSid = "AC207a5beb566133cc7513e9ae8abe9aca";
         var authToken = "b682bba886ddf54c8f710833dc5d7c38";
+
+
         TwilioClient.Init(accountSid, authToken);
 
         var messageOptions = new CreateMessageOptions(
           new PhoneNumber("+201093564989"));
         messageOptions.From = new PhoneNumber("+17623005240");
-        messageOptions.Body = body;
+        messageOptions.Body = "تجربة رسالة من الكود";
+
 
         var message = MessageResource.Create(messageOptions);
         Console.WriteLine(message.Body);
+
+
+        //var accountSid = "AC207a5beb566133cc7513e9ae8abe9aca";
+        //var authToken = "b682bba886ddf54c8f710833dc5d7c38";
+        //TwilioClient.Init(accountSid, authToken);
+
+        //var messageOptions = new CreateMessageOptions(
+        //  new PhoneNumber("+201093564989"));
+        //messageOptions.From = new PhoneNumber("+17623005240");
+        //messageOptions.Body = body;
+
+        //var message = MessageResource.Create(messageOptions);
+        //Console.WriteLine(message.Body);
 
         return Ok(message.Body);
     }

@@ -40,7 +40,7 @@ public partial class Patient
 
     public int? NationalityId { get; set; }
 
-    public string? UserId { get; set; } = string.Empty;
+    public string? UserId { get; set; } = null;
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 

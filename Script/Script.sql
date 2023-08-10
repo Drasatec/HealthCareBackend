@@ -12,18 +12,19 @@
 	[FullName] [nvarchar](100) NOT NULL, --*
 	[UserName] [nvarchar](256) NULL,
 	[Email] [nvarchar](256) NULL,
-	[EmailConfirmed] [bit] NOT NULL,
 	[PhoneNumber] [nvarchar](max) NULL,
-	[PhoneNumberConfirmed] [bit] NOT NULL,
+	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
+	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
     [VerificationCode] VARCHar(8), -- new
-    [ExpirationTime] datetimeoffset(7), -- new
+    [ExpirationTime] DATETIMEOFFSET(7), -- new
+    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
 	[PasswordHash] [nvarchar](max) NULL,
 	[SecurityStamp] [nvarchar](max) NULL,
 	[ConcurrencyStamp] [nvarchar](max) NULL,
-	[TwoFactorEnabled] [bit] NOT NULL,
-	[LockoutEnd] [datetimeoffset](7) NULL,
-	[LockoutEnabled] [bit] NOT NULL,
-	[AccessFailedCount] [int] NOT NULL,
+	[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
+	[LockoutEnd] [DATETIMEOFFSET](7) NULL,
+	[LockoutEnabled] [bit] NOT NULL DEFAULT 0,
+	[AccessFailedCount] [int] NOT NULL DEFAULT 0,
 
 	CONSTRAINT PK_Users PRIMARY KEY (Id),
 );

@@ -128,7 +128,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                           where wp.LangCode == lang
 
                           join pati in Context.PatientTranslations on h.PatientId equals pati.PatientId
-                          where pati.LangCode == lang //|| pati.LangCode == "ar"
+                          where pati.LangCode == lang
 
                           join bstat in Context.BookingStatusesTranslations on h.BookingStatusId equals bstat.BookingStatusId
                           where bstat.LangCode == lang

@@ -38,7 +38,7 @@ public class PatientController : ControllerBase
         return Created("fawzy", response);
     }
 
-    [Authorize(Roles = "User")]
+    //[Authorize(Roles = "User")]
     [HttpPost("add-patient-data", Order = 0901)]
     public async Task<IActionResult> AddSingleFromPatient([FromForm] PatientDto model, [FromForm] string? userId)
     {

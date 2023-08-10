@@ -15,7 +15,7 @@ public interface IUserRepository: IGenericRepository
     Task<User?> FindById(string userId);
     //Task<User?> FindByPhoneNumberAsync(string email);
     Task<bool> IsEmailExistAsync(string email);
-    Task<bool> IsPhoneExistAsync(string email);
+    Task<bool> IsPhoneExistAsync(string phone);
     /// <summary>
     /// select userId, email, Full name properties in user by email
     /// </summary>

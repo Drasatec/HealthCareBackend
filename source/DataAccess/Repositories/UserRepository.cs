@@ -170,11 +170,9 @@ public class UserRepository : GenericRepository, IUserRepository
     }
 
     public Task<bool> IsEmailExistAsync(string email) => Context.Users.AnyAsync(e => e.Email == email.ToLower());
-    public Task<bool> IsPhoneExistAsync(string email) => Context.Users.AnyAsync(e => e.PhoneNumber == email.ToLower());
+    public Task<bool> IsPhoneExistAsync(string phone) => Context.Users.AnyAsync(e => e.PhoneNumber == phone.ToLower());
 
     // private methods
-    private bool IsEmailExist(string email) => Context.Users.Any(e => e.Email == email.ToLower());
-
 
 
     //public virtual Task<User?> FindByNameAsync(string userId)

@@ -1,12 +1,8 @@
 ﻿using DataAccess.Contexts;
-using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace DataAccess.Repositories;
@@ -249,6 +245,26 @@ public class GenericRepository : IGenericRepository
             return await query.Select(selectExpression).ToListAsync();
         else
             return await query.ToListAsync();
+    }
+    
+    public async Task<IEnumerable<TResult>> GenericSelectionReadAll<TEntity,TResult>(Expression<Func<TEntity, bool>>? filter, Expression<Func<TEntity, TResult>> selectExpression, Expression<Func<TEntity, object>>? order, int? page, int? pageSize) where TEntity : class
+    {
+        IQueryable<TEntity> query = Context.Set<TEntity>();
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            GenericPagination(ref query, ref pageSize, ref page);
+        }
+        if (order != null)
+        {
+            query = query.OrderByDescending(order);
+        }
+        return await query.Select(selectExpression).ToListAsync();
     }
 
 

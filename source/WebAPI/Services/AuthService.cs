@@ -59,12 +59,13 @@ public class AuthService : IAuthService
             if (verification.Equals("email"))
             {
                 entity.VerificationCode = Helper.VerificationCode();
-                _ = mailingService.SendVerificationCodeAsync(entity.Email, entity.VerificationCode, entity.FullName);
+                await mailingService.SendVerificationCodeAsync(entity.Email, entity.VerificationCode, entity.FullName);
+
             }
             else if (verification.Equals("sms") && entity.PhoneNumber != null)
             {
                 entity.VerificationCode = Helper.VerificationCode();
-                _ = smsService.SendVerificationCodeAsync(entity.PhoneNumber, entity.VerificationCode);
+                await smsService.SendVerificationCodeAsync(entity.PhoneNumber, entity.VerificationCode);
             }
         }
 
@@ -79,13 +80,14 @@ public class AuthService : IAuthService
 
         return new AuthModel
         {
-            Email = entity.Email,
-            ExpiresOn = jwtSecurityToken.ValidTo,
-            IsAuthenticated = true,
+            UserId = entity.Id,
             Success = true,
+            Email = entity.Email,
             Roles = new List<string> { "User" },
-            Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            Username = entity.UserName
+            Username = entity.UserName,
+            IsAuthenticated = false,
+            ExpiresOn = null,
+            Token = null,
         };
     }
 
@@ -119,12 +121,12 @@ public class AuthService : IAuthService
 
         auth.UserId = user.Id;
         auth.Email = user.Email;
-        auth.ExpiresOn = jwtSecurityToken.ValidTo;
+        auth.Username = user.UserName;
         authModel.Success = true;
         auth.IsAuthenticated = true;
-        auth.Roles = new List<string> { "User", "Patient" };
+        auth.Roles = new List<string> { "User" };
         auth.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        auth.Username = user.UserName;
+        auth.ExpiresOn = jwtSecurityToken.ValidTo;
         return auth;
     }
 
@@ -176,20 +178,27 @@ public class AuthService : IAuthService
     public async Task<Response> RenewEmailVerificationCode(string email)
     {
         Response res;
-        var user = await userRepository.ReadUserIdByEmailAsync(email);
-        if (user != null)
+        try
         {
-            user.VerificationCode = Helper.VerificationCode();
-            _ = mailingService.SendVerificationCodeAsync(email, user.VerificationCode, user.FullName);
-            var isUpdated = await userRepository.UpdateVerificationCode(user);
-            if (isUpdated)
-                res = new Response(true, null);
+            var user = await userRepository.ReadUserIdByEmailAsync(email);
+            if (user != null)
+            {
+                user.VerificationCode = Helper.VerificationCode();
+                await mailingService.SendVerificationCodeAsync(email, user.VerificationCode, user.FullName);
+                var isUpdated = await userRepository.UpdateVerificationCode(user);
+                if (isUpdated)
+                    res = new Response(true, null);
+                else
+                    res = new Response(false, "Something went wrong with the database");
+            }
             else
-                res = new Response(false, "Something went wrong with the database");
+                res = new Response(false, "email not found");
+            return res;
         }
-        else
-            res = new Response(false, "email not found");
-        return res;
+        catch (Exception ex)
+        {
+            return new Response(false, ex.Message);
+        }
     }
 
     public async Task<Response> RenewSmsVerificationCode(string phone)
@@ -199,7 +208,7 @@ public class AuthService : IAuthService
         if (user != null)
         {
             user.VerificationCode = Helper.VerificationCode();
-            _ = smsService.SendVerificationCodeAsync(phone, user.VerificationCode);
+            await smsService.SendVerificationCodeAsync(phone, user.VerificationCode);
 
             var isUpdated = await userRepository.UpdateVerificationCode(user);
             if (isUpdated)
