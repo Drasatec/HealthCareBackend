@@ -3,7 +3,7 @@ using DomainModel.Entities.DoctorEntities;
 using DomainModel.Models;
 using System.Linq.Expressions;
 
-namespace WebAPI.Controllers.version1;
+namespace WebAPI.Controllers.version1.DoctorControllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -53,7 +53,7 @@ public class DoctorVisitPriceController : ControllerBase
             return BadRequest(new Error("400", "can not assign 0"));
 
         if (lang != null)
-           return Ok(await Data.Doctors.ReadDoctorVisitPrices(id,docId, priceCategoryId, typeVisitId, price, lang));
+            return Ok(await Data.Doctors.ReadDoctorVisitPrices(id, docId, priceCategoryId, typeVisitId, price, lang));
         else
             return BadRequest(new Error("400", "The lang field is required"));
     }
@@ -77,7 +77,7 @@ public class DoctorVisitPriceController : ControllerBase
     // ============================= delete ============================= 
 
     [HttpDelete(Order = 0830)]
-    public async Task<IActionResult> Delete([FromQuery] int? docId, [FromQuery] params  int[] id)
+    public async Task<IActionResult> Delete([FromQuery] int? docId, [FromQuery] params int[] id)
     {
         Expression<Func<DoctorVisitPrice, bool>> expression;
 

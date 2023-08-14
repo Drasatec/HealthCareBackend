@@ -61,14 +61,14 @@ public class MedicalSpecialtyController : ControllerBase
 
 
     [HttpGet("names", Order = 0811)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? hosId, [FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] int? doctorId, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         Expression<Func<MedicalSpecialtyTranslation, bool>> filterExpression;
-        if (hosId.HasValue)
+        if (doctorId.HasValue)
         {
             filterExpression = f =>
             f.LangCode == lang && f.MedicalSpecialty != null &&
-            f.MedicalSpecialty.Hospitals.Where(hos => hos.Id == hosId).FirstOrDefault()!.Id == hosId;
+            f.MedicalSpecialty.SpecialtiesDoctors.Any(doc => doc.DoctorId == doctorId);
         }
         else
             filterExpression = f => f.LangCode == lang;

@@ -48,7 +48,6 @@ namespace DataAccess.UnitOfWorks
             //Users = new UserRepository(context);
         }
 
-
         public int Complete()
         {
             return Context.SaveChangesAsync().Result;

@@ -162,11 +162,13 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
+            entity.Property(e => e.CreateOn).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.Email).HasMaxLength(256);
-            //entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.UserName).HasMaxLength(256);
-            //entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+            entity.Property(e => e.VerificationCode)
+                .HasMaxLength(8)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<UserRole>(entity =>
@@ -455,16 +457,37 @@ public class AppDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorsWorkHospitals)
-                .HasForeignKey(d => d.DoctorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_DoctorsWorkHospital_DoctorId");
+            //entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorsWorkHospitals)
+            //    .HasForeignKey(d => d.DoctorId)
+            //    .OnDelete(DeleteBehavior.ClientSetNull)
+            //    .HasConstraintName("FK_DoctorsWorkHospital_DoctorId");
 
-            entity.HasOne(d => d.Hospital).WithMany(p => p.DoctorsWorkHospitals)
-                .HasForeignKey(d => d.HospitalId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_DoctorsWorkHospital_HospitalId");
+            //entity.HasOne(d => d.Hospital).WithMany(p => p.DoctorsWorkHospitals)
+            //    .HasForeignKey(d => d.HospitalId)
+            //    .OnDelete(DeleteBehavior.ClientSetNull)
+            //    .HasConstraintName("FK_DoctorsWorkHospital_HospitalId");
         });
+
+        modelBuilder.Entity<SpecialtiesDoctor>(entity =>
+        {
+            entity.HasKey(e => new { e.DoctorId, e.MedicalSpecialtyId });
+            entity.HasIndex(e => e.DoctorId, "IX_SpecialtiesDoctors_DoctorId");
+
+            entity.HasIndex(e => e.MedicalSpecialtyId, "IX_SpecialtiesDoctors_MedicalSpecialtyId");
+
+            entity.Property(e => e.CreateOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            //entity.HasOne(d => d.Doctor).WithMany(p => p.SpecialtiesDoctors)
+            //    .HasForeignKey(d => d.DoctorId)
+            //    .HasConstraintName("FK_MedicalSpecialtiesHospitals_DoctorId");
+
+            //entity.HasOne(d => d.MedicalSpecialty).WithMany(p => p.SpecialtiesDoctors)
+            //    .HasForeignKey(d => d.MedicalSpecialtyId)
+            //    .HasConstraintName("FK_MedicalSpecialtiesHospitals_MedicalSpecialtyId");
+        });
+
 
         modelBuilder.Entity<DoctorVisitPrice>(entity =>
         {
@@ -965,24 +988,7 @@ public class AppDbContext : DbContext
 
 
 
-        modelBuilder.Entity<SpecialtiesDoctor>(entity =>
-        {
-            entity.HasIndex(e => e.DoctorId, "IX_SpecialtiesDoctors_DoctorId");
 
-            entity.HasIndex(e => e.MedicalSpecialtyId, "IX_SpecialtiesDoctors_MedicalSpecialtyId");
-
-            entity.Property(e => e.CreateOn)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-
-            //entity.HasOne(d => d.Doctor).WithMany(p => p.SpecialtiesDoctors)
-            //    .HasForeignKey(d => d.DoctorId)
-            //    .HasConstraintName("FK_MedicalSpecialtiesHospitals_DoctorId");
-
-            entity.HasOne(d => d.MedicalSpecialty).WithMany(p => p.SpecialtiesDoctors)
-                .HasForeignKey(d => d.MedicalSpecialtyId)
-                .HasConstraintName("FK_MedicalSpecialtiesHospitals_MedicalSpecialtyId");
-        });
 
         // =========================== translations ===========================
 

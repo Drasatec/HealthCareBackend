@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 
-namespace WebAPI.Controllers.version1;
+namespace WebAPI.Controllers.version1.DoctorControllers;
 
 [Route("api/DoctorWorkPeriod")]
 [ApiController]
@@ -100,7 +100,7 @@ public class DoctorWorkPeriodController : ControllerBase
         {
             filter = f => f.ClinicId.Equals(clinicId) && f.DoctorId.Equals(docId);
         }
-        
+
         else if (hosId.HasValue && clinicId.HasValue && docId.HasValue)
         {
             filter = f => f.HospitalId.Equals(hosId) && f.ClinicId.Equals(clinicId) && f.DoctorId.Equals(docId);

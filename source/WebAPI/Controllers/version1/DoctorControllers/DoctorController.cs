@@ -7,8 +7,9 @@ using DomainModel.Models.Doctors;
 using DomainModel.Services;
 using DomainModel.Helpers;
 using DomainModel.Entities.DoctorEntities;
+using DomainModel.Entities.HospitalBody;
 
-namespace WebAPI.Controllers.version1;
+namespace WebAPI.Controllers.version1.DoctorControllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -193,6 +194,61 @@ public class DoctorController : ControllerBase
     {
         var res = new Response();
         res = await Data.Doctors.GenericDelete<DoctorTranslation>(t => translteId.Contains(t.Id), translteId);
+        if (res.Success)
+            return Ok(res);
+        return BadRequest(res);
+    }
+
+    #endregion
+
+    #region workHos
+    [HttpPost("WorkHospital-add", Order = 0801)]
+    public async Task<IActionResult> AddDocInHos([FromForm] DoctorsWorkHospital model)
+    {
+        var res = await Data.Generic.GenericCreate(model);
+        int id = 0;
+
+        if (res.Success)
+        {
+            if (res.Value is not null)
+                id = res.Value.DoctorId;
+            var response = new ResponseId(res.Success, res.Message, id);
+            return Created("", response);
+        }
+        return BadRequest(res);
+    }
+
+    [HttpDelete("WorkHospital-delete", Order = 0830)]
+    public async Task<IActionResult> Delete([FromQuery] int doctorId, int hospitalId)
+    {
+        var res = await Data.Generic.GenericDelete<DoctorsWorkHospital>(f => f.DoctorId == doctorId && f.HospitalId == hospitalId);
+        if (res.Success)
+            return Ok(res);
+        return BadRequest(res);
+    }
+    #endregion
+
+    #region Specialty
+    [HttpPost("specialy-add", Order = 0801)]
+    public async Task<IActionResult> AddSpecialtyToDoc([FromForm] SpecialtiesDoctor model)
+    {
+        var res = await Data.Generic.GenericCreate(model);
+        int id = 0;
+
+        if (res.Success)
+        {
+            if (res.Value is not null)
+                id = res.Value.DoctorId;
+            var response = new ResponseId(res.Success, res.Message, id);
+            return Created("", response);
+        }
+        return BadRequest(res);
+    }
+
+    [HttpDelete("specialy-delete", Order = 0830)]
+    public async Task<IActionResult> DeleteSpecialty([FromQuery] int doctorId, int specialtyId)
+    {
+        var res = await Data.Generic.GenericDelete<SpecialtiesDoctor>(f => f.DoctorId == doctorId && f.MedicalSpecialtyId == specialtyId);
         if (res.Success)
             return Ok(res);
         return BadRequest(res);

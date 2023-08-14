@@ -811,7 +811,7 @@ public partial class AlrahmaCareDbContext : DbContext
 
         modelBuilder.Entity<HospitalFeature>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Hospital__3214EC07F3D27817");
+            entity.HasKey(e => e.Id).HasName("PK__Hospital__3214EC07C1FE9EA8");
 
             entity.Property(e => e.CreateOn)
                 .HasDefaultValueSql("(getdate())")
@@ -1325,8 +1325,8 @@ public partial class AlrahmaCareDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
+            entity.Property(e => e.CreateOn).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.Email).HasMaxLength(256);
-            entity.Property(e => e.ExpirationTime).HasColumnType("datetime");
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.UserName).HasMaxLength(256);
             entity.Property(e => e.VerificationCode)

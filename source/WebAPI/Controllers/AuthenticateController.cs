@@ -3,6 +3,7 @@ using DomainModel.Helpers;
 using DomainModel.Interfaces.Services;
 using DomainModel.Models;
 using DomainModel.Models.Users;
+using Microsoft.AspNetCore.Authorization;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -27,15 +28,23 @@ public class AuthenticateController : ControllerBase
     {
         var result = await authService.RegisterAsync(model, verification);
 
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
 
         return Ok(result);
-        //return Ok(authService.TestAuth());
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(UserLoginDto model)
     {
         var result = await authService.LoginAsync(model);
+
+        if(!result.Success)
+        {
+            return BadRequest(result);
+        }
 
         return Ok(result);
     }
@@ -51,7 +60,11 @@ public class AuthenticateController : ControllerBase
         }
 
         var result = await authService.VerificationEmail(model.Email, model.VerificationCode);
-        //var email = User.FindFirst("uid")?.Value;
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
         return Ok(result);
     }
 
@@ -59,7 +72,12 @@ public class AuthenticateController : ControllerBase
     public async Task<IActionResult> SendVerificationCodeToEmail(UserVerificationEmailModel model)
     {
         var result = await authService.RenewEmailVerificationCode(model.Email);
-        //var email = User.FindFirst("uid")?.Value;
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
         return Ok(result);
     }
 
@@ -70,6 +88,11 @@ public class AuthenticateController : ControllerBase
     {
         var result = await authService.RenewSmsVerificationCode(model.PhoneNumber);
         //var email = User.FindFirst("uid")?.Value;
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
         return Ok(result);
     }
 
@@ -84,11 +107,39 @@ public class AuthenticateController : ControllerBase
             return BadRequest(new Response(false, "can not insert null or empty "));
         }
         var result = await authService.VerificationPhone(model.PhoneNumber, model.VerificationCode);
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
         return Ok(result);
     }
 
 
 
+
+    [Authorize(Roles = "User")]
+    [HttpPost("ChangePassword")]
+    public async Task<IActionResult> ChangePassword(UserChangePassDto model)
+    {
+        if (string.IsNullOrEmpty(model.UserId))
+        {
+            model.UserId = User.FindFirst("uid")?.Value;
+        }
+        var result = await authService.ChangePassword(model);
+
+        if(result != null && !result.Success) 
+        {
+            return BadRequest(result);
+        }
+        return Ok(result);
+    }
+
+
+
+
+
+    // ============================================================================================================================================================
     [HttpGet("AllUsers", Order = 0111)]
     public async Task<IActionResult> GetAllNames([FromQuery] string? lang, bool? active, int page = 1, int pageSize = Constants.PageSize)
     {
@@ -106,13 +157,12 @@ public class AuthenticateController : ControllerBase
             EmailConfirmed = user.EmailConfirmed,
             PhoneNumberConfirmed = user.PhoneNumberConfirmed,
             CreateAt = user.CreateOn
-            
+
         },
         order,
         page, pageSize);
         return Ok(result);
     }
-
 
 
     [HttpDelete("delete/{phoneNumber?}", Order = 0830)]
@@ -133,12 +183,6 @@ public class AuthenticateController : ControllerBase
             return Ok(res);
         return BadRequest(res);
     }
-
-
-    //public async Task<IActionResult> ChangePassword(UserLoginDto model, [FromQuery] string verification = "email")
-    //{
-
-    //}
 
 
     [HttpGet("g2")]

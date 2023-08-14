@@ -7,15 +7,15 @@ VALUES
     (2, N'أنثى', 'ar'),
     (2, 'Female', 'en');
 GO
-INSERT INTO Users
-(Id,FullName,Email,PhoneNumber,EmailConfirmed,PhoneNumberConfirmed)
-     VALUES
-	 ('19322255-1692-4eeb-aaa0-c1a3e7dff0b9','mai 1','mai1@gmail.com','+201234567891',1,0),
-     ('3e2fe885-5041-47ee-93cd-d4ff264450b3','mai 2','mai2@gmail.com','+201234567892',0,1),
-     ('3f430285-c46e-4af0-8b34-7f2d6af64d59','mai 3','mai3@gmail.com','+201234567893',1,1),
-     ('528b2b93-53c7-4f39-a2a1-056b92abad9d','mai 4','mai4@gmail.com','+201234567894',0,0),
-     ('5a44d741-312a-4604-a8c4-f6a903de44d5','mai 5','mai5@gmail.com','+201234567895',1,1);
-GO
+-- INSERT INTO Users
+-- (Id,FullName,Email,PhoneNumber,EmailConfirmed,PhoneNumberConfirmed, PasswordHash)
+--      VALUES
+-- 	 ('19322255-1692-4eeb-aaa0-c1a3e7dff0b9','mai 1',N'mai1@gmail.com','+201234567891',1,0,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
+--      ('3e2fe885-5041-47ee-93cd-d4ff264450b3','mai 2',N'mai2@gmail.com','+201234567892',0,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
+--      ('3f430285-c46e-4af0-8b34-7f2d6af64d59','mai 3',N'mai3@gmail.com','+201234567893',1,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
+--      ('528b2b93-53c7-4f39-a2a1-056b92abad9d','mai 4',N'mai4@gmail.com','+201234567894',0,0,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
+--      ('5a44d741-312a-4604-a8c4-f6a903de44d5','mai 5',N'mai5@gmail.com','+201234567895',1,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f');
+-- GO
 --  Currencies
 INSERT INTO Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) 
 VALUES

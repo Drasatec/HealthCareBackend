@@ -7,56 +7,56 @@
 -- GO
 -- use alrahma_care_db;
 --GO
- CREATE TABLE Users(
-	[Id] [nvarchar](450) NOT NULL, --*
-	[FullName] [nvarchar](100) NOT NULL, --*
-	[UserName] [nvarchar](256) NULL,
-	[Email] [nvarchar](256) NULL,
-	[PhoneNumber] [nvarchar](max) NULL,
-	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
-	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
-    [VerificationCode] VARCHar(8), -- new
-    [ExpirationTime] DATETIMEOFFSET(7), -- new
-    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
-	[PasswordHash] [nvarchar](max) NULL,
-	[SecurityStamp] [nvarchar](max) NULL,
-	[ConcurrencyStamp] [nvarchar](max) NULL,
-	[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
-	[LockoutEnd] [DATETIMEOFFSET](7) NULL,
-	[LockoutEnabled] [bit] NOT NULL DEFAULT 0,
-	[AccessFailedCount] [int] NOT NULL DEFAULT 0,
+--  CREATE TABLE Users(
+-- 	[Id] [nvarchar](450) NOT NULL, --*
+-- 	[FullName] [nvarchar](100) NOT NULL, --*
+-- 	[UserName] [nvarchar](256) NULL,
+-- 	[Email] [nvarchar](256) NULL,
+-- 	[PhoneNumber] [nvarchar](max) NULL,
+-- 	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
+-- 	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
+--     [VerificationCode] VARCHar(8), -- new
+--     [ExpirationTime] DATETIMEOFFSET(7), -- new
+--     [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
+-- 	[PasswordHash] [nvarchar](max) NULL,
+-- 	[SecurityStamp] [nvarchar](max) NULL,
+-- 	[ConcurrencyStamp] [nvarchar](max) NULL,
+-- 	[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
+-- 	[LockoutEnd] [DATETIMEOFFSET](7) NULL,
+-- 	[LockoutEnabled] [bit] NOT NULL DEFAULT 0,
+-- 	[AccessFailedCount] [int] NOT NULL DEFAULT 0,
 
-	CONSTRAINT PK_Users PRIMARY KEY (Id),
-);
-GO
-CREATE TABLE Roles(
-	[Id] [nvarchar](450) NOT NULL,
-	[Name] [nvarchar](256) NULL,
-	[ConcurrencyStamp] [nvarchar](max) NULL,
+-- 	CONSTRAINT PK_Users PRIMARY KEY (Id),
+-- );
+-- GO
+-- CREATE TABLE Roles(
+-- 	[Id] [nvarchar](450) NOT NULL,
+-- 	[Name] [nvarchar](256) NULL,
+-- 	[ConcurrencyStamp] [nvarchar](max) NULL,
 
-	CONSTRAINT PK_Roles PRIMARY KEY (Id),
-);
+-- 	CONSTRAINT PK_Roles PRIMARY KEY (Id),
+-- );
 
-GO
-CREATE TABLE UserRoles(
-	[Id] [BIGINT] IDENTITY(1,1),
-	[UserId] [nvarchar](450) NOT NULL,
-	[RoleId] [nvarchar](450) NOT NULL,
-	[CreateOn] DATETIME DEFAULT GETDATE(),
+-- GO
+-- CREATE TABLE UserRoles(
+-- 	[Id] [BIGINT] IDENTITY(1,1),
+-- 	[UserId] [nvarchar](450) NOT NULL,
+-- 	[RoleId] [nvarchar](450) NOT NULL,
+-- 	[CreateOn] DATETIME DEFAULT GETDATE(),
 
-	CONSTRAINT PK_UserRoles PRIMARY KEY (Id),
+-- 	CONSTRAINT PK_UserRoles PRIMARY KEY (Id),
 
-	CONSTRAINT FK_UserRoles_UserId
-    FOREIGN KEY (UserId)
-      REFERENCES Users(Id)
-		ON DELETE CASCADE,
+-- 	CONSTRAINT FK_UserRoles_UserId
+--     FOREIGN KEY (UserId)
+--       REFERENCES Users(Id)
+-- 		ON DELETE CASCADE,
 
-    CONSTRAINT FK_UserRoles_RoleId
-    FOREIGN KEY (RoleId)
-      REFERENCES Roles(Id)
-		ON DELETE CASCADE,
-);
-GO
+--     CONSTRAINT FK_UserRoles_RoleId
+--     FOREIGN KEY (RoleId)
+--       REFERENCES Roles(Id)
+-- 		ON DELETE CASCADE,
+-- );
+-- GO
 ----------------
 CREATE TABLE ConfirmationOptions(
 	[Id] [varchar](450) NOT NULL,
@@ -913,12 +913,11 @@ GO
 ---------------- 
 CREATE TABLE SpecialtiesDoctors --MM
 (
-    Id INT IDENTITY(1,1),
-    DoctorId INT,
-    MedicalSpecialtyId INT,
+    DoctorId INT Not NULL,
+    MedicalSpecialtyId INT Not NULL,
     CreateOn DATETIME DEFAULT GETDATE(),
 
-    CONSTRAINT PK_SpecialtiesDoctors PRIMARY KEY (Id),
+    CONSTRAINT PK_SpecialtiesDoctors PRIMARY KEY (DoctorId,MedicalSpecialtyId),
 
 	CONSTRAINT FK_MedicalSpecialtiesHospitals_DoctorId
 	FOREIGN KEY (DoctorId)
@@ -1327,6 +1326,39 @@ CREATE TABLE BookingStatusesTranslations --MM
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
     INDEX IX_BookingStatusesTranslations_StatusName NONCLUSTERED (StatusName)
+);
+GO
+----------------
+CREATE TABLE Promotions (
+    Id INT IDENTITY(1,1),
+    ImageURL VARCHAR(255),
+    Position INT,
+    Link VARCHAR(255)
+    CONSTRAINT PK_Promotions PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE PromotionsTranslations --MM
+(
+    Id INT IDENTITY (1,1),
+    Title VARCHAR(255),
+    Description NVARCHAR(500),
+
+    PromotionId INT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_PromotionsTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_Promotions_LangCode_PromotionId UNIQUE (PromotionId, LangCode),
+
+	CONSTRAINT FK_Promotions_PromotionId
+    FOREIGN KEY (PromotionId)
+      REFERENCES Promotions(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_Promotions_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
 );
 GO
 ----------------

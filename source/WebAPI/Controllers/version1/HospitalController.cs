@@ -44,7 +44,7 @@ public class HospitalController : ControllerBase
     // ============================= get ============================= 4
 
     [HttpGet(Order = 0101)]
-    public async Task<IActionResult> GetById([FromQuery] int id, [FromQuery] string? lang)
+    public async Task<IActionResult> GetById([FromQuery] int id, string? lang)
     {
         if (id < 1)
             return BadRequest(new Error("400", "can not assign 0"));
@@ -54,33 +54,40 @@ public class HospitalController : ControllerBase
     }
 
     [HttpGet("names", Order = 0111)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, [FromQuery] bool? active, [FromQuery] int page = 1, [FromQuery] int pageSize = Constants.PageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] int? doctorId, bool? active, string lang, int page = 1, int pageSize = Constants.PageSize)
     {
-
-        Expression<Func<HospitalTranslation, bool>> filterExpression;
-        if (active.HasValue)
-        {
-            if (active.Value)
-                filterExpression = f => f.LangCode == lang && f.Hospital != null && !f.Hospital.IsDeleted;
-            else
-                filterExpression = f => f.LangCode == lang && f.Hospital != null && f.Hospital.IsDeleted;
-        }
-        else
-            filterExpression = f => f.LangCode == lang;
-
-        var result = await Data.Hospitals.GenericReadAll(filterExpression, (hos) =>
-        new HospitalTranslation
-        {
-            Id = hos.Id,
-            LangCode = hos.LangCode,
-            Name = hos.Name,
-            HospitalId = hos.HospitalId,
-        }, page, pageSize);
+        var result = await Data.Hospitals.ReadAllHosNames(doctorId, active, lang, page, pageSize);
+        //if (result == null || result.Count < 1)
+        //{
+        //    return NoContent();
+        //}
         return Ok(result);
+
+
+        //Expression<Func<HospitalTranslation, bool>> filterExpression;
+        //if (active.HasValue)
+        //{
+        //    if (active.Value)
+        //        filterExpression = f => f.LangCode == lang && f.Hospital != null && !f.Hospital.IsDeleted;
+        //    else
+        //        filterExpression = f => f.LangCode == lang && f.Hospital != null && f.Hospital.IsDeleted;
+        //}
+        //else
+        //    filterExpression = f => f.LangCode == lang;
+
+        //var result = await Data.Hospitals.GenericReadAll(filterExpression, (hos) =>
+        //new HospitalTranslation
+        //{
+        //    Id = hos.Id,
+        //    LangCode = hos.LangCode,
+        //    Name = hos.Name,
+        //    HospitalId = hos.HospitalId,
+        //}, page, pageSize);
+        //return Ok(result);
     }
 
     [HttpGet("all", Order = 0112)]
-    public async Task<IActionResult> GetAll([FromQuery] string? status, [FromQuery] int? pageSize = null, [FromQuery] int page = 1, [FromQuery] string? lang = null)
+    public async Task<IActionResult> GetAll([FromQuery] string? status, int? pageSize = null, int page = 1, string? lang = null)
     {
         var resutl = await Data.Hospitals.ReadAllHospitals(status, lang, pageSize, page);
         if (resutl == null)
@@ -91,7 +98,7 @@ public class HospitalController : ControllerBase
     }
 
     [HttpGet("search", Order = 0114)]
-    public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] string? name, bool? active, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? lang)
+    public async Task<IActionResult> Search([FromQuery] string? searchTerm, string? name, bool? active, int? page, int? pageSize, string? lang)
     {
         if (!string.IsNullOrEmpty(name))
         {
@@ -169,7 +176,7 @@ public class HospitalController : ControllerBase
     }
 
     [HttpPut("deactivate", Order = 0125)]
-    public async Task<IActionResult> EditSingleProp([FromQuery] int? id, [FromQuery] string status)
+    public async Task<IActionResult> EditSingleProp([FromQuery] int? id, string status)
     {
         if (!id.HasValue)
         {

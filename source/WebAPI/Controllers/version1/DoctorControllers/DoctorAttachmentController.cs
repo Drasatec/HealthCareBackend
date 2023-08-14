@@ -5,7 +5,7 @@ using DomainModel.Models;
 using DomainModel.Models.Doctors;
 using DomainModel.Services;
 
-namespace WebAPI.Controllers.version1;
+namespace WebAPI.Controllers.version1.DoctorControllers;
 
 [Route("api/doctor")]
 [ApiController]
@@ -16,7 +16,7 @@ public class DoctorAttachmentController : ControllerBase
 
     public DoctorAttachmentController(IUnitOfWork data)
     {
-        this.Data = data;
+        Data = data;
     }
 
     [HttpPost("add_attachment", Order = 0901)]
@@ -59,7 +59,7 @@ public class DoctorAttachmentController : ControllerBase
         if (docId < 1)
             return BadRequest(new Error("400", "can not assign 0"));
 
-        var result = await Data.Generic.GenericReadAll<DoctorAttachment>(f => f.DoctorId == docId, null, page, pageSize) ;
+        var result = await Data.Generic.GenericReadAll<DoctorAttachment>(f => f.DoctorId == docId, null, page, pageSize);
         return Ok(result);
     }
 

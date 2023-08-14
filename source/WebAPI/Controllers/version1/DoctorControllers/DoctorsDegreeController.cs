@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 
-namespace WebAPI.Controllers.version1;
+namespace WebAPI.Controllers.version1.DoctorControllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -74,7 +74,7 @@ public class DoctorsDegreeController : ControllerBase
 
 
     [HttpGet("all", Order = 0812)]
-    public async Task<IActionResult> GetAll([FromQuery] int? pageSize,int? page,string? lang)
+    public async Task<IActionResult> GetAll([FromQuery] int? pageSize, int? page, string? lang)
     {
 
         var result = await Data.Generic.GenericReadAllWihInclude<DoctorsDegree>(null, o => o.Id, inc => inc.DoctorsDegreesTranslations.Where(l => l.LangCode == lang), page, pageSize);
@@ -90,7 +90,7 @@ public class DoctorsDegreeController : ControllerBase
 
 
     [HttpGet("search", Order = 0814)]
-    public async Task<IActionResult> Search([FromQuery] string? searchTerm,  string? name, int? page, int? pageSize,  string? lang)
+    public async Task<IActionResult> Search([FromQuery] string? searchTerm, string? name, int? page, int? pageSize, string? lang)
     {
         if (!string.IsNullOrEmpty(name))
         {
@@ -115,7 +115,7 @@ public class DoctorsDegreeController : ControllerBase
     {
         Response response;
 
-        response = await Data.Generic.GenericUpdate(model,c=>c.CreateOn!);
+        response = await Data.Generic.GenericUpdate(model, c => c.CreateOn!);
 
         if (!response.Success)
             return BadRequest(response);

@@ -143,9 +143,14 @@ public class PatientRepository : GenericRepository, IPatientRepository
         }
     }
 
-    public async Task<string?> FindByUserId(string userId)
+    public async Task<PatientToLoginDto?> FindPatientByUserId(string userId)
     {
-        return await GenericReadSingle<Patient, string>(uId => uId.UserId == userId, (user) => user.UserId);
+        return await GenericReadSingle<Patient, PatientToLoginDto>(uId => uId.UserId == userId, (patient) =>
+        new PatientToLoginDto() 
+        { 
+            PatientId = patient.Id,
+            UserId = patient.UserId
+        });
     }
 
 

@@ -1,0 +1,28 @@
+return PatientStatus  ✔
+filter with PatientStatus in get all in patient  ✔
+return userId in regestration and remove token. ✔
+longin by phone number ✔
+change pass ✔
+return PatientId at login ✔
+return usrid at verifications ✔
+Patient History Browsing - Booking ⏸
+doctor work in hos ✔
+specialty doctors ✔
+slides 
+ConfirmationOption
+Admin Dashboard
+admin login
+Password Recovery
+change email
+Is visit, or re-visit?
+add user form dashboard
+Religion,MaritalStatus in patient
+language controlar
+add array of days at DoctorWorkPeriod
+return email when add patient data ❎
+
+
+questions
+1- whate the best name of General input ? Setup, preparations,
+
+	

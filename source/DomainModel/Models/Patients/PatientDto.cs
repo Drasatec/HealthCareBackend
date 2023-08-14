@@ -1,6 +1,5 @@
 ﻿using DomainModel.Entities;
 using DomainModel.Entities.TranslationModels;
-using DomainModel.Models.Dtos;
 
 namespace DomainModel.Models.Patients;
 

@@ -83,13 +83,35 @@ public class UserRepository : GenericRepository, IUserRepository
 
     public async Task<User?> FindById(string userId)
     {
-        return await GenericReadById<User>(u => u.Id == userId, null);
+        //return await GenericReadById<User>(u => u.Id == userId, null);
+        try
+        {
+            return await Context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
     public async Task<User?> FindByEmailAsync(string email)
     {
         try
         {
-            return await Context.Users.Where(x => x.Email == email.ToLower()).FirstOrDefaultAsync();
+            //return await Context.Users.Where(x => x.Email == email.ToLower()).FirstOrDefaultAsync();
+            return await Context.Users.FirstOrDefaultAsync(x => x.Email == email.ToLower());
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+    
+    public async Task<User?> FindByPhoneNumberAsync(string phone)
+    {
+        try
+        {
+            //return await Context.Users.Where(x => x.PhoneNumber == phone.ToLower()).FirstOrDefaultAsync();
+            return await Context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phone.ToLower());
         }
         catch (Exception)
         {

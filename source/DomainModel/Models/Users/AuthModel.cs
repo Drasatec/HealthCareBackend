@@ -4,6 +4,8 @@ public class AuthModel
 {
     public string? UserId { get; set; } 
     
+    public int? PatientId { get; set; } 
+    
     public string Email { get; set; } = string.Empty;
 
     public bool IsAuthenticated { get; set; }

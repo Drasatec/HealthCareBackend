@@ -1,7 +1,9 @@
 ﻿using DomainModel.Contracts;
 using DomainModel.Entities.TranslationModels;
+using DomainModel.Entities.Users;
 using DomainModel.Models;
 using DomainModel.Models.Patients;
+using DomainModel.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq.Expressions;
 
@@ -42,12 +44,39 @@ public class PatientController : ControllerBase
     [HttpPost("add-patient-data", Order = 0901)]
     public async Task<IActionResult> AddSingleFromPatient([FromForm] PatientDto model, [FromForm] string? userId)
     {
-        if (userId == null)
+        var response = new Response<ApplicationUser>();
+        if (string.IsNullOrEmpty(userId))
         {
             userId = User.FindFirst("uid")?.Value;
         }
 
-        return Created("fawzy", await Data.Patients.CreateFromPatient(model, userId));
+        if (string.IsNullOrEmpty(userId))
+        {
+            return BadRequest(new Response<int>(false, "user id id is required"));
+        }
+
+        var res = await Data.Patients.CreateFromPatient(model, userId);
+        if(res.Success)
+        {
+            return Created("rahma.care", (res));
+        }
+        else
+            return BadRequest(new ResponseId(false, "We could not save the patient data",0));
+
+        //if (res.Success)
+        //{
+        //    response.Value = await Data.Generic.GenericReadSingle<User, ApplicationUser>(u => u.Id == userId, (user) =>
+        //    new ApplicationUser
+        //    {
+        //        Id = userId,
+        //        Email = user.Email,
+        //        FullName = user.FullName,
+        //        UserName = user.UserName,
+        //    });
+        //    return Created("rahma.care", response);
+        //}
+        //else
+        //    return BadRequest(new Response<int>(false, "We could not save the patient data"));
     }
 
     // ============================= get ============================= 

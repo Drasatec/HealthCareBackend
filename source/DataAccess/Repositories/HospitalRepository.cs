@@ -9,6 +9,9 @@ using DomainModel.Models.Buildings;
 using DomainModel.Models.Clinics;
 using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Linq;
+
 namespace DataAccess.Repositories;
 public class HospitalRepository : GenericRepository, IHospitalRepository
 {
@@ -108,7 +111,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
             var current = Context.HospitalFeatures.Find(id);
             if (current == null)
                 return respons = new(false, $"id: {id} is not found");
-            
+
             var modfied = false;
 
             if (image != null)
@@ -167,6 +170,41 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         }
     }
 
+
+    public async Task<List<HospitalTranslation>> ReadAllHosNames(int? docId, bool? active, string lang, int? page, int? pageSize)
+    {
+        IQueryable<HospitalTranslation> query = Context.HospitalTranslations;
+
+        if (docId != null)
+        {
+            query = query.Where(f => f.Hospital != null && f.Hospital.DoctorsWorkHospitals.Any(i => i.DoctorId == docId));
+        }
+
+        if (active.HasValue)
+        {
+            if (active.Value)
+                query = query.Where(f => f.Hospital != null && !f.Hospital.IsDeleted);
+            else
+                query = query.Where(f =>  f.Hospital != null && f.Hospital.IsDeleted);
+        }
+
+        query = query.Where(l => l.LangCode == lang);
+
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            GenericPagination(ref query, ref pageSize, ref page);
+        }
+
+        return await query.Select((hos) => new HospitalTranslation
+        {
+            Id = hos.Id,
+            LangCode = hos.LangCode,
+            Name = hos.Name,
+            HospitalId = hos.HospitalId,
+        }).ToListAsync();
+    }
+
     public async Task<PagedResponse<HospitalDto>?> ReadAllHospitals(string? status, string? lang, int? pageSize, int? page)
     {
         IQueryable<Hospital> query = Context.Hospitals;
@@ -187,7 +225,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         query = query.OrderByDescending(o => o.Id);
 
         total = query.Count();
-        if (total < 0) 
+        if (total < 0)
             return null;
 
 
@@ -203,7 +241,7 @@ public class HospitalRepository : GenericRepository, IHospitalRepository
         {
             query = query.Include(tranc2 => tranc2.HospitalTranslations);
         }
-        
+
         await query.ToListAsync();
 
         var all = new PagedResponse<HospitalDto>();

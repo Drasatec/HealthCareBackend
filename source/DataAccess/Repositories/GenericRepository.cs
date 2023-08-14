@@ -34,6 +34,27 @@ public class GenericRepository : IGenericRepository
             return new Response<TEntity>(false, ex.Message + "and______" + ex.InnerException?.Message);
         }
     }
+    
+    public async Task<Response> GenericCreateRange<TEntity>(List<TEntity> entity) where TEntity : class
+    {
+        try
+        {
+            await Context.Set<TEntity>().AddRangeAsync(entity);
+
+            var row = await Context.SaveChangesAsync();
+
+            if (row > 0)
+            {
+                return new Response(true, "succcess");
+            }
+
+            return new Response(false, "No rows affected");
+        }
+        catch (Exception ex)
+        {
+            return new Response(false, ex.Message + "and______" + ex.InnerException?.Message);
+        }
+    }
 
     public async Task<Response<object>> GenericCreateWithImage<TEntity>(TEntity tEntity, Stream? image = null) where TEntity : class
     {

@@ -13,6 +13,8 @@ public interface IUserRepository: IGenericRepository
     /// <returns></returns>
     Task<User?> FindByEmailAsync(string email);
     Task<User?> FindById(string userId);
+    Task<User?> FindByPhoneNumberAsync(string phone);
+
     //Task<User?> FindByPhoneNumberAsync(string email);
     Task<bool> IsEmailExistAsync(string email);
     Task<bool> IsPhoneExistAsync(string phone);
