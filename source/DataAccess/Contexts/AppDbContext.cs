@@ -16,6 +16,10 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     #region DbSets
+    public virtual DbSet<Promotion> Promotions { get; set; }
+
+    public virtual DbSet<PromotionsTranslation> PromotionsTranslations { get; set; }
+
     public virtual DbSet<ConfirmationOption> ConfirmationOptions { get; set; }
     public virtual DbSet<Role> Roles { get; set; }
 
@@ -987,6 +991,18 @@ public class AppDbContext : DbContext
         });
 
 
+        modelBuilder.Entity<Promotion>(entity =>
+        {
+            entity.Property(e => e.Photo)
+                .HasMaxLength(55)
+                .IsUnicode(false)
+                .HasColumnName("Photo");
+            entity.Property(e => e.Link)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+        });
+
+
 
 
 
@@ -1347,6 +1363,26 @@ public class AppDbContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<PromotionsTranslation>(entity =>
+        {
+            entity.HasIndex(e => new { e.PromotionId, e.LangCode }, "UK_Promotions_LangCode_PromotionId").IsUnique();
+
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Title)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.PromotionsTranslations)
+            //    .HasForeignKey(d => d.LangCode)
+            //    .HasConstraintName("FK_Promotions_LangCode");
+
+            //entity.HasOne(d => d.Promotion).WithMany(p => p.PromotionsTranslations)
+            //    .HasForeignKey(d => d.PromotionId)
+            //    .HasConstraintName("FK_Promotions_PromotionId");
+        });
         //OnModelCreatingPartial(modelBuilder);
     }
 

@@ -8,7 +8,9 @@ return usrid at verifications ✔
 Patient History Browsing - Booking ⏸
 doctor work in hos ✔
 specialty doctors ✔
-slides 
+slides ✔
+find doc
+
 ConfirmationOption
 Admin Dashboard
 admin login

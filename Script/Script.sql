@@ -1331,7 +1331,7 @@ GO
 ----------------
 CREATE TABLE Promotions (
     Id INT IDENTITY(1,1),
-    ImageURL VARCHAR(255),
+    Photo VARCHAR(55),
     Position INT,
     Link VARCHAR(255)
     CONSTRAINT PK_Promotions PRIMARY KEY (Id),

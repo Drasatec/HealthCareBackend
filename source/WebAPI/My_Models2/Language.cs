@@ -39,6 +39,8 @@ public partial class Language
 
     public virtual ICollection<PriceCategoryTranslation> PriceCategoryTranslations { get; set; } = new List<PriceCategoryTranslation>();
 
+    public virtual ICollection<PromotionsTranslation> PromotionsTranslations { get; set; } = new List<PromotionsTranslation>();
+
     public virtual ICollection<RoomTranslation> RoomTranslations { get; set; } = new List<RoomTranslation>();
 
     public virtual ICollection<RoomTypeTranslation> RoomTypeTranslations { get; set; } = new List<RoomTypeTranslation>();

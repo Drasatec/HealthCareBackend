@@ -14,7 +14,7 @@ public static class DataAccessImageService
     //private const string large = "large";
     private static readonly string path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot\\Images\\");
 
-    public static async Task<string> SaveSingleImage(Stream image)
+    public static async Task<string?> SaveSingleImage(Stream? image)
     {
         if (image != null)
         {

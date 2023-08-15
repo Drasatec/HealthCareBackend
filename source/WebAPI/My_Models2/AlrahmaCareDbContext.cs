@@ -101,6 +101,10 @@ public partial class AlrahmaCareDbContext : DbContext
 
     public virtual DbSet<PriceCategoryTranslation> PriceCategoryTranslations { get; set; }
 
+    public virtual DbSet<Promotion> Promotions { get; set; }
+
+    public virtual DbSet<PromotionsTranslation> PromotionsTranslations { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<RoomTranslation> RoomTranslations { get; set; }
@@ -1102,6 +1106,38 @@ public partial class AlrahmaCareDbContext : DbContext
                 .HasConstraintName("FK_PriceCategoryTranslations_PriceCategoryId");
         });
 
+        modelBuilder.Entity<Promotion>(entity =>
+        {
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("ImageURL");
+            entity.Property(e => e.Link)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<PromotionsTranslation>(entity =>
+        {
+            entity.HasIndex(e => new { e.PromotionId, e.LangCode }, "UK_Promotions_LangCode_PromotionId").IsUnique();
+
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Title)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.PromotionsTranslations)
+                .HasForeignKey(d => d.LangCode)
+                .HasConstraintName("FK_Promotions_LangCode");
+
+            entity.HasOne(d => d.Promotion).WithMany(p => p.PromotionsTranslations)
+                .HasForeignKey(d => d.PromotionId)
+                .HasConstraintName("FK_Promotions_PromotionId");
+        });
+
         modelBuilder.Entity<Role>(entity =>
         {
             entity.Property(e => e.Name).HasMaxLength(256);
@@ -1246,6 +1282,8 @@ public partial class AlrahmaCareDbContext : DbContext
 
         modelBuilder.Entity<SpecialtiesDoctor>(entity =>
         {
+            entity.HasKey(e => new { e.DoctorId, e.MedicalSpecialtyId });
+
             entity.HasIndex(e => e.DoctorId, "IX_SpecialtiesDoctors_DoctorId");
 
             entity.HasIndex(e => e.MedicalSpecialtyId, "IX_SpecialtiesDoctors_MedicalSpecialtyId");
@@ -1256,10 +1294,12 @@ public partial class AlrahmaCareDbContext : DbContext
 
             entity.HasOne(d => d.Doctor).WithMany(p => p.SpecialtiesDoctors)
                 .HasForeignKey(d => d.DoctorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MedicalSpecialtiesHospitals_DoctorId");
 
             entity.HasOne(d => d.MedicalSpecialty).WithMany(p => p.SpecialtiesDoctors)
                 .HasForeignKey(d => d.MedicalSpecialtyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MedicalSpecialtiesHospitals_MedicalSpecialtyId");
         });
 
