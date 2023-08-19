@@ -1,8 +1,8 @@
 ﻿using DataAccess;
 using DomainModel.Contracts;
+using DomainModel.Entities.HosInfo;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
-using DomainModel.Models.Clinics;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;

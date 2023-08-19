@@ -1,10 +1,8 @@
 ﻿using DomainModel.Contracts;
 using DomainModel.Entities.TranslationModels;
-using DomainModel.Entities.Users;
 using DomainModel.Models;
 using DomainModel.Models.Patients;
 using DomainModel.Models.Users;
-using Microsoft.AspNetCore.Authorization;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DomainModel.Entities.TranslationModels;
 using System.Text.Json.Serialization;
-using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities.DoctorEntities;
 

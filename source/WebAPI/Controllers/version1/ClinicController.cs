@@ -1,8 +1,8 @@
-﻿using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Contracts;
+using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
-using System.Linq.Expressions;
-using DomainModel.Contracts;
 using DomainModel.Models.Clinics;
+using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
 

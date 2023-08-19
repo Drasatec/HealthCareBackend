@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DomainModel.Entities.SettingsEntities;
+﻿using DomainModel.Entities.SettingsEntities;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.MedicalServices;
 
 public partial class ServicePrice
 {

@@ -1,6 +1,9 @@
 ﻿using DomainModel.Entities;
 using DomainModel.Entities.DoctorEntities;
+using DomainModel.Entities.HosInfo;
 using DomainModel.Entities.HospitalBody;
+using DomainModel.Entities.MedicalServices;
+using DomainModel.Entities.Others;
 using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Entities.Users;
@@ -1437,8 +1440,5 @@ public class AppDbContext : DbContext
             //    .HasConstraintName("FK_MaritalStatusTranslations_MaritalId");
         });
 
-        //OnModelCreatingPartial(modelBuilder);
     }
-
-    //partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

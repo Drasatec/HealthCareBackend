@@ -14,7 +14,6 @@ public partial class PromotionsTranslation
 
     public string LangCode { get; set; } = null!;
 
-    //public virtual Language? LangCodeNavigation { get; set; }
 
     [JsonIgnore]
     public virtual Promotion? Promotion { get; set; }

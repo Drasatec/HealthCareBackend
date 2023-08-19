@@ -5,29 +5,29 @@
 --     CREATE DATABASE alrahma_care_db COLLATE Arabic_100_CI_AS_KS_WS_SC_UTF8;
 -- END
 -- GO
--- use alrahma_care_db;
+use alrahma_care_db;
 --GO
- CREATE TABLE Users(
-	[Id] [nvarchar](450) NOT NULL, --*
-	[FullName] [nvarchar](100) NOT NULL, --*
-	[UserName] [nvarchar](256) NULL,
-	[PhoneNumber] [nvarchar](max) NULL,
-	[Email] [nvarchar](256) NULL,
-	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
-	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
-    [VerificationCode] VARCHar(8), -- new
-    [ExpirationTime] DATETIMEOFFSET(7), -- new
-    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
-	[PasswordHash] [nvarchar](max) NULL,
-	[SecurityStamp] [nvarchar](max) NULL,
-	[ConcurrencyStamp] [nvarchar](max) NULL,
-	[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
-	[LockoutEnd] [DATETIMEOFFSET](7) NULL,
-	[LockoutEnabled] [bit] NOT NULL DEFAULT 0,
-	[AccessFailedCount] [int] NOT NULL DEFAULT 0,
+-- CREATE TABLE Users(
+--	[Id] [nvarchar](450) NOT NULL, --*
+--	[FullName] [nvarchar](100) NOT NULL, --*
+--	[UserName] [nvarchar](256) NULL,
+--	[PhoneNumber] [nvarchar](max) NULL,
+--	[Email] [nvarchar](256) NULL,
+--	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
+--	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
+--    [VerificationCode] VARCHar(8), -- new
+--    [ExpirationTime] DATETIMEOFFSET(7), -- new
+--    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
+--	[PasswordHash] [nvarchar](max) NULL,
+--	[SecurityStamp] [nvarchar](max) NULL,
+--	[ConcurrencyStamp] [nvarchar](max) NULL,
+--	[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
+--	[LockoutEnd] [DATETIMEOFFSET](7) NULL,
+--	[LockoutEnabled] [bit] NOT NULL DEFAULT 0,
+--	[AccessFailedCount] [int] NOT NULL DEFAULT 0,
 
-	CONSTRAINT PK_Users PRIMARY KEY (Id),
-);
+--	CONSTRAINT PK_Users PRIMARY KEY (Id),
+--);
 -- GO
 -- CREATE TABLE Roles(
 -- 	[Id] [nvarchar](450) NOT NULL,
@@ -267,7 +267,7 @@ CREATE TABLE HosBuildings
 	CodeNumber VARCHAR(16),
 	Photo VARCHAR(55),
 	CreateOn DATETIME DEFAULT GETDATE(),
-	IsDeleted BIT,
+	IsDeleted BIT NOT NULL DEFAULT 0,
     HospitalId INT NOT NULL,
 
 	CONSTRAINT PK_HosBuildings PRIMARY KEY (Id),
@@ -310,7 +310,7 @@ CREATE TABLE HosFloors
 	CodeNumber VARCHAR(16),
     Photo VARCHAR(55),
 	CreateOn DATETIME DEFAULT GETDATE(),
-	IsDeleted BIT,
+	IsDeleted BIT NOT NULL DEFAULT 0,
     HospitalId INT NOT NULL,
     BuildId INT NOT NULL,
 
@@ -357,7 +357,7 @@ CREATE TABLE RoomTypes
     Id INT IDENTITY (1,1),
 	CodeNumber VARCHAR(16),
 	CreateOn DATETIME DEFAULT GETDATE(),
-	IsDeleted BIT,
+	IsDeleted BIT NOT NULL DEFAULT 0,
 	CONSTRAINT PK_RoomTypes PRIMARY KEY (Id),
 );
 GO
@@ -390,7 +390,7 @@ CREATE TABLE HosRooms
 	CodeNumber VARCHAR(16),
     Kind VARCHAR(16), -- ==Type  --(Clinic - inpatient - operations - laboratory - x-rays - pharmacy - office)
     IsActive BIT NOT NULL DEFAULT 1,  -- (Active, inactive) -- update1
-	IsDeleted BIT,
+	IsDeleted BIT NOT NULL DEFAULT 0,
     HospitalId INT NOT NULL,
     BuildId INT NOT NULL,
     FloorId INT NOT NULL,
@@ -678,7 +678,7 @@ CREATE TABLE TypesVisit
     Id INT IDENTITY (1,1),
 	CodeNumber VARCHAR(16),
 	CreateOn DATETIME DEFAULT GETDATE(),
-	IsDeleted BIT,
+	IsDeleted BIT NOT NULL DEFAULT 0,
 	CONSTRAINT PK_TypesVisit PRIMARY KEY (Id),
 )
 CREATE TABLE TypesVisitTranslations --  1M
@@ -766,16 +766,16 @@ CREATE TABLE DoctorsDegreesTranslations --MM
 GO
 ----------------
 CREATE TABLE Religions (
-    Id TINYINT,
+    Id SMALLINT NOT NULL,
     CONSTRAINT PK_Religions PRIMARY KEY (Id),
 );
 GO
 ----------------
 CREATE TABLE ReligionsTranslations --MM
 (
-    Id TINYINT IDENTITY (1,1),
+    Id SMALLINT IDENTITY (1,1),
     Name NVARCHAR(30),
-    ReligionId TINYINT,
+    ReligionId SMALLINT,
     LangCode VARCHAR(6),
 
 	CONSTRAINT PK_ReligionsTranslations PRIMARY KEY (Id),
@@ -794,16 +794,16 @@ CREATE TABLE ReligionsTranslations --MM
 GO
 ----------------
 CREATE TABLE MaritalStatus (
-    Id TINYINT,
+    Id SMALLINT NOT NULL,
     CONSTRAINT PK_MaritalStatus PRIMARY KEY (Id),
 );
 GO
 ----------------
 CREATE TABLE MaritalStatusTranslations --MM
 (
-    Id INT IDENTITY (1,1),
+    Id SMALLINT IDENTITY (1,1),
     Name NVARCHAR(30),
-    MaritalId TINYINT,
+    MaritalId SMALLINT,
     LangCode VARCHAR(6),
 
 	CONSTRAINT PK_MaritalStatusTranslations PRIMARY KEY (Id),

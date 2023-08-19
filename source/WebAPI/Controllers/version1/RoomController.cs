@@ -1,7 +1,6 @@
 ﻿using DomainModel.Contracts;
 using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
-using DomainModel.Helpers;
 using DomainModel.Models;
 using DomainModel.Models.Rooms;
 using System.Linq.Expressions;

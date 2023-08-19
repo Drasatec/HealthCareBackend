@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DomainModel.Entities.MedicalServices;
 using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.TranslationModels;
@@ -15,6 +14,4 @@ public partial class MainServiceTranslation
     public string LangCode { get; set; } = null!;
     [JsonIgnore]
     public virtual MainService? MainService { get; set; }
-
-    //public virtual Language? LangCodeNavigation { get; set; }
 }

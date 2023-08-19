@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DomainModel.Entities.SettingsEntities;
+﻿namespace DomainModel.Entities.SettingsEntities;
 
 public partial class Gender
 {

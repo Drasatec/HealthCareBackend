@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using DomainModel.Entities.SettingsEntities;
+﻿using DomainModel.Entities.SettingsEntities;
+using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.TranslationModels;
 
@@ -16,6 +16,4 @@ public partial class BookingStatusesTranslation
     [JsonIgnore]
 
     public virtual BookingStatus? BookingStatus { get; set; }
-
-    //public virtual Language? LangCodeNavigation { get; set; }
 }

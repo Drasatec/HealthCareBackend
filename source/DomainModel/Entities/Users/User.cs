@@ -1,6 +1,4 @@
 ﻿namespace DomainModel.Entities.Users;
-
-
 public partial class User
 {
     public string Id { get; set; } = null!;

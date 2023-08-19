@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using DomainModel.Entities.SettingsEntities;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using DomainModel.Entities.SettingsEntities;
 
 namespace DomainModel.Entities.TranslationModels;
 
@@ -17,9 +12,6 @@ public partial class SsntypesTranslation
     public int? SsntypeId { get; set; }
 
     public string LangCode { get; set; } = null!;
-
-
-    //public virtual Language? LangCodeNavigation { get; set; }
 
     [JsonIgnore]
     public virtual Ssntype? Ssntype { get; set; }

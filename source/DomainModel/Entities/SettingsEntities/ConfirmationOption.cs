@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DomainModel.Entities;
-
+﻿namespace DomainModel.Entities.SettingsEntities;
 public partial class ConfirmationOption
 {
     public string Id { get; set; } = null!;

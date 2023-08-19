@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.DoctorEntities;
+﻿using DomainModel.Entities.DoctorEntities;
+using DomainModel.Entities.HosInfo;
 using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities.HospitalBody;
@@ -49,6 +48,5 @@ public partial class Hospital
 
     public virtual ICollection<MedicalSpecialty> Specialties { get; set; } = new List<MedicalSpecialty>();
 
-    //public virtual ICollection<HospitalMedicalSpecialties> HospitalSpecialties { get; set; } = new List<HospitalMedicalSpecialties>();
 
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.TranslationModels;
 
@@ -22,9 +20,8 @@ public partial class PatientTranslation
 
     public string LangCode { get; set; } = null!;
 
-    public string? Address { get; set; } // add this
+    public string? Address { get; set; } 
 
-    //public virtual Language? LangCodeNavigation { get; set; }
     [JsonIgnore]
     public virtual Patient? Patient { get; set; }
 }

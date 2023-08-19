@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.SettingsEntities;
-
-namespace DomainModel.Entities;
+﻿using DomainModel.Entities.SettingsEntities;
+namespace DomainModel.Entities.Others;
 
 public partial class ClientsSubscription
 {

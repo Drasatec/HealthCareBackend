@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities.SettingsEntities;
 

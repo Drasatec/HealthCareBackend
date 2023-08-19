@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DomainModel.Entities;
+﻿namespace DomainModel.Entities.Others;
 
 public partial class HosClient
 {

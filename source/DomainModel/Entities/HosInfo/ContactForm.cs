@@ -1,7 +1,7 @@
-﻿using System.Text.Json.Serialization;
-using DomainModel.Entities.HospitalBody;
+﻿using DomainModel.Entities.HospitalBody;
+using System.Text.Json.Serialization;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.HosInfo;
 
 public partial class ContactForm
 {
@@ -18,7 +18,7 @@ public partial class ContactForm
     public DateTime? ContactDate { get; set; }
 
     public int? HospitalId { get; set; }
-    
+
     [JsonIgnore]
     public virtual Hospital? Hospital { get; set; }
 }

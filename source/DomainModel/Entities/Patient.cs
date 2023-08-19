@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities.SettingsEntities;
+﻿using DomainModel.Entities.Others;
+using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Entities.Users;
 

@@ -1,9 +1,6 @@
-﻿using DomainModel.Models.MedicalSpecialteis;
+﻿using DomainModel.Contracts;
+using DomainModel.Entities.Others;
 using DomainModel.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq.Expressions;
-using DomainModel.Contracts;
 using DomainModel.Models.Clients;
 
 namespace WebAPI.Controllers.version1;

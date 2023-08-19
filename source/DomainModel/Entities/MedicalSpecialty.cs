@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities.HospitalBody;
+﻿using DomainModel.Entities.DoctorEntities;
+using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities;
@@ -22,10 +23,7 @@ public partial class MedicalSpecialty
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
-
     public virtual ICollection<MedicalSpecialtyTranslation> MedicalSpecialtyTranslations { get; set; } = new List<MedicalSpecialtyTranslation>();
-
-    //public virtual ICollection<DoctorWorkPeriod> DoctorWorkPeriods { get; set; } = new List<DoctorWorkPeriod>();
 
     public virtual ICollection<SpecialtiesDoctor> SpecialtiesDoctors { get; set; } = new List<SpecialtiesDoctor>();
 

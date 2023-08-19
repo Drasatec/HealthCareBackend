@@ -1,4 +1,4 @@
-﻿using DomainModel.Entities;
+﻿using DomainModel.Entities.Others;
 
 namespace DomainModel.Models.Clients;
 public class HotClientDto

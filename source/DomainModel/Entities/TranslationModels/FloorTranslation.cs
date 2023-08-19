@@ -16,6 +16,4 @@ public partial class FloorTranslation
     public string LangCode { get; set; } = null!;
     [JsonIgnore]
     public virtual HosFloor? Floor { get; set; }
-
-    //public virtual Language? LangCodeNavigation { get; set; }
 }

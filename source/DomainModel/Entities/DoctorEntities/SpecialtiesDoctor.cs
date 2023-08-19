@@ -1,10 +1,10 @@
 ﻿namespace DomainModel.Entities.DoctorEntities;
 
-public partial class DoctorsWorkHospital
+public partial class SpecialtiesDoctor
 {
     public int DoctorId { get; set; }
 
-    public int HospitalId { get; set; }
+    public int MedicalSpecialtyId { get; set; }
 
     public DateTime? CreateOn { get; set; }
 }

@@ -1,5 +1,5 @@
 ﻿using DomainModel.Contracts;
-using DomainModel.Entities;
+using DomainModel.Entities.HosInfo;
 using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
 using System.Text.Json.Serialization;

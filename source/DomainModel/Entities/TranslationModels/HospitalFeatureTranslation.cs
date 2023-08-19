@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DomainModel.Entities.HosInfo;
 using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.TranslationModels;
@@ -18,6 +17,4 @@ public partial class HospitalFeatureTranslation
     
     [JsonIgnore]
     public virtual HospitalFeature? Feature { get; set; }
-
-   // public virtual Language? LangCodeNavigation { get; set; }
 }

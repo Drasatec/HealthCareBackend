@@ -49,7 +49,7 @@ public class TypesVisitController : ControllerBase
 
 
     [HttpGet(Order = 0801)]
-    public async Task<IActionResult> GetById([FromQuery] int id, [FromQuery] string? lang)
+    public async Task<IActionResult> GetById([FromQuery] int id, string? lang)
     {
         if (id < 1) return BadRequest(new Error("400", "can not assign 0"));
 

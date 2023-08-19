@@ -1,10 +1,10 @@
 ﻿using DomainModel.Contracts;
+using DomainModel.Entities.HosInfo;
 using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Models;
 using DomainModel.Models.Hospitals;
-using System;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;

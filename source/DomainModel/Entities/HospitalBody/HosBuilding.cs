@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities.HospitalBody;
 
@@ -28,5 +26,4 @@ public partial class HosBuilding
 
     public virtual Hospital Hospital { get; set; } = null!;
 
-    //public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
 }

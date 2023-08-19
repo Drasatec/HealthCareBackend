@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using DomainModel.Entities.DoctorEntities;
+﻿using DomainModel.Entities.DoctorEntities;
 using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
+using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities;
-
 public partial class Clinic
 {
     public int Id { get; set; }

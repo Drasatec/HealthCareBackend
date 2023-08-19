@@ -30,8 +30,14 @@ DROP TABLE WorkingPeriod;
 DROP TABLE SpecialtiesDoctors;
 DROP TABLE DoctorsWorkHospital;
 DROP TABLE DoctorAttachments
-DROP TABLE EmployeesStatusTranslations
-DROP TABLE EmployeesStatus
+DROP TABLE EmployeesStatusTranslations;
+DROP TABLE EmployeesStatus;
+DROP TABLE MaritalStatusTranslations;
+DROP TABLE MaritalStatus;
+DROP TABLE ReligionsTranslations;
+DROP TABLE Religions;
+DROP TABLE PromotionsTranslations;
+DROP TABLE Promotions;
 
 DROP TABLE DoctorTranslations;
 DROP TABLE Doctors;

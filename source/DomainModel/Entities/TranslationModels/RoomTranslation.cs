@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DomainModel.Entities.HospitalBody;
 using System.Text.Json.Serialization;
-using DomainModel.Entities.HospitalBody;
 
 namespace DomainModel.Entities.TranslationModels;
 
@@ -17,7 +15,6 @@ public partial class RoomTranslation
 
     public string LangCode { get; set; } = null!;
 
-    //public virtual Language? LangCodeNavigation { get; set; }
     [JsonIgnore]
     public virtual HosRoom? Room { get; set; }
 }

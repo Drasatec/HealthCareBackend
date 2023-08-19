@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.TranslationModels;
 
@@ -19,5 +17,4 @@ public partial class MedicalSpecialtyTranslation
     [JsonIgnore]
     public virtual MedicalSpecialty? MedicalSpecialty { get; set; }
 
-    //public virtual Language? LangCodeNavigation { get; set; }
 }

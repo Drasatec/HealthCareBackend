@@ -1,5 +1,5 @@
 ﻿using DataAccess.Contexts;
-using DomainModel.Entities;
+using DomainModel.Entities.Others;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;

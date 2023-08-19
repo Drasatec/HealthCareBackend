@@ -2,7 +2,7 @@
 using DomainModel.Entities.TranslationModels;
 using System.Text.Json.Serialization;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.HosInfo;
 
 public partial class HospitalFeature
 {

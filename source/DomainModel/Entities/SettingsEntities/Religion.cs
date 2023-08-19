@@ -1,10 +1,9 @@
 ﻿using DomainModel.Entities.TranslationModels;
-
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.SettingsEntities;
 
 public partial class Religion
 {
-    public byte Id { get; set; }
+    public short Id { get; set; }
 
     public virtual ICollection<ReligionsTranslation> ReligionsTranslations { get; set; } = new List<ReligionsTranslation>();
 }

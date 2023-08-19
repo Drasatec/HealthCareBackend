@@ -1,7 +1,6 @@
 ﻿using DomainModel.Contracts;
+using DomainModel.Entities.HosInfo;
 using DomainModel.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.SettingsEntities;
+﻿using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
-
 namespace DomainModel.Entities.HospitalBody;
 
 public partial class HosRoom
@@ -29,15 +26,13 @@ public partial class HosRoom
 
     public virtual HosBuilding Build { get; set; } = null!;
 
-    public virtual ICollection<Clinic> Clinics { get; set; } = new List<Clinic>();
-
     public virtual HosFloor Floor { get; set; } = null!;
 
     public virtual Hospital Hospital { get; set; } = null!;
 
-    //public virtual ICollection<PeriodWorkDoctorClinic> PeriodWorkDoctorClinics { get; set; } = new List<PeriodWorkDoctorClinic>();
+    public virtual RoomType RoomType { get; set; } = null!;
+
+    public virtual ICollection<Clinic> Clinics { get; set; } = new List<Clinic>();
 
     public virtual ICollection<RoomTranslation> RoomTranslations { get; set; } = new List<RoomTranslation>();
-
-    public virtual RoomType RoomType { get; set; } = null!;
 }

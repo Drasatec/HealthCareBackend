@@ -1,5 +1,4 @@
 ﻿namespace DomainModel.Entities.Users;
-
 public partial class UserRole
 {
     public long Id { get; set; }

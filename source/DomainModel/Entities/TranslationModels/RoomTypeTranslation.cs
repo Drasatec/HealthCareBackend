@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DomainModel.Entities.SettingsEntities;
 using System.Text.Json.Serialization;
-using DomainModel.Entities.SettingsEntities;
 
 namespace DomainModel.Entities.TranslationModels;
 
@@ -15,7 +13,6 @@ public partial class RoomTypeTranslation
 
     public string LangCode { get; set; } = null!;
 
-    //public virtual Language? LangCodeNavigation { get; set; }
     [JsonIgnore]
     public virtual RoomType? RoomType { get; set; }
 }

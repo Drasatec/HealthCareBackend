@@ -1,8 +1,7 @@
 ﻿using DomainModel.Contracts;
+using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
@@ -25,9 +24,13 @@ public class MaritalStatusController : ControllerBase
     [HttpPost("add", Order = 0801)]
     public async Task<IActionResult> AddSingle([FromForm] MaritalStatus model)
     {
+        if (model.Id <= 0)
+        {
+            model.Id = Convert.ToInt16(await Data.Generic.GenericCount<MaritalStatus>() + 1);
+        }
+
         var res = await Data.Generic.GenericCreate(model);
         int id = 0;
-
         if (res.Success)
         {
             if (res.Value is not null)
@@ -36,15 +39,12 @@ public class MaritalStatusController : ControllerBase
             return Created("", response);
         }
         return BadRequest(res);
-
     }
-
 
     // ============================= get ============================= 
 
-
     [HttpGet(Order = 0801)]
-    public async Task<IActionResult> GetById([FromQuery] int id, string? lang)
+    public async Task<IActionResult> GetById([FromQuery] short id, string? lang)
     {
         if (id < 1) return BadRequest(new Error("400", "can not assign 0"));
 

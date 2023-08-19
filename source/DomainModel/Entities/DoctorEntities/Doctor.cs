@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.SettingsEntities;
+﻿using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
 
 namespace DomainModel.Entities.DoctorEntities;

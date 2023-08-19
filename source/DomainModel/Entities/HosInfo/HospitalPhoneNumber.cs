@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DomainModel.Entities;
+﻿namespace DomainModel.Entities.HosInfo;
 
 public partial class HospitalPhoneNumber
 {
@@ -11,5 +8,4 @@ public partial class HospitalPhoneNumber
 
     public int? HospitalId { get; set; }
 
-    //public virtual Hospital? Hospital { get; set; }
 }

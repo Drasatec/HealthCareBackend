@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.TranslationModels;
+﻿using DomainModel.Entities.TranslationModels;
 
-namespace DomainModel.Entities;
+namespace DomainModel.Entities.MedicalServices;
 
 public partial class Service
 {

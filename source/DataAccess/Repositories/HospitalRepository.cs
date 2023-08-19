@@ -1,5 +1,4 @@
 ﻿using DataAccess.Contexts;
-using DomainModel.Entities;
 using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
@@ -11,6 +10,7 @@ using DomainModel.Models.Hospitals;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Linq;
+using DomainModel.Entities.HosInfo;
 
 namespace DataAccess.Repositories;
 public class HospitalRepository : GenericRepository, IHospitalRepository

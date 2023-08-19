@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainModel.Entities.DoctorEntities;
+﻿using DomainModel.Entities.DoctorEntities;
 using DomainModel.Entities.HospitalBody;
 using DomainModel.Entities.SettingsEntities;
 
 namespace DomainModel.Entities;
-
 public partial class Booking
 {
     public long Id { get; set; }
