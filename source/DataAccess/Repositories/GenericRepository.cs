@@ -2,6 +2,7 @@
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
+using DomainModel.Models.Common;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -396,6 +397,24 @@ public class GenericRepository : IGenericRepository
         {
             page = 0;
             pageSize = 0;
+        }
+    }
+    protected static void GenericPagination<TQuery>(ref IQueryable<TQuery> query, ref PaginationOptions pageOptions, int totalCount = 0) where TQuery : class
+    {
+
+        if (pageOptions.Page.HasValue && pageOptions.PageSize.HasValue)
+        {
+            //if (page.Value * pageSize > totalCount)
+            //{
+
+            //}
+            int skip = (pageOptions.Page.Value - 1) * pageOptions.PageSize.Value;
+            query = query.Skip(skip).Take(pageOptions.PageSize.Value);
+        }
+        else
+        {
+            pageOptions.Page = 0;
+            pageOptions.PageSize = 0;
         }
     }
 

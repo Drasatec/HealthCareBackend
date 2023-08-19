@@ -16,6 +16,15 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     #region DbSets
+
+    public virtual DbSet<MaritalStatus> MaritalStatuses { get; set; }
+
+    public virtual DbSet<MaritalStatusTranslation> MaritalStatusTranslations { get; set; }
+
+    public virtual DbSet<Religion> Religions { get; set; }
+
+    public virtual DbSet<ReligionsTranslation> ReligionsTranslations { get; set; }
+
     public virtual DbSet<Promotion> Promotions { get; set; }
 
     public virtual DbSet<PromotionsTranslation> PromotionsTranslations { get; set; }
@@ -198,10 +207,8 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("Booking");
 
-            entity.Property(e => e.CreateOn)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.VisitingDate).HasColumnType("date");
+            entity.Property(e => e.CreateOn).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.VisitingDate).HasDefaultValueSql("(getutcdate())");
 
             entity.Property(e => e.BookingReason).HasMaxLength(500);
 
@@ -1005,6 +1012,14 @@ public class AppDbContext : DbContext
 
 
 
+        modelBuilder.Entity<MaritalStatus>(entity =>
+        {
+            entity.ToTable("MaritalStatus");
+        });
+
+
+
+
 
         // =========================== translations ===========================
 
@@ -1383,6 +1398,45 @@ public class AppDbContext : DbContext
             //    .HasForeignKey(d => d.PromotionId)
             //    .HasConstraintName("FK_Promotions_PromotionId");
         });
+
+        modelBuilder.Entity<ReligionsTranslation>(entity =>
+        {
+            entity.HasIndex(e => new { e.ReligionId, e.LangCode }, "UK_ReligionsTranslations_LangCode_ReligionId").IsUnique();
+
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Name).HasMaxLength(30);
+
+            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.ReligionsTranslations)
+            //    .HasForeignKey(d => d.LangCode)
+            //    .HasConstraintName("FK_ReligionsTranslations_LangCode");
+
+            //entity.HasOne(d => d.Religion).WithMany(p => p.ReligionsTranslations)
+            //    .HasForeignKey(d => d.ReligionId)
+            //    .HasConstraintName("FK_ReligionsTranslations_ReligionId");
+        });
+
+
+        modelBuilder.Entity<MaritalStatusTranslation>(entity =>
+        {
+            entity.HasIndex(e => new { e.MaritalId, e.LangCode }, "UK_MaritalStatusTranslations_LangCode_MaritalId").IsUnique();
+
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Name).HasMaxLength(30);
+
+            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.MaritalStatusTranslations)
+            //    .HasForeignKey(d => d.LangCode)
+            //    .HasConstraintName("FK_MaritalStatusTranslations_LangCode");
+
+            //entity.HasOne(d => d.Marital).WithMany(p => p.MaritalStatusTranslations)
+            //    .HasForeignKey(d => d.MaritalId)
+            //    .HasConstraintName("FK_MaritalStatusTranslations_MaritalId");
+        });
+
         //OnModelCreatingPartial(modelBuilder);
     }
 

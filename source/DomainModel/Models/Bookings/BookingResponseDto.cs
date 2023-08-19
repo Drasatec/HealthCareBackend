@@ -35,11 +35,12 @@ public class BookingResponseDto
 
     public int? Price { get; set; }
 
-    public DateTime? VisitingDate { get; set; }
+    public DateTimeOffset? VisitingDate { get; set; }
+
+    public DateTimeOffset? CreateOn { get; set; }
 
     public byte DayNumber { get; set; }
 
-    public DateTime? CreateOn { get; set; }
     public string? BookingReason { get; set; }
 
     public virtual string? BookingStatus { get; set; }
@@ -63,31 +64,32 @@ public class BookingResponseDto
     public virtual string WorkingPeriod { get; set; } = null!;
 
 
-    //public static implicit operator BookingResponseDto(Booking arg)
-    //{
-    //    if (arg == null)
-    //        return null!;
+    public static implicit operator BookingResponseDto(Booking arg)
+    {
+        if (arg == null)
+            return null!;
 
-    //    return new BookingResponseDto
-    //    {
-    //        Id = arg.Id,
-    //        Price = arg.Price,
-    //        TypeVisitId = arg.TypeVisitId,
-    //        PriceCategoryId = arg.PriceCategoryId,
-    //        DoctorId = arg.DoctorId,
-    //        BookingStatusId = arg.BookingStatusId,
-    //        ClinicId = arg.ClinicId,
-    //        CreateOn = arg.CreateOn,
-    //        CurrencyId = arg.CurrencyId,
-    //        HospitalId = arg.HospitalId,
-    //        PatientId = arg.PatientId,
-    //        SpecialtyId = arg.SpecialtyId,
-    //        VisitingDate = arg.VisitingDate,
-    //        WorkingPeriodId = arg.WorkingPeriodId,
-    //        BookingNumber = arg.BookingNumber,
-    //        DayNumber = arg.DayNumber,
-    //    };
-    //}
+        return new BookingResponseDto
+        {
+            Id = arg.Id,
+            Price = arg.Price,
+            TypeVisitId = arg.TypeVisitId,
+            PriceCategoryId = arg.PriceCategoryId,
+            DoctorId = arg.DoctorId,
+            BookingStatusId = arg.BookingStatusId,
+            ClinicId = arg.ClinicId,
+            CreateOn = arg.CreateOn,
+            CurrencyId = arg.CurrencyId,
+            HospitalId = arg.HospitalId,
+            PatientId = arg.PatientId,
+            SpecialtyId = arg.SpecialtyId,
+            VisitingDate = arg.VisitingDate,
+            WorkingPeriodId = arg.WorkingPeriodId,
+            BookingNumber = arg.BookingNumber,
+            DayNumber = arg.DayNumber,
+            BookingReason = arg.BookingReason,
+        };
+    }
 
     //public static List<BookingResponseDto> ToList(IEnumerable<Booking> enList)
     //{

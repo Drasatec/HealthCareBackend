@@ -3,6 +3,7 @@ using DomainModel.Entities;
 using DomainModel.Interfaces;
 using DomainModel.Models;
 using DomainModel.Models.Bookings;
+using DomainModel.Models.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
@@ -48,63 +49,75 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
         }
     }
 
-    public async Task<PagedResponse<BookingResponseDto>?> ReadAllAppointments(long? id, int? hosId, int? specialtyId, int? clinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, byte? dayNumber, string? lang, int? page, int? pageSize)
+
+    public async Task<PagedResponse<BookingResponseDto>?> ReadAllAppointments(AppointmentFilterOptions filterOptions, PaginationOptions pageOptions, string? lang)
     {
         try
         {
             IQueryable<Booking> query = Context.Bookings;
             IQueryable<BookingResponseDto> result;
 
-            if (id.HasValue)
+            if (filterOptions.Id.HasValue)
             {
-                query = query.Where(i => i.Id.Equals(id));
+                query = query.Where(i => i.Id.Equals(filterOptions.Id));
             }
             else
             {
-                if (hosId.HasValue && hosId > 0)
+                if (filterOptions.HospitalId.HasValue && filterOptions.HospitalId > 0)
                 {
-                    query = query.Where(d => d.HospitalId.Equals(hosId));
+                    query = query.Where(d => d.HospitalId.Equals(filterOptions.HospitalId));
                 }
 
-                if (specialtyId.HasValue && specialtyId > 0)
+                if (filterOptions.SpecialtyId.HasValue && filterOptions.SpecialtyId > 0)
                 {
-                    query = query.Where(t => t.SpecialtyId.Equals(specialtyId));
+                    query = query.Where(t => t.SpecialtyId.Equals(filterOptions.SpecialtyId));
                 }
 
-                if (clinicId.HasValue && clinicId > 0)
+                if (filterOptions.ClinicId.HasValue && filterOptions.ClinicId > 0)
                 {
-                    query = query.Where(t => t.ClinicId.Equals(clinicId));
+                    query = query.Where(t => t.ClinicId.Equals(filterOptions.ClinicId));
                 }
 
-                if (docId.HasValue)
+                if (filterOptions.DoctorId.HasValue)
                 {
-                    query = query.Where(t => t.DoctorId.Equals(docId));
+                    query = query.Where(t => t.DoctorId.Equals(filterOptions.DoctorId));
                 }
 
-                if (typeVisitId.HasValue)
+                if (filterOptions.TypeVisitId.HasValue)
                 {
-                    query = query.Where(t => t.TypeVisitId.Equals(typeVisitId));
+                    query = query.Where(t => t.TypeVisitId.Equals(filterOptions.TypeVisitId));
                 }
 
-                if (workingPeriodId.HasValue)
+                if (filterOptions.WorkingPeriodId.HasValue)
                 {
-                    query = query.Where(t => t.WorkingPeriodId.Equals(workingPeriodId));
+                    query = query.Where(t => t.WorkingPeriodId.Equals(filterOptions.WorkingPeriodId));
                 }
 
-                if (patientId.HasValue)
+                if (filterOptions.PatientId.HasValue)
                 {
-                    query = query.Where(t => t.PatientId.Equals(patientId));
+                    query = query.Where(t => t.PatientId.Equals(filterOptions.PatientId));
                 }
 
-                if (bookStatusId.HasValue)
+                if (filterOptions.BookingStatusId.HasValue)
                 {
-                    query = query.Where(t => t.BookingStatusId.Equals(bookStatusId));
+                    query = query.Where(t => t.BookingStatusId.Equals(filterOptions.BookingStatusId));
                 }
 
-                if (dayNumber.HasValue)
+                if (filterOptions.DayNumber.HasValue)
                 {
-                    query = query.Where(t => t.DayNumber.Equals(dayNumber));
+                    query = query.Where(t => t.DayNumber.Equals(filterOptions.DayNumber));
                 }
+
+                if (filterOptions.bookingTime is not null && filterOptions.bookingTime == "past")
+                {
+                    query = query.Where(t => t.VisitingDate < DateTimeOffset.UtcNow);
+                }
+                
+                if (filterOptions.bookingTime is not null && filterOptions.bookingTime == "future")
+                {
+                    query = query.Where(t => t.VisitingDate > DateTimeOffset.UtcNow);
+                }
+
             }
             if (lang != null)
                 result = (from h in query
@@ -122,7 +135,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                           where doc.LangCode == lang
 
                           join tv in Context.TypesVisitTranslations on h.TypeVisitId equals tv.TypeVisitId
-                          where tv.LangCode == lang 
+                          where tv.LangCode == lang
 
                           join wp in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wp.WorkingPeriodId
                           where wp.LangCode == lang
@@ -187,7 +200,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
 
             var totalCount = await result.CountAsync();
 
-            GenericPagination(ref result, ref pageSize, ref page, totalCount);
+            GenericPagination(ref result, ref pageOptions, totalCount);
 
             var listDto = await result.OrderByDescending(h => h.Id)
                                      .ToListAsync();
@@ -195,8 +208,8 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
             var all = new PagedResponse<BookingResponseDto>
             {
                 Total = totalCount,
-                Page = page,
-                PageSize = pageSize,
+                Page = pageOptions.Page,
+                PageSize = pageOptions.PageSize,
                 Data = listDto
             };
 

@@ -7,7 +7,7 @@ public partial class Promotion
 {
     public int Id { get; set; }
 
-    public string? ImageUrl { get; set; }
+    public string? Photo { get; set; }
 
     public int? Position { get; set; }
 

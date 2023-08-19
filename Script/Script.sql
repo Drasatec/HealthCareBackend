@@ -7,27 +7,27 @@
 -- GO
 -- use alrahma_care_db;
 --GO
---  CREATE TABLE Users(
--- 	[Id] [nvarchar](450) NOT NULL, --*
--- 	[FullName] [nvarchar](100) NOT NULL, --*
--- 	[UserName] [nvarchar](256) NULL,
--- 	[Email] [nvarchar](256) NULL,
--- 	[PhoneNumber] [nvarchar](max) NULL,
--- 	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
--- 	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
---     [VerificationCode] VARCHar(8), -- new
---     [ExpirationTime] DATETIMEOFFSET(7), -- new
---     [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
--- 	[PasswordHash] [nvarchar](max) NULL,
--- 	[SecurityStamp] [nvarchar](max) NULL,
--- 	[ConcurrencyStamp] [nvarchar](max) NULL,
--- 	[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
--- 	[LockoutEnd] [DATETIMEOFFSET](7) NULL,
--- 	[LockoutEnabled] [bit] NOT NULL DEFAULT 0,
--- 	[AccessFailedCount] [int] NOT NULL DEFAULT 0,
+ CREATE TABLE Users(
+	[Id] [nvarchar](450) NOT NULL, --*
+	[FullName] [nvarchar](100) NOT NULL, --*
+	[UserName] [nvarchar](256) NULL,
+	[PhoneNumber] [nvarchar](max) NULL,
+	[Email] [nvarchar](256) NULL,
+	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
+	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
+    [VerificationCode] VARCHar(8), -- new
+    [ExpirationTime] DATETIMEOFFSET(7), -- new
+    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
+	[PasswordHash] [nvarchar](max) NULL,
+	[SecurityStamp] [nvarchar](max) NULL,
+	[ConcurrencyStamp] [nvarchar](max) NULL,
+	[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
+	[LockoutEnd] [DATETIMEOFFSET](7) NULL,
+	[LockoutEnabled] [bit] NOT NULL DEFAULT 0,
+	[AccessFailedCount] [int] NOT NULL DEFAULT 0,
 
--- 	CONSTRAINT PK_Users PRIMARY KEY (Id),
--- );
+	CONSTRAINT PK_Users PRIMARY KEY (Id),
+);
 -- GO
 -- CREATE TABLE Roles(
 -- 	[Id] [nvarchar](450) NOT NULL,
@@ -765,6 +765,62 @@ CREATE TABLE DoctorsDegreesTranslations --MM
 );
 GO
 ----------------
+CREATE TABLE Religions (
+    Id TINYINT,
+    CONSTRAINT PK_Religions PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE ReligionsTranslations --MM
+(
+    Id TINYINT IDENTITY (1,1),
+    Name NVARCHAR(30),
+    ReligionId TINYINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_ReligionsTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_ReligionsTranslations_LangCode_ReligionId UNIQUE (ReligionId, LangCode),
+
+	CONSTRAINT FK_ReligionsTranslations_ReligionId
+    FOREIGN KEY (ReligionId)
+      REFERENCES Religions(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_ReligionsTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION
+);
+GO
+----------------
+CREATE TABLE MaritalStatus (
+    Id TINYINT,
+    CONSTRAINT PK_MaritalStatus PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE MaritalStatusTranslations --MM
+(
+    Id INT IDENTITY (1,1),
+    Name NVARCHAR(30),
+    MaritalId TINYINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_MaritalStatusTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_MaritalStatusTranslations_LangCode_MaritalId UNIQUE (MaritalId, LangCode),
+
+	CONSTRAINT FK_MaritalStatusTranslations_MaritalId
+    FOREIGN KEY (MaritalId)
+      REFERENCES MaritalStatus(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_MaritalStatusTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION
+);
+GO
+----------------
 CREATE TABLE EmployeesStatus
 (
     Id SMALLINT IDENTITY (1,1),
@@ -1297,38 +1353,6 @@ CREATE TABLE ClientsSubscription --MM
 );
 GO
 ----------------
-CREATE TABLE BookingStatuses
-(
-    Id SMALLINT IDENTITY (1,1),
-	CreateOn DATETIME DEFAULT GETDATE(),
-    CONSTRAINT PK_BookingStatuses PRIMARY KEY (Id),
-);
-GO
-----------------
-CREATE TABLE BookingStatusesTranslations --MM
-(
-    Id INT IDENTITY (1,1),
-    StatusName NVARCHAR(50) NOT NULL,
-    BookingStatusId SMALLINT,
-    LangCode VARCHAR(6),
-
-	CONSTRAINT PK_BookingStatusesTranslations PRIMARY KEY (Id),
-    CONSTRAINT UK_BookingStatusesTranslations_LangCode_BookingStatusId UNIQUE (BookingStatusId, LangCode),
-
-	CONSTRAINT FK_BookingStatusesTranslations_BookingStatusId
-    FOREIGN KEY (BookingStatusId)
-      REFERENCES BookingStatuses(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-	CONSTRAINT FK_BookingStatusesTranslations_LangCode
-    FOREIGN KEY (LangCode)
-      REFERENCES Languages(Code)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-    INDEX IX_BookingStatusesTranslations_StatusName NONCLUSTERED (StatusName)
-);
-GO
-----------------
 CREATE TABLE Promotions (
     Id INT IDENTITY(1,1),
     Photo VARCHAR(55),
@@ -1362,6 +1386,38 @@ CREATE TABLE PromotionsTranslations --MM
 );
 GO
 ----------------
+CREATE TABLE BookingStatuses
+(
+    Id SMALLINT IDENTITY (1,1),
+	CreateOn DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_BookingStatuses PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE BookingStatusesTranslations --MM
+(
+    Id INT IDENTITY (1,1),
+    StatusName NVARCHAR(50) NOT NULL,
+    BookingStatusId SMALLINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_BookingStatusesTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_BookingStatusesTranslations_LangCode_BookingStatusId UNIQUE (BookingStatusId, LangCode),
+
+	CONSTRAINT FK_BookingStatusesTranslations_BookingStatusId
+    FOREIGN KEY (BookingStatusId)
+      REFERENCES BookingStatuses(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_BookingStatusesTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    INDEX IX_BookingStatusesTranslations_StatusName NONCLUSTERED (StatusName)
+);
+GO
+----------------
 CREATE TABLE Booking
 (
 	Id BIGINT IDENTITY(1,1),
@@ -1378,9 +1434,9 @@ CREATE TABLE Booking
     CurrencyId INT,
     Price INT,
     DayNumber TINYINT,
-	VisitingDate DATE,
+	VisitingDate DATETIMEOFFSET(7),
     BookingReason NVARCHAR(500),
-    CreateOn DATETIME DEFAULT GETDATE(),
+    CreateOn DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
 	
 	CONSTRAINT PK_Booking PRIMARY KEY (Id),
     CONSTRAINT UK_Booking_BookingNumber UNIQUE (BookingNumber),

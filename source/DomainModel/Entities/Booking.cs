@@ -36,9 +36,9 @@ public partial class Booking
 
     public byte DayNumber { get; set; }
 
-    public DateTime? VisitingDate { get; set; }
+    public DateTimeOffset? VisitingDate { get; set; }
 
-    public DateTime? CreateOn { get; set; }
+    public DateTimeOffset? CreateOn { get; set; }
     
     public string? BookingReason { get; set; }
 

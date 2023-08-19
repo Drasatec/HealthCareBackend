@@ -85,6 +85,10 @@ public partial class AlrahmaCareDbContext : DbContext
 
     public virtual DbSet<MainServiceTranslation> MainServiceTranslations { get; set; }
 
+    public virtual DbSet<MaritalStatus> MaritalStatuses { get; set; }
+
+    public virtual DbSet<MaritalStatusTranslation> MaritalStatusTranslations { get; set; }
+
     public virtual DbSet<MedicalSpecialty> MedicalSpecialties { get; set; }
 
     public virtual DbSet<MedicalSpecialtyTranslation> MedicalSpecialtyTranslations { get; set; }
@@ -104,6 +108,10 @@ public partial class AlrahmaCareDbContext : DbContext
     public virtual DbSet<Promotion> Promotions { get; set; }
 
     public virtual DbSet<PromotionsTranslation> PromotionsTranslations { get; set; }
+
+    public virtual DbSet<Religion> Religions { get; set; }
+
+    public virtual DbSet<ReligionsTranslation> ReligionsTranslations { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
 
@@ -160,10 +168,7 @@ public partial class AlrahmaCareDbContext : DbContext
             entity.Property(e => e.BookingNumber).HasMaxLength(25);
             entity.Property(e => e.BookingReason).HasMaxLength(500);
             entity.Property(e => e.BookingStatusId).HasDefaultValueSql("((1))");
-            entity.Property(e => e.CreateOn)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.VisitingDate).HasColumnType("date");
+            entity.Property(e => e.CreateOn).HasDefaultValueSql("(getutcdate())");
 
             entity.HasOne(d => d.BookingStatus).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.BookingStatusId)
@@ -922,6 +927,29 @@ public partial class AlrahmaCareDbContext : DbContext
                 .HasConstraintName("FK_MainServiceTranslations_MainServiceId");
         });
 
+        modelBuilder.Entity<MaritalStatus>(entity =>
+        {
+            entity.ToTable("MaritalStatus");
+        });
+
+        modelBuilder.Entity<MaritalStatusTranslation>(entity =>
+        {
+            entity.HasIndex(e => new { e.MaritalId, e.LangCode }, "UK_MaritalStatusTranslations_LangCode_MaritalId").IsUnique();
+
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Name).HasMaxLength(30);
+
+            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.MaritalStatusTranslations)
+                .HasForeignKey(d => d.LangCode)
+                .HasConstraintName("FK_MaritalStatusTranslations_LangCode");
+
+            entity.HasOne(d => d.Marital).WithMany(p => p.MaritalStatusTranslations)
+                .HasForeignKey(d => d.MaritalId)
+                .HasConstraintName("FK_MaritalStatusTranslations_MaritalId");
+        });
+
         modelBuilder.Entity<MedicalSpecialty>(entity =>
         {
             entity.Property(e => e.Appearance).HasDefaultValueSql("((1))");
@@ -1108,12 +1136,11 @@ public partial class AlrahmaCareDbContext : DbContext
 
         modelBuilder.Entity<Promotion>(entity =>
         {
-            entity.Property(e => e.ImageUrl)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("ImageURL");
             entity.Property(e => e.Link)
                 .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Photo)
+                .HasMaxLength(55)
                 .IsUnicode(false);
         });
 
@@ -1136,6 +1163,25 @@ public partial class AlrahmaCareDbContext : DbContext
             entity.HasOne(d => d.Promotion).WithMany(p => p.PromotionsTranslations)
                 .HasForeignKey(d => d.PromotionId)
                 .HasConstraintName("FK_Promotions_PromotionId");
+        });
+
+        modelBuilder.Entity<ReligionsTranslation>(entity =>
+        {
+            entity.HasIndex(e => new { e.ReligionId, e.LangCode }, "UK_ReligionsTranslations_LangCode_ReligionId").IsUnique();
+
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Name).HasMaxLength(30);
+
+            entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.ReligionsTranslations)
+                .HasForeignKey(d => d.LangCode)
+                .HasConstraintName("FK_ReligionsTranslations_LangCode");
+
+            entity.HasOne(d => d.Religion).WithMany(p => p.ReligionsTranslations)
+                .HasForeignKey(d => d.ReligionId)
+                .HasConstraintName("FK_ReligionsTranslations_ReligionId");
         });
 
         modelBuilder.Entity<Role>(entity =>

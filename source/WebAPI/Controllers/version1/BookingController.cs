@@ -1,6 +1,7 @@
 ﻿using DomainModel.Contracts;
 using DomainModel.Models;
 using DomainModel.Models.Bookings;
+using DomainModel.Models.Common;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
@@ -50,15 +51,11 @@ public class BookingController : ControllerBase
 
     // ============================= get ============================= 
 
-    [HttpGet(Order = 0801)]
-    public async Task<IActionResult> Get([FromQuery] long? id, int? hosId, int? specialtyId, int? ClinicId, int? docId, int? typeVisitId, int? workingPeriodId, int? patientId, short? bookStatusId, byte? dayNumber, string? lang, int? page, int? pageSize)
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] AppointmentFilterOptions filterOptions, [FromQuery] PaginationOptions pageOptions, string? lang)
     {
-        //if (docId < 1 || ClinicId < 1 || typeVisitId < 1 || workingPeriodId < 1)
-        //    return BadRequest(new Error("400", "can not assign 0"));
-
-        //if (lang != null)
-        return Ok(await Data.Appointments.ReadAllAppointments(id, hosId, specialtyId, ClinicId, docId, typeVisitId, workingPeriodId, patientId, bookStatusId, dayNumber, lang, page, pageSize));
-
+        //return Ok(filterOptions);
+        return Ok(await Data.Appointments.ReadAllAppointments(filterOptions,pageOptions,lang));
     }
 
     // ============================= put ============================= 
