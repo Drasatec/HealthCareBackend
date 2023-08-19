@@ -30,5 +30,6 @@ namespace DomainModel.Interfaces
         Task<IEnumerable<TResult>> GenericSelectionReadAll<TEntity, TResult>(Expression<Func<TEntity, bool>>? filter, Expression<Func<TEntity, TResult>> selectExpression, Expression<Func<TEntity, object>>? order, int? page, int? pageSize) where TEntity : class;
         Task<Response> GenericCreateRange<TEntity>(List<TEntity> entity) where TEntity : class;
         Task<int?> GenericCount<TEntity>(Expression<Func<TEntity, bool>>? filter = null) where TEntity : class;
+        Task<Response> UpdateSinglePropertyInEntities<TEntity>(Expression<Func<TEntity, bool>> filter, Action<TEntity> updateAction) where TEntity : class;
     }
 }

@@ -1,11 +1,9 @@
-using DomainModel.Interfaces.Services;
 using DomainModel.Models.AppSettings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApi.Startup;
-using WebAPI.Services;
 using WebAPI.Startup;
 //  Scaffold-DbContext 'Data Source=pcFawzy\SQLEXPRESS; Initial Catalog=alrahma_care_db;Trusted_Connection=true; TrustServerCertificate=true;' Microsoft.EntityFrameworkCore.SqlServer -OutputDir My_Models2
 

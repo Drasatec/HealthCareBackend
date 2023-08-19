@@ -165,9 +165,11 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<ConfirmationOption>(entity =>
         {
-            entity.Property(e => e.Id)
+            entity.HasKey(e => e.Code).HasName("PK_ConfirmationOptions");
+            entity.Property(e => e.Code)
                 .HasMaxLength(450)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .HasColumnName("Id");
             entity.Property(e => e.OptionName).HasMaxLength(112);
         });
 

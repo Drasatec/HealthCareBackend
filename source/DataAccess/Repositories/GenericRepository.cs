@@ -178,6 +178,23 @@ public class GenericRepository : IGenericRepository
         }
     }
 
+    public async Task<Response> UpdateSinglePropertyInEntities<TEntity>(Expression<Func<TEntity, bool>> filter, Action<TEntity> updateAction) where TEntity : class
+    {
+        var entities = await Context.Set<TEntity>().Where(filter).ToListAsync();
+
+        foreach (var entity in entities)
+        {
+            updateAction(entity);
+        }
+
+        Context.UpdateRange(entities);
+        var row =await Context.SaveChangesAsync();
+        if (row > 0)
+            return new Response(true, $"Update on entity with Id:");
+        else
+            return new Response(false, $"Update on entity with Id:");
+    }
+
     // read
     public async Task<PagedResponse<TEntity>?> GenericReadAllWihInclude<TEntity>(
        Expression<Func<TEntity, bool>>? filter,
@@ -198,11 +215,9 @@ public class GenericRepository : IGenericRepository
             //query = orderBy(query);
         }
 
-
         total = query.Count();
         if (total < 0)
             return null!;
-
 
         // page size
         GenericPagination(ref query, ref pageSize, ref page, total);

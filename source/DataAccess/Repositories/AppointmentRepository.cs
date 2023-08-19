@@ -1,5 +1,6 @@
 ﻿using DataAccess.Contexts;
 using DomainModel.Entities;
+using DomainModel.Entities.SettingsEntities;
 using DomainModel.Interfaces;
 using DomainModel.Models;
 using DomainModel.Models.Bookings;
@@ -112,7 +113,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                 {
                     query = query.Where(t => t.VisitingDate < DateTimeOffset.UtcNow);
                 }
-                
+
                 if (filterOptions.bookingTime is not null && filterOptions.bookingTime == "future")
                 {
                     query = query.Where(t => t.VisitingDate > DateTimeOffset.UtcNow);
