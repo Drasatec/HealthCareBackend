@@ -1,3 +1,8 @@
+DROP TABLE GendersTranslations;
+DROP TABLE Genders;
+DROP TABLE WeekdaysTranslations;
+DROP TABLE Weekdays;
+DROP TABLE EmployeeAccounts;
 
 DROP TABLE Booking;
 DROP TABLE BookingStatusesTranslations;
@@ -65,11 +70,13 @@ DROP TABLE HospitalFeatureTranslations;
 DROP TABLE HospitalFeatures;
 DROP TABLE ContactForm;
 DROP TABLE Hospitals;
-DROP TABLE Weekdays;
-DROP TABLE Genders;
 DROP TABLE Currencies;
 DROP TABLE Languages;
 -- DROP TABLE UserRoles;
 -- DROP TABLE Roles;
 -- DROP TABLE Users;
 DROP TABLE ConfirmationOptions;
+
+SELECT TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE';

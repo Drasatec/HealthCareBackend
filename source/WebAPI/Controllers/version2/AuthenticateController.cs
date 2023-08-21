@@ -188,19 +188,20 @@ public class AuthenticateController : ControllerBase
     [HttpGet("g2")]
     public async Task<IActionResult> Get2()
     {
-        var stopWatch = Stopwatch.StartNew();
-        int dateTimeR = 0;
-        int dateDateTimeOffsetR = 0;
+        DateTimeOffset StartDateTime =  DateTimeOffset.Parse("2022-08-30");
+        DateTimeOffset EndDateTime = DateTimeOffset.Parse("2023-08-30");
 
-        for (var i = 0; i < 100; i++)
+
+        if (StartDateTime >= EndDateTime)
         {
-            stopWatch.Start();
-            var d1 = DateTime.Now.ToUniversalTime();
-            stopWatch.Stop();
-            dateTimeR = stopWatch.Elapsed.Microseconds;
+            return Ok("1- StartDateTime >= EndDateTime"+$"{StartDateTime},{EndDateTime}");
         }
 
-        var high = Stopwatch.IsHighResolution;
-        return Ok(new { dateTimeR, dateDateTimeOffsetR, high });
+        if (StartDateTime <= EndDateTime)
+        {
+            return Ok("2- StartDateTime <= EndDateTime" + $"{StartDateTime},{EndDateTime}");
+        }
+
+        return Ok("nooooooo");
     }
 }

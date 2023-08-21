@@ -5,7 +5,7 @@
 --     CREATE DATABASE alrahma_care_db COLLATE Arabic_100_CI_AS_KS_WS_SC_UTF8;
 -- END
 -- GO
-use alrahma_care_db;
+
 --GO
 -- CREATE TABLE Users(
 --	[Id] [nvarchar](450) NOT NULL, --*
@@ -58,6 +58,18 @@ use alrahma_care_db;
 -- );
 -- GO
 ----------------
+CREATE TABLE EmployeeAccounts(
+	[Id] [nvarchar](450) NOT NULL, --*
+	[FullName] [nvarchar](100) NOT NULL, --*
+	[UserName] [nvarchar](256) NULL,
+	[PhoneNumber] [nvarchar](max) NULL,
+	[Email] [nvarchar](256) NULL,
+    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
+	[PasswordHash] [nvarchar](max) NULL,
+	CONSTRAINT PK_EmployeeAccounts PRIMARY KEY (Id),
+);
+-- GO
+----------------
 CREATE TABLE ConfirmationOptions(
 	[Id] [varchar](450) NOT NULL,
 	[OptionName] [nvarchar](112) NULL,
@@ -66,58 +78,18 @@ CREATE TABLE ConfirmationOptions(
 	CONSTRAINT PK_ConfirmationOptions PRIMARY KEY (Id),
 );
 GO
+INSERT INTO ConfirmationOptions VALUES('sms','by phone number',0),('email','by email',0),('non','We do not need Confirmation',1);
+GO
 ----------------
 CREATE TABLE Languages
 (
     [Code] VARCHAR(6),
     [LanguageName] NVARCHAR(20),
+    [IsDefault] BIT NOT NULL DEFAULT 0,
 	CONSTRAINT PK_Language PRIMARY KEY (Code)
 );
 GO
-INSERT INTO Languages VALUES('ar','عربي'),('en','English'),('fr','française'),('es','España');
-GO
-----------------
-CREATE TABLE Weekdays
-(
-    [Id] INT IDENTITY(1,1),
-    [DayNumber] TINYINT NOT NULL,
-    [WeekdayName] NVARCHAR(20) NOT NULL,
-    [LangCode] VARCHAR(6) NOT NULL,
-
-    CONSTRAINT PK_Weekdays PRIMARY KEY (Id),
-    CONSTRAINT UK_Weekdays_DayNumber_LangCode UNIQUE (DayNumber, LangCode),
-    CONSTRAINT CHECK_Weekdays_DayNumber CHECK(DayNumber between 1 and 7),
-
-    CONSTRAINT FK_Weekdays_LangCode
-    FOREIGN KEY (LangCode)
-      REFERENCES Languages(Code)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-	INDEX IX_Weekdays_DayNumber NONCLUSTERED (DayNumber)
-);
-GO
-INSERT INTO Weekdays VALUES(1,N'سبت','ar'),(1,'Saturday','en'),(1,'Samedi','fr'),(1,'saa','es');
-INSERT INTO Weekdays VALUES(2,N'الأحد','ar'),(2,'Sunday','en'),(2,'Dimanche','fr'),(2,'suu','es');
-INSERT INTO Weekdays VALUES(3,N'الإثنين','ar'),(3,'Monday','en'),(3,'Lundi','fr'),(3,'moo','es');
-INSERT INTO Weekdays VALUES(4,N'الثلاثاء','ar'),(5,N'الأربعاء','ar'),(6,N'الخميس','ar'),(7,N'الجمعة','ar')
-GO
-----------------
-CREATE TABLE Genders
-(
-    [Id] INT IDENTITY(1,1),
-    [GenderNumber] TINYINT NOT NULL,
-    [GenderName] NVARCHAR(20) NOT NULL,
-    [LangCode] VARCHAR(6) NOT NULL,
-
-    CONSTRAINT PK_Genders PRIMARY KEY (Id),
-    CONSTRAINT UK_Genders_GenderNumber_LangCode UNIQUE (GenderNumber, LangCode),
-    CONSTRAINT CHECK_Genders_GenderNumber CHECK(GenderNumber between 1 and 3),
-
-    CONSTRAINT FK_Genders_LangCode
-    FOREIGN KEY (LangCode)
-      REFERENCES Languages(Code)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-	INDEX IX_Genders_GenderNumber NONCLUSTERED (GenderNumber)
-);
+INSERT INTO Languages VALUES('ar','عربي',1),('en','English',0),('fr','française',0),('es','España',0);
 GO
 ----------------
 CREATE TABLE Currencies
@@ -208,10 +180,13 @@ CREATE TABLE ContactForm (
 GO
 CREATE TABLE HospitalFeatures
 (
-    Id INT IDENTITY(1, 1) PRIMARY KEY,
+    Id INT IDENTITY(1, 1),
     Photo VARCHAR(255),
     CreateOn DATETIME DEFAULT GETDATE(),
     HospitalId INT,
+
+    CONSTRAINT PK_HospitalFeatures PRIMARY KEY (Id),
+
     CONSTRAINT FK_HospitalFeatures_HospitalId
     FOREIGN KEY (HospitalId)
       REFERENCES Hospitals(Id)
@@ -821,6 +796,63 @@ CREATE TABLE MaritalStatusTranslations --MM
 );
 GO
 ----------------
+CREATE TABLE Genders
+(
+    Id SMALLINT NOT NULL,
+    CONSTRAINT PK_Genders PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE GendersTranslations --MM
+(
+    Id SMALLINT IDENTITY (1,1),
+    Name NVARCHAR(30),
+    GenderId SMALLINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_GendersTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_GendersTranslations_LangCode_GenderId UNIQUE (GenderId, LangCode),
+
+	CONSTRAINT FK_GendersTranslations_GenderId
+    FOREIGN KEY (GenderId)
+      REFERENCES Genders(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_GendersTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION
+);
+GO
+----------------
+CREATE TABLE Weekdays (
+    Id SMALLINT NOT NULL,
+    CONSTRAINT PK_Weekdays PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE WeekdaysTranslations --MM
+(
+    Id SMALLINT IDENTITY (1,1),
+    Name NVARCHAR(30),
+    WeekdayId SMALLINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT WK_WeekdaysTranslations PRIMARY KEY (Id),
+    CONSTRAINT WK_WeekdaysTranslations_LangCode_WeekdayId UNIQUE (WeekdayId, LangCode),
+
+	CONSTRAINT WK_WeekdaysTranslations_WeekdayId
+    FOREIGN KEY (WeekdayId)
+      REFERENCES Weekdays(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT WK_WeekdaysTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION
+);
+GO
+----------------
 CREATE TABLE EmployeesStatus
 (
     Id SMALLINT IDENTITY (1,1),
@@ -1416,6 +1448,15 @@ CREATE TABLE BookingStatusesTranslations --MM
 
     INDEX IX_BookingStatusesTranslations_StatusName NONCLUSTERED (StatusName)
 );
+INSERT INTO BookingStatuses (CreateOn)
+VALUES (GETDATE()),(GETDATE()),(GETDATE()),(GETDATE()),(GETDATE());
+INSERT INTO BookingStatusesTranslations (StatusName, BookingStatusId, LangCode)
+VALUES
+('Pending', 1, 'en'),('قيد الانتظار', 1, 'ar'),
+('Confirmed', 2, 'en'),('تم التأكيد', 2, 'ar'),
+('Cancelled', 3, 'en'),('تم الإلغاء', 3, 'ar'),
+('Completed', 4, 'en'),('تم الانتهاء', 4, 'ar'),
+('In Progress', 5, 'en'),('جاري التنفيذ', 5, 'ar');
 GO
 ----------------
 CREATE TABLE Booking
@@ -1435,9 +1476,10 @@ CREATE TABLE Booking
     Price INT,
     DayNumber TINYINT,
 	VisitingDate DATETIMEOFFSET(7),
-    BookingReason NVARCHAR(500),
     CreateOn DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
-	
+    BookingReason NVARCHAR(500),
+	StatusReason NVARCHAR(500),
+
 	CONSTRAINT PK_Booking PRIMARY KEY (Id),
     CONSTRAINT UK_Booking_BookingNumber UNIQUE (BookingNumber),
     

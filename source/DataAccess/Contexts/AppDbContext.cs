@@ -20,6 +20,10 @@ public class AppDbContext : DbContext
 
     #region DbSets
 
+    public virtual DbSet<WeekdaysTranslation> WeekdaysTranslations { get; set; }
+    public virtual DbSet<GendersTranslation> GendersTranslations { get; set; }
+    public virtual DbSet<EmployeeAccount> EmployeeAccounts { get; set; }
+
     public virtual DbSet<MaritalStatus> MaritalStatuses { get; set; }
 
     public virtual DbSet<MaritalStatusTranslation> MaritalStatusTranslations { get; set; }
@@ -163,6 +167,14 @@ public class AppDbContext : DbContext
         modelBuilder.UseCollation("Arabic_100_CI_AS_KS_WS_SC_UTF8");
 
 
+        modelBuilder.Entity<EmployeeAccount>(entity =>
+        {
+            entity.Property(e => e.CreateOn).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.UserName).HasMaxLength(256);
+        });
+
         modelBuilder.Entity<ConfirmationOption>(entity =>
         {
             entity.HasKey(e => e.Code).HasName("PK_ConfirmationOptions");
@@ -216,6 +228,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.VisitingDate).HasDefaultValueSql("(getutcdate())");
 
             entity.Property(e => e.BookingReason).HasMaxLength(500);
+            entity.Property(e => e.StatusReason).HasMaxLength(500);
 
             entity.HasOne(d => d.Clinic).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.ClinicId)
@@ -356,24 +369,6 @@ public class AppDbContext : DbContext
             //    .HasForeignKey(d => d.LangCode)
             //    .HasConstraintName("FK_EmployeesStatusTranslations_LangCode");
         });
-
-        modelBuilder.Entity<Gender>(entity =>
-        {
-            entity.HasIndex(e => e.GenderNumber, "IX_Genders_GenderNumber");
-
-            entity.HasIndex(e => new { e.GenderNumber, e.LangCode }, "UK_Genders_GenderNumber_LangCode").IsUnique();
-
-            entity.Property(e => e.GenderName).HasMaxLength(20);
-            entity.Property(e => e.LangCode)
-                .HasMaxLength(6)
-                .IsUnicode(false);
-
-            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.Genders)
-            //    .HasForeignKey(d => d.LangCode)
-            //    .OnDelete(DeleteBehavior.ClientSetNull)
-            //    .HasConstraintName("FK_Genders_LangCode");
-        });
-
 
 
         modelBuilder.Entity<Doctor>(entity =>
@@ -698,7 +693,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<HospitalFeature>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Hospital__3214EC07FE0C2CF3");
+            entity.HasKey(e => e.Id).HasName("PK_HospitalFeatures");
 
             entity.Property(e => e.CreateOn)
                 .HasDefaultValueSql("(getdate())")
@@ -1002,7 +997,6 @@ public class AppDbContext : DbContext
             //    .HasConstraintName("FK_ServicePrices_ServiceId");
         });
 
-
         modelBuilder.Entity<Promotion>(entity =>
         {
             entity.Property(e => e.Photo)
@@ -1014,17 +1008,26 @@ public class AppDbContext : DbContext
                 .IsUnicode(false);
         });
 
-
-
-
         modelBuilder.Entity<MaritalStatus>(entity =>
         {
             entity.ToTable("MaritalStatus");
+            entity.Property(e => e.Id).ValueGeneratedNever();
         });
 
+        modelBuilder.Entity<Religion>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+        });
 
+        modelBuilder.Entity<Weekday>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+        });
 
-
+        modelBuilder.Entity<Gender>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+        });
 
         // =========================== translations ===========================
 
@@ -1372,16 +1375,6 @@ public class AppDbContext : DbContext
                 .HasConstraintName("FK_SSNTypesTranslations_SSNTypeId");
         });
 
-        modelBuilder.Entity<Weekday>(entity =>
-        {
-            entity.ToTable("Weekdays");
-
-            entity.HasIndex(e => new { e.DayNumber, e.LangCode }, "UK_Weekdays_DayNumber_LangCode").IsUnique();
-
-            entity.Property(e => e.LangCode)
-                .HasMaxLength(6)
-                .IsUnicode(false);
-        });
 
         modelBuilder.Entity<PromotionsTranslation>(entity =>
         {
@@ -1440,6 +1433,44 @@ public class AppDbContext : DbContext
             //entity.HasOne(d => d.Marital).WithMany(p => p.MaritalStatusTranslations)
             //    .HasForeignKey(d => d.MaritalId)
             //    .HasConstraintName("FK_MaritalStatusTranslations_MaritalId");
+        });
+
+        modelBuilder.Entity<WeekdaysTranslation>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("WK_WeekdaysTranslations");
+
+            entity.HasIndex(e => new { e.WeekdayId, e.LangCode }, "WK_WeekdaysTranslations_LangCode_WeekdayId").IsUnique();
+
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Name).HasMaxLength(30);
+
+            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.WeekdaysTranslations)
+            //    .HasForeignKey(d => d.LangCode)
+            //    .HasConstraintName("WK_WeekdaysTranslations_LangCode");
+
+            //entity.HasOne(d => d.Weekday).WithMany(p => p.WeekdaysTranslations)
+            //    .HasForeignKey(d => d.WeekdayId)
+            //    .HasConstraintName("WK_WeekdaysTranslations_WeekdayId");
+        });
+
+        modelBuilder.Entity<GendersTranslation>(entity =>
+        {
+            entity.HasIndex(e => new { e.GenderId, e.LangCode }, "UK_GendersTranslations_LangCode_GenderId").IsUnique();
+
+            entity.Property(e => e.LangCode)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.Name).HasMaxLength(30);
+
+            //entity.HasOne(d => d.Gender).WithMany(p => p.GendersTranslations)
+            //    .HasForeignKey(d => d.GenderId)
+            //    .HasConstraintName("FK_GendersTranslations_GenderId");
+
+            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.GendersTranslations)
+            //    .HasForeignKey(d => d.LangCode)
+            //    .HasConstraintName("FK_GendersTranslations_LangCode");
         });
 
     }

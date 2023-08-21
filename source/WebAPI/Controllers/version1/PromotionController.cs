@@ -114,11 +114,37 @@ public class PromotionController : ControllerBase
 
 
     [HttpPut("edit", Order = 0820)]
-    public async Task<IActionResult> UpdateSingleWithImage([FromForm] Promotion model)
+    public async Task<IActionResult> UpdateSingleWithImage([FromForm] IFormFile? file, [FromForm] Promotion model)
     {
         Response response;
 
-        response = await Data.Generic.GenericUpdate(model, null);
+        if (file is not null)
+        {
+            var current = await Data.Generic.GenericReadById<Promotion>(i => i.Id == model.Id);
+            if (current != null)
+            {
+                // if photo in database is null
+                if (string.IsNullOrEmpty(current.Photo))
+                {
+                    model.Photo = await DataAccessImageService.SaveSingleImage(file.OpenReadStream());
+                    response = await Data.Generic.GenericUpdate(model, null);
+                }
+                else
+                {
+                    _ = DataAccessImageService.UpdateSingleImage(file.OpenReadStream(), current.Photo);
+                    response = await Data.Generic.GenericUpdate(model, p => p.Photo!);
+                }
+            }
+            else
+                response = new Response(false,"not found");
+
+            var name = await DataAccessImageService.SaveSingleImage(file.OpenReadStream());
+            model.Photo = name;
+        }
+        else
+            response = await Data.Generic.GenericUpdate(model, p => p.Photo!);
+
+
 
         if (!response.Success)
             return BadRequest(response);

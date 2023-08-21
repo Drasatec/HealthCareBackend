@@ -12,4 +12,6 @@ public class AppointmentFilterOptions
     public short? BookingStatusId { get; set; }
     public byte? DayNumber { get; set; }
     public string? bookingTime { get; set; }
+    public DateTimeOffset? StartDateTime { get; set; }
+    public DateTimeOffset? EndDateTime { get; set; }
 }

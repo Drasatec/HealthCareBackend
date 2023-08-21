@@ -27,13 +27,15 @@ public class BookingRequestDto
     public int? CurrencyId { get; set; }
 
     public short BookingStatusId { get; set; }
+    
+    public string StatusReason { get; set; } = string.Empty;
 
     public int? Price { get; set; }
 
     public byte DayNumber { get; set; }
 
     public DateTime? VisitingDate { get; set; }
-    public string? BookingReason { get; set; }
+    public string BookingReason { get; set; } = string.Empty;
 
     public static implicit operator Booking(BookingRequestDto arg)
     {
@@ -50,10 +52,11 @@ public class BookingRequestDto
             PriceCategoryId = arg.PriceCategoryId,
             CurrencyId = arg.CurrencyId,
             BookingStatusId = arg.BookingStatusId,
-            VisitingDate = arg.VisitingDate,
+            VisitingDate = arg.VisitingDate,//Value.ToUniversalTime()
             Price = arg.Price,
             DayNumber = arg.DayNumber,
             BookingReason = arg.BookingReason,
+            StatusReason = arg.StatusReason,
             
         };
 

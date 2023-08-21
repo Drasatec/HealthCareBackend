@@ -399,7 +399,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                     join wpt in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wpt.WorkingPeriodId
                     where wpt.LangCode == lang
 
-                    join dy in Context.Weekdays on h.OnDay equals dy.DayNumber
+                    join dy in Context.WeekdaysTranslations on h.OnDay equals dy.WeekdayId
                     where dy.LangCode == lang
 
                     select new PeriodWorkDoctorClinicDto
@@ -411,7 +411,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                         WorkingPeriodId = h.WorkingPeriodId,
                         OnDay = h.OnDay,
 
-                        DayName = dy.WeekdayName,
+                        DayName = dy.Name,
                         Doctor = dt.FullName,
                         Hospital = hos.Name,
                         Clinic = ct.Name,

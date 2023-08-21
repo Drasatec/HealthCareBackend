@@ -11,7 +11,7 @@ public partial class RoomType
 
     public DateTime? CreateOn { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     public virtual ICollection<HosRoom> HosRooms { get; set; } = new List<HosRoom>();
 

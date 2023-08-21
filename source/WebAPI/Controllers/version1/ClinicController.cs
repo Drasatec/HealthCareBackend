@@ -2,6 +2,7 @@
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using DomainModel.Models.Clinics;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq.Expressions;
 
 namespace WebAPI.Controllers.version1;
@@ -20,7 +21,7 @@ public class ClinicController : ControllerBase
 
     // ============================= post ============================= 
 
-
+    [Authorize(Roles ="admin")]
     [HttpPost("add", Order = 0901)]
     public async Task<IActionResult> AddSingle([FromForm] IFormFile? file, [FromForm] ClinicDto model)
     {

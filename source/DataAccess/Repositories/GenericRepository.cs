@@ -35,7 +35,7 @@ public class GenericRepository : IGenericRepository
             return new Response<TEntity>(false, ex.Message + "and______" + ex.InnerException?.Message);
         }
     }
-    
+
     public async Task<Response> GenericCreateRange<TEntity>(List<TEntity> entity) where TEntity : class
     {
         try
@@ -139,28 +139,6 @@ public class GenericRepository : IGenericRepository
             return res;
         }
     }
-
-    public async Task<Response> GenericDelete<TEntity>(Expression<Func<TEntity, bool>> expression, params int[] ids) where TEntity : class
-    {
-        var arrayIds = string.Join(" ", ids);
-        try
-        {
-            var current = await Context.Set<TEntity>().Where(expression).ToListAsync();
-            if (current != null)
-            {
-                Context.RemoveRange(current); 
-            }
-            var rowEffict = await Context.SaveChangesAsync();
-            if (rowEffict > 0) return new Response(true, $"delete ids of {typeof(TEntity).Name}: {arrayIds} ");
-
-            return new Response(false, $"Ids : {arrayIds} is not found."); ;
-        }
-        catch (Exception ex)
-        {
-            return new Response(false, ex.Message + "and_____" + ex.InnerException?.Message);
-        }
-    }
-
     public async Task<Response> GenericUpdateSinglePropertyById<TEntity>(int id, TEntity entity, Expression<Func<TEntity, object>> propertyExpression) where TEntity : class
     {
         try
@@ -178,6 +156,52 @@ public class GenericRepository : IGenericRepository
         }
     }
 
+    public async Task<Response> GenericDelete<TEntity>(Expression<Func<TEntity, bool>> expression, params int[] ids) where TEntity : class
+    {
+        var arrayIds = string.Join(" ", ids);
+        try
+        {
+            var current = await Context.Set<TEntity>().Where(expression).ToListAsync();
+            if (current != null)
+            {
+                Context.RemoveRange(current);
+            }
+            var rowEffict = await Context.SaveChangesAsync();
+            if (rowEffict > 0) return new Response(true, $"delete ids of {typeof(TEntity).Name}: {arrayIds} ");
+
+            return new Response(false, $"Ids : {arrayIds} is not found."); ;
+        }
+        catch (Exception ex)
+        {
+            return new Response(false, ex.Message + "and_____" + ex.InnerException?.Message);
+        }
+    }
+
+   
+
+    public async Task<Response> GenericUpdatePropertiesById<TEntity>(int id, TEntity entity, params Expression<Func<TEntity, object>>[]? propertiesIsModified) where TEntity : class
+    {
+        try
+        {
+            Context.Attach(entity);
+
+            if (propertiesIsModified is not null)
+                foreach (var prop in propertiesIsModified)
+                {
+                    Context.Entry(entity).Property(prop).IsModified = true;
+                }
+            var rowEffected = await Context.SaveChangesAsync();
+            if (rowEffected > 0)
+                return new Response(true, $"Update on entity with Id: {id}");
+            return new Response(false, $"Entity with Id: {id} not found");
+        }
+        catch (Exception ex)
+        {
+            return new Response(false, $"No changes on entity with Id: {id} , ..." + ex.Message);
+        }
+    }
+
+
     public async Task<Response> UpdateSinglePropertyInEntities<TEntity>(Expression<Func<TEntity, bool>> filter, Action<TEntity> updateAction) where TEntity : class
     {
         var entities = await Context.Set<TEntity>().Where(filter).ToListAsync();
@@ -188,7 +212,7 @@ public class GenericRepository : IGenericRepository
         }
 
         Context.UpdateRange(entities);
-        var row =await Context.SaveChangesAsync();
+        var row = await Context.SaveChangesAsync();
         if (row > 0)
             return new Response(true, $"Update on entity with Id:");
         else
@@ -249,7 +273,7 @@ public class GenericRepository : IGenericRepository
 
         return await query.FirstOrDefaultAsync();
     }
-    
+
     public async Task<int?> GenericCount<TEntity>(Expression<Func<TEntity, bool>>? filter = null) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
@@ -261,8 +285,8 @@ public class GenericRepository : IGenericRepository
 
         return await query.CountAsync();
     }
-    
-    public async Task<TResult?> GenericReadSingle<TEntity,TResult>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TResult?>>? selectExpression) where TEntity : class where TResult: class
+
+    public async Task<TResult?> GenericReadSingle<TEntity, TResult>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TResult?>>? selectExpression) where TEntity : class where TResult : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
@@ -295,8 +319,8 @@ public class GenericRepository : IGenericRepository
         else
             return await query.ToListAsync();
     }
-    
-    public async Task<IEnumerable<TResult>> GenericSelectionReadAll<TEntity,TResult>(Expression<Func<TEntity, bool>>? filter, Expression<Func<TEntity, TResult>> selectExpression, Expression<Func<TEntity, object>>? order, int? page, int? pageSize) where TEntity : class
+
+    public async Task<IEnumerable<TResult>> GenericSelectionReadAll<TEntity, TResult>(Expression<Func<TEntity, bool>>? filter, Expression<Func<TEntity, TResult>> selectExpression, Expression<Func<TEntity, object>>? order, int? page, int? pageSize) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
@@ -373,7 +397,7 @@ public class GenericRepository : IGenericRepository
             return null;
         }
     }
-    
+
     public async Task<IEnumerable<TEntity>?> GenericSearchByText<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>? include, int? page, int? pageSize) where TEntity : class
     {
         try

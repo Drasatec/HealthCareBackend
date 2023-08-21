@@ -52,12 +52,12 @@ public class ContactFormController : ControllerBase
 
 
     [HttpGet("all", Order = 0812)]
-    public async Task<IActionResult> GetAll([FromQuery] string? currencyCode, int? pageSize, int? page)
+    public async Task<IActionResult> GetAll([FromQuery] int? hosId, int? pageSize, int? page)
     {
         Expression<Func<ContactForm, bool>> expression;
-        if (currencyCode != null)
+        if (hosId != null)
         {
-            expression = f => f.Id.Equals(currencyCode);
+            expression = f => f.HospitalId.Equals(hosId);
         }
         else
             expression = null!;

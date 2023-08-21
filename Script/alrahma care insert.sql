@@ -1,12 +1,39 @@
-﻿
--- Inserting data into the Genders table
-INSERT INTO Genders (GenderNumber, GenderName, LangCode)
+﻿-- Insert into Genders table
+INSERT INTO Genders (Id)
+VALUES (1), (2), (3);
+
+-- Insert into GendersTranslations table
+INSERT INTO GendersTranslations (Name, GenderId, LangCode)
 VALUES
-    (1, N'ذكر', 'ar'),
-    (1, 'Male', 'en'),
-    (2, N'أنثى', 'ar'),
-    (2, 'Female', 'en');
-GO
+    ('Male', 1, 'en'),
+    ('ذكر', 1, 'ar'),
+    ('Female', 2, 'en'),
+    ('أنثى', 2, 'ar'),
+    ('Other', 3, 'en'),
+    ('آخر', 3, 'ar');
+
+-- Insert into Weekdays table
+INSERT INTO Weekdays (Id)
+VALUES (1), (2), (3), (4), (5), (6), (7);
+
+-- Insert into WeekdaysTranslations table
+INSERT INTO WeekdaysTranslations (Name, WeekdayId, LangCode)
+VALUES
+    ('Monday', 1, 'en'),
+    ('الإثنين', 1, 'ar'),
+    ('Tuesday', 2, 'en'),
+    ('الثلاثاء', 2, 'ar'),
+    ('Wednesday', 3, 'en'),
+    ('الأربعاء', 3, 'ar'),
+    ('Thursday', 4, 'en'),
+    ('الخميس', 4, 'ar'),
+    ('Friday', 5, 'en'),
+    ('الجمعة', 5, 'ar'),
+    ('Saturday', 6, 'en'),
+    ('السبت', 6, 'ar'),
+    ('Sunday', 7, 'en'),
+    ('الأحد', 7, 'ar');
+
 -- INSERT INTO Users
 -- (Id,FullName,Email,PhoneNumber,EmailConfirmed,PhoneNumberConfirmed, PasswordHash)
 --      VALUES
@@ -905,53 +932,53 @@ VALUES
 GO
 -- ===========================================================================================================================================================
 -- Inserting data into BookingStatuses
-INSERT INTO BookingStatuses (CreateOn)
-VALUES (GETDATE()), -- Assuming current date and time for simplicity
-       (GETDATE()),
-       (GETDATE()),
-       (GETDATE()),
-       (GETDATE());
+-- INSERT INTO BookingStatuses (CreateOn)
+-- VALUES (GETDATE()), -- Assuming current date and time for simplicity
+--        (GETDATE()),
+--        (GETDATE()),
+--        (GETDATE()),
+--        (GETDATE());
 
--- Inserting translation data for the booking statuses (English and Arabic translations)
--- Assuming BookingStatusId starts from 1 for the first row in BookingStatuses table
-INSERT INTO BookingStatusesTranslations (StatusName, BookingStatusId, LangCode)
-VALUES
-('Pending', 1, 'en'),
-('قيد الانتظار', 1, 'ar'),
-('Confirmed', 2, 'en'),
-('تم التأكيد', 2, 'ar'),
-('Cancelled', 3, 'en'),
-('تم الإلغاء', 3, 'ar'),
--- Continue inserting translations for other booking statuses and languages.
-('Completed', 4, 'en'),
-('تم الانتهاء', 4, 'ar'),
-('In Progress', 5, 'en'),
-('جاري التنفيذ', 5, 'ar');
-GO
+-- -- Inserting translation data for the booking statuses (English and Arabic translations)
+-- -- Assuming BookingStatusId starts from 1 for the first row in BookingStatuses table
+-- INSERT INTO BookingStatusesTranslations (StatusName, BookingStatusId, LangCode)
+-- VALUES
+-- ('Pending', 1, 'en'),
+-- ('قيد الانتظار', 1, 'ar'),
+-- ('Confirmed', 2, 'en'),
+-- ('تم التأكيد', 2, 'ar'),
+-- ('Cancelled', 3, 'en'),
+-- ('تم الإلغاء', 3, 'ar'),
+-- -- Continue inserting translations for other booking statuses and languages.
+-- ('Completed', 4, 'en'),
+-- ('تم الانتهاء', 4, 'ar'),
+-- ('In Progress', 5, 'en'),
+-- ('جاري التنفيذ', 5, 'ar');
+-- GO
 GO
 -- ===========================================================================================================================================================
-INSERT INTO Booking (BookingNumber,PatientId, HospitalId, SpecialtyId, DoctorId, WorkingPeriodId, TypeVisitId, ClinicId, PriceCategoryId, CurrencyId, BookingStatusId, Price, VisitingDate,DayNumber)
+INSERT INTO Booking (BookingNumber,PatientId, HospitalId, SpecialtyId, DoctorId, WorkingPeriodId, TypeVisitId, ClinicId, PriceCategoryId, CurrencyId, BookingStatusId, Price, VisitingDate,DayNumber,StatusReason,BookingReason)
 VALUES 
-  ('201203394321',1, 1, 3, 4, 5, 1, 2, 3, 4, 5, 100, '2023-06-01',1),
-  ('201203394322',3, 1, 5, 1, 2, 2, 3, 4, 5, 1, 200, '2023-06-02',2),
-  ('201203394323',2, 1, 4, 5, 1, 3, 4, 5, 1, 2, 300, '2023-06-03',2),
-  ('201203394324',4, 2, 1, 2, 2, 4, 5, 1, 2, 3, 400, '2023-06-04',5),
-  ('201203394325',5, 2, 2, 3, 3, 5, 1, 2, 3, 4, 500, '2023-06-05',1),
-  ('201203394326',1, 2, 3, 4, 4, 1, 2, 3, 4, 5, 600, '2023-06-06',7),
-  ('201203394327',3, 1, 5, 1, 5, 2, 3, 4, 5, 1, 700, '2023-06-07',4),
-  ('201203394328',2, 1, 4, 5, 1, 3, 4, 5, 1, 2, 800, '2023-06-08',6),
-  ('201203394329',4, 1, 1, 2, 2, 4, 5, 1, 2, 3, 900, '2023-06-09',1),
-  ('201203394320',5, 1, 2, 3, 3, 5, 1, 2, 3, 4, 1000, '2023-06-10',1),
-  ('201203394312',1, 1, 3, 4, 4, 1, 2, 3, 4, 5, 1100, '2023-06-11',2),
-  ('211203394132',3, 2, 5, 1, 5, 2, 3, 4, 5, 1, 1200, '2023-06-12',2),
-  ('221203394232',2, 2, 4, 5, 1, 3, 4, 5, 1, 2, 1300, '2023-06-13',5),
-  ('231203393432',4, 2, 1, 2, 2, 4, 5, 1, 2, 3, 1400, '2023-06-14',1),
-  ('241203349432',5, 1, 2, 3, 3, 5, 1, 2, 3, 4, 1500, '2023-06-15',7),
-  ('251203539432',1, 1, 3, 4, 4, 1, 2, 3, 4, 5, 1600, '2023-06-16',4),
-  ('261203639432',3, 1, 5, 1, 5, 2, 3, 4, 5, 1, 1700, '2023-06-17',6),
-  ('271203739432',2, 2, 4, 5, 1, 3, 4, 5, 1, 2, 1800, '2023-06-18',1),
-  ('271203839432',4, 1, 1, 2, 2, 4, 5, 1, 2, 3, 1900, '2023-06-19',1),
-  ('281203739432',5, 1, 2, 3, 3, 5, 1, 2, 3, 4, 2000, '2023-06-20',4)
+  ('201203394321',1, 1, 3, 4, 5, 1, 2, 3, 4, 5, 100,  '2023-08-17T00:00:00+00:00',1,'',''),
+  ('201203394322',3, 1, 5, 1, 2, 2, 3, 4, 5, 1, 200,  '2023-08-17T00:00:00+00:00',2,'',''),
+  ('201203394323',2, 1, 4, 5, 1, 3, 4, 5, 1, 2, 300,  '2023-08-17T00:00:00+00:00',2,'',''),
+  ('201203394324',4, 2, 1, 2, 2, 4, 5, 1, 2, 3, 400,  '2023-08-17T00:00:00+00:00',5,'',''),
+  ('201203394325',5, 2, 2, 3, 3, 5, 1, 2, 3, 4, 500,  '2023-08-17T00:00:00+00:00',1,'',''),
+  ('201203394326',1, 2, 3, 4, 4, 1, 2, 3, 4, 5, 600,  '2023-08-17T00:00:00+00:00',7,'',''),
+  ('201203394327',3, 1, 5, 1, 5, 2, 3, 4, 5, 1, 700,  '2023-08-17T00:00:00+00:00',4,'',''),
+  ('201203394328',2, 1, 4, 5, 1, 3, 4, 5, 1, 2, 800,  '2023-08-17T00:00:00+00:00',6,'',''),
+  ('201203394329',4, 1, 1, 2, 2, 4, 5, 1, 2, 3, 900,  '2023-08-17T00:00:00+00:00',1,'',''),
+  ('201203394320',5, 1, 2, 3, 3, 5, 1, 2, 3, 4, 1000, '2023-08-17T00:00:00+00:00',1,'',''),
+  ('201203394312',1, 1, 3, 4, 4, 1, 2, 3, 4, 5, 1100, '2023-08-17T00:00:00+00:00',2,'',''),
+  ('211203394132',3, 2, 5, 1, 5, 2, 3, 4, 5, 1, 1200, '2023-08-17T00:00:00+00:00',2,'',''),
+  ('221203394232',2, 2, 4, 5, 1, 3, 4, 5, 1, 2, 1300, '2023-08-17T00:00:00+00:00',5,'',''),
+  ('231203393432',4, 2, 1, 2, 2, 4, 5, 1, 2, 3, 1400, '2023-08-17T00:00:00+00:00',1,'',''),
+  ('241203349432',5, 1, 2, 3, 3, 5, 1, 2, 3, 4, 1500, '2023-08-17T00:00:00+00:00',7,'',''),
+  ('251203539432',1, 1, 3, 4, 4, 1, 2, 3, 4, 5, 1600, '2023-08-17T00:00:00+00:00',4,'',''),
+  ('261203639432',3, 1, 5, 1, 5, 2, 3, 4, 5, 1, 1700, '2023-08-17T00:00:00+00:00',6,'',''),
+  ('271203739432',2, 2, 4, 5, 1, 3, 4, 5, 1, 2, 1800, '2023-08-17T00:00:00+00:00',1,'',''),
+  ('271203839432',4, 1, 1, 2, 2, 4, 5, 1, 2, 3, 1900, '2023-08-17T00:00:00+00:00',1,'',''),
+  ('281203739432',5, 1, 2, 3, 3, 5, 1, 2, 3, 4, 2000, '2023-08-17T00:00:00+00:00',4,'','')
 ;
 
 GO

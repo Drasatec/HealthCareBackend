@@ -5,11 +5,11 @@ namespace WebAPI.My_Models2;
 
 public partial class MaritalStatusTranslation
 {
-    public int Id { get; set; }
+    public short Id { get; set; }
 
     public string? Name { get; set; }
 
-    public byte? MaritalId { get; set; }
+    public short? MaritalId { get; set; }
 
     public string? LangCode { get; set; }
 

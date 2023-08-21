@@ -1,5 +1,4 @@
 ﻿using DataAccess.Contexts;
-using DataAccess.Services;
 using DomainModel.Entities.Users;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
@@ -8,7 +7,6 @@ using DomainModel.Models;
 using DomainModel.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using r = Twilio.TwiML.Voice;
 
 namespace DataAccess.Repositories;
 

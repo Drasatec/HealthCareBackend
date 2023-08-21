@@ -1,5 +1,6 @@
 ﻿using DomainModel.Contracts;
 using DomainModel.Entities.SettingsEntities;
+using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
 using System.Linq.Expressions;
 
@@ -24,14 +25,13 @@ public class HumanGenderController : ControllerBase
     [HttpPost("add", Order = 0801)]
     public async Task<IActionResult> AddSingle([FromForm] Gender model)
     {
-
-        if (model == null)
+        if (model.Id <= 0)
         {
-            return BadRequest(new Error("400", "model is requerd"));
+            model.Id = Convert.ToInt16(await Data.Generic.GenericCount<Gender>() + 1);
         }
+
         var res = await Data.Generic.GenericCreate(model);
         int id = 0;
-
         if (res.Success)
         {
             if (res.Value is not null)
@@ -42,35 +42,22 @@ public class HumanGenderController : ControllerBase
         return BadRequest(res);
     }
 
-
     // ============================= get ============================= 
 
-
     [HttpGet(Order = 0801)]
-    public async Task<IActionResult> GetById([FromQuery] int? id)
+    public async Task<IActionResult> GetById([FromQuery] short id, string? lang)
     {
-        if (id < 1)
-            return BadRequest(new Error("400", "can not assign 0"));
+        if (id < 1) return BadRequest(new Error("400", "can not assign 0"));
 
-        var result = await Data.Generic.GenericReadById<Gender>(f => f.Id.Equals(id), null);
-
-        return Ok(result);
-    }
-
-    [HttpGet("gender", Order = 0801)]
-    public async Task<IActionResult> GetByNumber([FromQuery] byte? number)
-    {
-        if (number < 1)
-            return BadRequest(new Error("400", "can not assign 0"));
-
-        Expression<Func<Gender, bool>> filter;
-
-        if (number.HasValue)
-            filter = f => f.GenderNumber.Equals(number);
+        Expression<Func<Gender, object>>? filterExpression;
+        if (lang != null)
+        {
+            filterExpression = inc => inc.GendersTranslations.Where(l => l.LangCode == lang);
+        }
         else
-            return BadRequest(new Error("400", "can not assign null"));
+            filterExpression = inc => inc.GendersTranslations;
 
-        var result = await Data.Generic.GenericReadAll(filter, null, null, null);
+        var result = await Data.Generic.GenericReadById(i => i.Id == id, filterExpression);
 
         return Ok(result);
     }
@@ -79,22 +66,43 @@ public class HumanGenderController : ControllerBase
     [HttpGet("names", Order = 0811)]
     public async Task<IActionResult> GetAllNames([FromQuery] string? lang, int? page, int? pageSize)
     {
-        var result = await Data.Generic.GenericReadAll<Gender>(t => t.LangCode.Equals(lang), null, page, pageSize);
+
+        var result = await Data.Generic.GenericReadAll<GendersTranslation>(t => t.LangCode.Equals(lang), null, page, pageSize);
         return Ok(result);
     }
 
-    // not working
+
     [HttpGet("all", Order = 0812)]
-    public async Task<IActionResult> GetAll([FromQuery] bool? isActive, int? pageSize, int? page, string? lang)
+    public async Task<IActionResult> GetAll([FromQuery] int? pageSize, int? page, string? lang)
     {
 
-        var result = await Data.Generic.GenericReadAll<Gender>(t => t.LangCode.Equals(lang), null, page, pageSize);
+        var result = await Data.Generic.GenericReadAllWihInclude<Gender>(null, o => o.Id, inc => inc.GendersTranslations.Where(l => l.LangCode == lang), page, pageSize);
 
         if (result == null)
         {
             return Ok(new Response(true, "no content"));
         }
+
+
         return Ok(result);
+    }
+
+
+    [HttpGet("search", Order = 0814)]
+    public async Task<IActionResult> Search([FromQuery] string? searchTerm, string? name, int? page, int? pageSize, string? lang)
+    {
+        if (!string.IsNullOrEmpty(name))
+        {
+            return Ok(await Data.Generic.GenericSearchByText<GendersTranslation>(t => t.Name.Contains(name), null, page, pageSize));
+        }
+        else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
+        {
+            Expression<Func<Gender, bool>> filter = f => f.GendersTranslations.Any(t => t.Name.Contains(searchTerm));
+            Expression<Func<Gender, object>> include = i => i.GendersTranslations.Where(l => l.LangCode == lang);
+
+            return Ok(await Data.Generic.GenericSearchByText(filter, include, page, pageSize));
+        }
+        return BadRequest(new Error("400", "name or searchTerm with lang is required"));
     }
 
 
@@ -102,7 +110,7 @@ public class HumanGenderController : ControllerBase
 
 
     [HttpPut("edit", Order = 0820)]
-    public async Task<IActionResult> Update([FromForm] Gender model)
+    public async Task<IActionResult> UpdateSingleWithImage([FromForm] Gender model)
     {
         Response response;
 
@@ -114,10 +122,40 @@ public class HumanGenderController : ControllerBase
         return Created("https//fawzy", response);
     }
 
+    [HttpPut("edit-translations", Order = 0822)]
+    public async Task<IActionResult> Add_EditTranslations([FromForm] List<GendersTranslation> translations)
+    {
+        Response response;
+
+        response = await Data.Generic.GenericUpdate(translations);
+
+        if (response.Success)
+            return Created("fawzy", response);
+
+        return BadRequest(response);
+    }
+
     // ============================= delete ============================= 
 
+    [HttpDelete("delete-translat", Order = 0830)]
+    public async Task<IActionResult> DeleteTraslate([FromQuery] short? parentId, [FromQuery] params int[] translteId)
+    {
+        Expression<Func<GendersTranslation, bool>> expression;
+
+        if (parentId.HasValue)
+            expression = t => t.GenderId.Equals(parentId);
+        else
+            expression = t => translteId.Contains(t.Id);
+
+        var res = await Data.Generic.GenericDelete(expression, translteId);
+
+        if (res.Success)
+            return Ok(res);
+        return BadRequest(res);
+    }
+
     [HttpDelete("delete", Order = 0830)]
-    public async Task<IActionResult> Delete([FromQuery] int id)
+    public async Task<IActionResult> Delete([FromQuery] short id)
     {
         var res = await Data.Generic.GenericDelete<Gender>(t => t.Id.Equals(id));
         if (res.Success)
@@ -126,3 +164,4 @@ public class HumanGenderController : ControllerBase
     }
 
 }// end class
+

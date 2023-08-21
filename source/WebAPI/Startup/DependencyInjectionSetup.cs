@@ -28,11 +28,15 @@ public static class DependencyInjectionSetup
         });
 
         Services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
-        Services.AddScoped<IAuthService, AuthService>();
         Services.AddTransient<IMailingService, MailingService>();
         Services.AddTransient<ISMSService, SMSService>();
         Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+        Services.AddScoped<IAuthService, AuthService>();
         Services.AddScoped<IUserRepository, UserRepository>();
+
+        Services.AddScoped<IAdminRepository, AdminRepository>();
+        Services.AddScoped<IAdminAuthService, AdminAuthService>();
 
         return Services;
     }
@@ -41,7 +45,7 @@ public static class DependencyInjectionSetup
     {
         // LocalDb ||| SomeeDb
         Services.AddDbContext<AppDbContext>(options => options
-        .UseSqlServer(Configuration.GetConnectionString("SomeeDb"))
+        .UseSqlServer(Configuration.GetConnectionString("LocalDb"))
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
         return Services;
     }

@@ -11,7 +11,7 @@ public partial class TypesVisit
 
     public DateTime? CreateOn { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 

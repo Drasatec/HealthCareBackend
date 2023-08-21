@@ -31,5 +31,6 @@ namespace DomainModel.Interfaces
         Task<Response> GenericCreateRange<TEntity>(List<TEntity> entity) where TEntity : class;
         Task<int?> GenericCount<TEntity>(Expression<Func<TEntity, bool>>? filter = null) where TEntity : class;
         Task<Response> UpdateSinglePropertyInEntities<TEntity>(Expression<Func<TEntity, bool>> filter, Action<TEntity> updateAction) where TEntity : class;
+        Task<Response> GenericUpdatePropertiesById<TEntity>(int id, TEntity entity, params Expression<Func<TEntity, object>>[]? propertiesIsModified) where TEntity : class;
     }
 }

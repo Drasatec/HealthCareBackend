@@ -13,7 +13,7 @@ public partial class HosBuilding
 
     public DateTime? CreateOn { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     public int HospitalId { get; set; }
 

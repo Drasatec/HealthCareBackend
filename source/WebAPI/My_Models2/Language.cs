@@ -9,6 +9,8 @@ public partial class Language
 
     public string? LanguageName { get; set; }
 
+    public bool IsDefault { get; set; }
+
     public virtual ICollection<BookingStatusesTranslation> BookingStatusesTranslations { get; set; } = new List<BookingStatusesTranslation>();
 
     public virtual ICollection<BuildingTranslation> BuildingTranslations { get; set; } = new List<BuildingTranslation>();
@@ -23,7 +25,7 @@ public partial class Language
 
     public virtual ICollection<FloorTranslation> FloorTranslations { get; set; } = new List<FloorTranslation>();
 
-    public virtual ICollection<Gender> Genders { get; set; } = new List<Gender>();
+    public virtual ICollection<GendersTranslation> GendersTranslations { get; set; } = new List<GendersTranslation>();
 
     public virtual ICollection<HospitalFeatureTranslation> HospitalFeatureTranslations { get; set; } = new List<HospitalFeatureTranslation>();
 
@@ -57,7 +59,7 @@ public partial class Language
 
     public virtual ICollection<TypesVisitTranslation> TypesVisitTranslations { get; set; } = new List<TypesVisitTranslation>();
 
-    public virtual ICollection<Weekday> Weekdays { get; set; } = new List<Weekday>();
+    public virtual ICollection<WeekdaysTranslation> WeekdaysTranslations { get; set; } = new List<WeekdaysTranslation>();
 
     public virtual ICollection<WorkingPeriodTranslation> WorkingPeriodTranslations { get; set; } = new List<WorkingPeriodTranslation>();
 }

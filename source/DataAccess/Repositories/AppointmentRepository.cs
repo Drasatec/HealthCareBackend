@@ -1,6 +1,6 @@
 ﻿using DataAccess.Contexts;
 using DomainModel.Entities;
-using DomainModel.Entities.SettingsEntities;
+using DomainModel.Helpers;
 using DomainModel.Interfaces;
 using DomainModel.Models;
 using DomainModel.Models.Bookings;
@@ -28,6 +28,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                 }
                 entity.BookingNumber = $"B{DateTime.Now.ToString("yyyyddMM")}{Context.Bookings.Count()}";
 
+                entity.VisitingDate = entity.VisitingDate.HasValue ? entity.VisitingDate.Value.ToUniversalTime() : null;
                 var result = await Context.Bookings.AddAsync(entity);
                 var row = await Context.SaveChangesAsync();
                 if (row > 0)
@@ -119,6 +120,23 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                     query = query.Where(t => t.VisitingDate > DateTimeOffset.UtcNow);
                 }
 
+                if (filterOptions.StartDateTime is not null && filterOptions.EndDateTime is not null)
+                {
+                    if (filterOptions.StartDateTime > filterOptions.EndDateTime)
+                        return null;
+                    //query = query.Where(t => t.VisitingDate >= filterOptions.StartDateTime.Value.ToUniversalTime() && t.VisitingDate <= filterOptions.EndDateTime.Value.ToUniversalTime());
+                }
+
+                if (filterOptions.StartDateTime is not null)
+                {
+                    query = query.Where(t => t.VisitingDate >= filterOptions.StartDateTime.Value.ToUniversalTime());
+                }
+
+                if (filterOptions.EndDateTime is not null)
+                {
+                    query = query.Where(et => et.VisitingDate <= filterOptions.EndDateTime.Value.ToUniversalTime());
+                }
+
             }
             if (lang != null)
                 result = (from h in query
@@ -141,11 +159,11 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                           join wp in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wp.WorkingPeriodId
                           where wp.LangCode == lang
 
-                          join pati in Context.PatientTranslations on h.PatientId equals pati.PatientId
-                          where pati.LangCode == lang
-
                           join bstat in Context.BookingStatusesTranslations on h.BookingStatusId equals bstat.BookingStatusId
                           where bstat.LangCode == lang
+
+                          //join pati in Context.PatientTranslations on h.PatientId equals pati.PatientId
+                          //where ( pati.LangCode == lang )|| (lang != Constants.BaseLang && pati.LangCode != lang && pati.LangCode == Constants.BaseLang)
 
                           select new BookingResponseDto
                           {
@@ -165,7 +183,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                               PriceCategoryId = h.PriceCategoryId,
                               DayNumber = h.DayNumber,
                               BookingReason = h.BookingReason,
-
+                              StatusReason = h.StatusReason,
 
                               Hospital = hos.Name,
                               Specialty = spec.Name,
@@ -173,9 +191,11 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                               Doctor = doc.FullName,
                               TypeVisit = tv.Name,
                               WorkingPeriod = wp.Name,
-                              Patient = pati.FullName,
                               BookingStatus = bstat.StatusName,
-
+                              Patient = (from pt in Context.PatientTranslations
+                                       where pt.PatientId == h.PatientId
+                                       where pt.LangCode == lang || pt.LangCode != lang && pt.LangCode == Constants.BaseLang
+                                         select pt.FullName).FirstOrDefault(),
                               CreateOn = h.CreateOn,
                           });
             else
@@ -197,6 +217,7 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                               VisitingDate = h.VisitingDate,
                               BookingNumber = h.BookingNumber,
                               BookingReason = h.BookingReason,
+                              StatusReason = h.StatusReason,
                           });
 
             var totalCount = await result.CountAsync();

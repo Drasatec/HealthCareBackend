@@ -1,9 +1,4 @@
 ﻿using DomainModel.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DomainModel.Models.Bookings;
 
@@ -33,6 +28,8 @@ public class BookingResponseDto
 
     public short? BookingStatusId { get; set; }
 
+    public string? StatusReason { get; set; }
+
     public int? Price { get; set; }
 
     public DateTimeOffset? VisitingDate { get; set; }
@@ -42,26 +39,27 @@ public class BookingResponseDto
     public byte DayNumber { get; set; }
 
     public string? BookingReason { get; set; }
+    
 
-    public virtual string? BookingStatus { get; set; }
+    public string? BookingStatus { get; set; }
 
-    public virtual string? Clinic { get; set; }
+    public string? Clinic { get; set; }
 
-    public virtual string? Currency { get; set; }
+    public string? Currency { get; set; }
 
-    public virtual string Doctor { get; set; } = null!;
+    public string Doctor { get; set; } = null!;
 
-    public virtual string Hospital { get; set; } = null!;
+    public string Hospital { get; set; } = null!;
 
-    public virtual string Patient { get; set; } = null!;
+    public string? Patient { get; set; } 
 
-    public virtual string? PriceCategory { get; set; }
+    public string? PriceCategory { get; set; }
 
-    public virtual string Specialty { get; set; } = null!;
+    public string Specialty { get; set; } = null!;
 
-    public virtual string TypeVisit { get; set; } = null!;
+    public string TypeVisit { get; set; } = null!;
 
-    public virtual string WorkingPeriod { get; set; } = null!;
+    public string WorkingPeriod { get; set; } = null!;
 
 
     public static implicit operator BookingResponseDto(Booking arg)
@@ -88,6 +86,7 @@ public class BookingResponseDto
             BookingNumber = arg.BookingNumber,
             DayNumber = arg.DayNumber,
             BookingReason = arg.BookingReason,
+            StatusReason = arg.StatusReason,
         };
     }
 

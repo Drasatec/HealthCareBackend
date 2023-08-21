@@ -55,7 +55,12 @@ public class BookingController : ControllerBase
     public async Task<IActionResult> Get([FromQuery] AppointmentFilterOptions filterOptions, [FromQuery] PaginationOptions pageOptions, string? lang)
     {
         //return Ok(filterOptions);
-        return Ok(await Data.Appointments.ReadAllAppointments(filterOptions,pageOptions,lang));
+        var res = await Data.Appointments.ReadAllAppointments(filterOptions, pageOptions, lang);
+        if(res == null)
+        {
+            return BadRequest(new Response(false, "pleas check you inputs"));
+        }
+        return Ok(res);
     }
 
     // ============================= put ============================= 
@@ -74,15 +79,15 @@ public class BookingController : ControllerBase
     }
 
     [HttpPut("edit-status", Order = 0925)]
-    public async Task<IActionResult> EditSingleProp([FromQuery] long? bookingId, short? statusId)
+    public async Task<IActionResult> EditSingleProp([FromQuery] long? bookingId, short? statusId, string statusReason = "")
     {
         if (!bookingId.HasValue || !statusId.HasValue)
         {
             return BadRequest(new Response(false, "id field is requerd"));
         }
 
-        Booking entity = new() { Id = bookingId.Value, BookingStatusId = statusId.Value };
-        return Ok(await Data.Clinics.GenericUpdateSinglePropertyById((int)bookingId.Value, entity, p => p.BookingStatusId));
+        Booking entity = new() { Id = bookingId.Value, BookingStatusId = statusId.Value, StatusReason = statusReason };
+        return Ok(await Data.Clinics.GenericUpdatePropertiesById((int)bookingId.Value, entity, sId=>sId.BookingStatusId, sr => sr.StatusReason));
     }
 
 
