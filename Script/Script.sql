@@ -1260,6 +1260,11 @@ CREATE TABLE ClientGroups
       REFERENCES HosClients(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 );
+-- ================================================================================= Patients =================================================================================
+-- ================================================================================= Patients =================================================================================
+-- ================================================================================= Patients =================================================================================
+-- ================================================================================= Patients =================================================================================
+-- ================================================================================= Patients =================================================================================
 GO
 ---------------- 
 CREATE TABLE Patients
@@ -1269,18 +1274,18 @@ CREATE TABLE Patients
     PhoneNumber VARCHAR(25),
     gender TINYINT,
     BirthDate DATE,
-    MaritalStatus TINYINT, --(single - married - divorced - widower)
     SSN TINYINT, --Social Security number
     NationalID TINYINT,
     BloodType VARCHAR (10),
     PatientStatus TINYINT, -- active=0  inactive=1  attitude=2)
     Photo VARCHAR(55),
-    Religion TINYINT,
     SSNTypeId INT, --(ID card - passport - insurance card - job card - driver's license)
     IsDeleted BIT NOT NULL DEFAULT 0,
     ClientId INT NULL,
     ClientGroupId INT,
     NationalityId INT,
+    MaritalStatus TINYINT, --(single - married - divorced - widower)
+    Religion TINYINT,
     UserId nvarchar (450) NULL
 
 	CONSTRAINT PK_Patients PRIMARY KEY (Id),

@@ -38,6 +38,9 @@ public static class DependencyInjectionSetup
         Services.AddScoped<IAdminRepository, AdminRepository>();
         Services.AddScoped<IAdminAuthService, AdminAuthService>();
 
+        Services.AddScoped<IStatisticsRepository, StatisticsRepository>();
+
+
         return Services;
     }
 
