@@ -55,7 +55,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 var app = builder.Build();
-app.UseStaticFiles();
 app.UseCors(w => w.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseStaticFiles();
 app.AppUsingPoints();
 

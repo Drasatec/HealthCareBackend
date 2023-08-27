@@ -32,7 +32,7 @@ public static class DataAccessImageService
             name = Helper.GenerateImageName();
         }
         using var imageResult = Image.Load(image);
-        CreateDirectories(path);
+        //CreateDirectories(path);
 
         // await SaveImageInFileSystem(imageResult, name, path + original, imageResult.Width);
         await SaveImageInFileSystem(imageResult, name, path + medium, mediumSize);
@@ -54,7 +54,7 @@ public static class DataAccessImageService
 
     private static void CreateDirectories(string path)
     {
-        Directory.CreateDirectory(path + original);
+        //Directory.CreateDirectory(path + original);
         Directory.CreateDirectory(path + medium);
         Directory.CreateDirectory(path + small);
     }

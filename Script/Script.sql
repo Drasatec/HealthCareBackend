@@ -7,56 +7,57 @@
 -- GO
 
 --GO
--- CREATE TABLE Users(
---	[Id] [nvarchar](450) NOT NULL, --*
---	[FullName] [nvarchar](100) NOT NULL, --*
---	[UserName] [nvarchar](256) NULL,
---	[PhoneNumber] [nvarchar](max) NULL,
---	[Email] [nvarchar](256) NULL,
---	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
---	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
---    [VerificationCode] VARCHar(8), -- new
---    [ExpirationTime] DATETIMEOFFSET(7), -- new
---    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
---	[PasswordHash] [nvarchar](max) NULL,
---	[SecurityStamp] [nvarchar](max) NULL,
---	[ConcurrencyStamp] [nvarchar](max) NULL,
---	[TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
---	[LockoutEnd] [DATETIMEOFFSET](7) NULL,
---	[LockoutEnabled] [bit] NOT NULL DEFAULT 0,
---	[AccessFailedCount] [int] NOT NULL DEFAULT 0,
+CREATE TABLE Users(
+	[Id] [nvarchar](450) NOT NULL, --*
+	[FullName] [nvarchar](100) NOT NULL, --*
+	[PhoneNumber] [nvarchar](max) NULL,
+	[Email] [nvarchar](256) NULL,
+	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
+	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
+    [VerificationCode] VARCHAR(8), -- new
+    [ExpirationTime] DATETIMEOFFSET(7), -- new
+    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
+	[PasswordHash] [nvarchar](max) NULL,
+	
+    -- [UserName] [nvarchar](256) NULL,
+	-- [SecurityStamp] [nvarchar](max) NULL,
+	-- [ConcurrencyStamp] [nvarchar](max) NULL,
+	-- [TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
+	-- [LockoutEnd] [DATETIMEOFFSET](7) NULL,
+	-- [LockoutEnabled] [bit] NOT NULL DEFAULT 0,
+	-- [AccessFailedCount] [int] NOT NULL DEFAULT 0,
 
---	CONSTRAINT PK_Users PRIMARY KEY (Id),
---);
--- GO
--- CREATE TABLE Roles(
--- 	[Id] [nvarchar](450) NOT NULL,
--- 	[Name] [nvarchar](256) NULL,
--- 	[ConcurrencyStamp] [nvarchar](max) NULL,
+	CONSTRAINT PK_Users PRIMARY KEY (Id),
+);
+GO
+CREATE TABLE Roles(
+	[Id] [nvarchar](450) NOT NULL,
+	[Name] [nvarchar](256) NULL,
+	[ConcurrencyStamp] [nvarchar](max) NULL,
 
--- 	CONSTRAINT PK_Roles PRIMARY KEY (Id),
--- );
+	CONSTRAINT PK_Roles PRIMARY KEY (Id),
+);
 
--- GO
--- CREATE TABLE UserRoles(
--- 	[Id] [BIGINT] IDENTITY(1,1),
--- 	[UserId] [nvarchar](450) NOT NULL,
--- 	[RoleId] [nvarchar](450) NOT NULL,
--- 	[CreateOn] DATETIME DEFAULT GETDATE(),
+GO
+CREATE TABLE UserRoles(
+	[Id] [BIGINT] IDENTITY(1,1),
+	[UserId] [nvarchar](450) NOT NULL,
+	[RoleId] [nvarchar](450) NOT NULL,
+	[CreateOn] DATETIME DEFAULT GETDATE(),
 
--- 	CONSTRAINT PK_UserRoles PRIMARY KEY (Id),
+	CONSTRAINT PK_UserRoles PRIMARY KEY (Id),
 
--- 	CONSTRAINT FK_UserRoles_UserId
---     FOREIGN KEY (UserId)
---       REFERENCES Users(Id)
--- 		ON DELETE CASCADE,
+	CONSTRAINT FK_UserRoles_UserId
+    FOREIGN KEY (UserId)
+      REFERENCES Users(Id)
+		ON DELETE CASCADE,
 
---     CONSTRAINT FK_UserRoles_RoleId
---     FOREIGN KEY (RoleId)
---       REFERENCES Roles(Id)
--- 		ON DELETE CASCADE,
--- );
--- GO
+    CONSTRAINT FK_UserRoles_RoleId
+    FOREIGN KEY (RoleId)
+      REFERENCES Roles(Id)
+		ON DELETE CASCADE,
+);
+GO
 ----------------
 CREATE TABLE EmployeeAccounts(
 	[Id] [nvarchar](450) NOT NULL, --*

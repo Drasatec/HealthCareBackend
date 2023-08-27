@@ -46,9 +46,9 @@ public static class DependencyInjectionSetup
 
     public static IServiceCollection RegisterDbContext(this IServiceCollection Services, IConfiguration Configuration)
     {
-        // LocalDb ||| SomeeDb
+        // LocalDb ||| SomeeDb || smarter
         Services.AddDbContext<AppDbContext>(options => options
-        .UseSqlServer(Configuration.GetConnectionString("LocalDb"))
+        .UseSqlServer(Configuration.GetConnectionString("smarter"))
         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
         return Services;
     }

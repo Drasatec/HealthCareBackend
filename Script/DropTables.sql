@@ -1,3 +1,4 @@
+-- TRUNCATE TABLE ;
 DROP TABLE GendersTranslations;
 DROP TABLE Genders;
 DROP TABLE WeekdaysTranslations;
@@ -72,9 +73,9 @@ DROP TABLE ContactForm;
 DROP TABLE Hospitals;
 DROP TABLE Currencies;
 DROP TABLE Languages;
--- DROP TABLE UserRoles;
--- DROP TABLE Roles;
--- DROP TABLE Users;
+DROP TABLE UserRoles;
+DROP TABLE Roles;
+DROP TABLE Users;
 DROP TABLE ConfirmationOptions;
 
 SELECT TABLE_NAME

@@ -5,13 +5,13 @@ public class UserRegisterDto
 {
     public string FullName { get; set; } = null!;
 
-    public string Username { get; set; } = string.Empty;
+    //public string Username { get; set; } = string.Empty;
 
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; }
 
     public string Password { get; set; } = null!;
 
-    public string PhoneNumber { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; } 
 
 
     public static implicit operator User(UserRegisterDto dto)
@@ -20,7 +20,7 @@ public class UserRegisterDto
         {
             Id = Guid.NewGuid().ToString(),
             FullName = dto.FullName,
-            Email = dto.Email.ToLower(),
+            Email = dto.Email?.ToLower(),
             //UserName = dto.Username,
             PhoneNumber = dto.PhoneNumber,
 

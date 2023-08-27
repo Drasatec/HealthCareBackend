@@ -85,7 +85,7 @@ public class AuthService : IAuthService
             Success = true,
             Email = entity.Email,
             Roles = new List<string> { "User" },
-            Username = entity.UserName,
+            //Username = entity.UserName,
             IsAuthenticated = false,
             ExpiresOn = null,
             Token = null,
@@ -137,7 +137,7 @@ public class AuthService : IAuthService
 
         auth.UserId = user.Id;
         auth.Email = user.Email;
-        auth.Username = user.UserName;
+       // auth.Username = user.UserName;
         auth.Success = true;
         auth.IsAuthenticated = true;
         auth.Roles = new List<string> { "User" };
@@ -292,7 +292,7 @@ public class AuthService : IAuthService
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+            //new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim("uid", user.Id),

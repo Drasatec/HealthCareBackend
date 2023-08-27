@@ -195,7 +195,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.CreateOn).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.Email).HasMaxLength(256);
             entity.Property(e => e.FullName).HasMaxLength(100);
-            entity.Property(e => e.UserName).HasMaxLength(256);
+            //entity.Property(e => e.UserName).HasMaxLength(256);
             entity.Property(e => e.VerificationCode)
                 .HasMaxLength(8)
                 .IsUnicode(false);
