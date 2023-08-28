@@ -379,6 +379,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             {
                 Id = h.Id,
                 DoctorId = h.DoctorId,
+                SpecialtyId = h.SpecialtyId,
                 ClinicId = h.ClinicId,
                 HospitalId = h.HospitalId,
                 WorkingPeriodId = h.WorkingPeriodId,
@@ -406,6 +407,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                     {
                         Id = h.Id,
                         DoctorId = h.DoctorId,
+                        SpecialtyId = h.SpecialtyId,
                         ClinicId = h.ClinicId,
                         HospitalId = h.HospitalId,
                         WorkingPeriodId = h.WorkingPeriodId,
