@@ -1,28 +1,18 @@
 -- TRUNCATE TABLE ;
 DROP TABLE GendersTranslations;
 DROP TABLE Genders;
-DROP TABLE WeekdaysTranslations;
-DROP TABLE Weekdays;
 DROP TABLE EmployeeAccounts;
 
 DROP TABLE Booking;
 DROP TABLE BookingStatusesTranslations;
 DROP TABLE BookingStatuses;
-DROP TABLE ClientsSubscription;
+DROP TABLE UserAccount;
 DROP TABLE PatientTranslations;
 DROP TABLE Patients;
 DROP TABLE ClientGroups;
 DROP TABLE SSNTypesTranslations;
 DROP TABLE SSNTypes;
 DROP TABLE HosClients;
-DROP TABLE ServicePrices;
-
-DROP TABLE ServiceTranslations;
-DROP TABLE Services;
-DROP TABLE SecondaryServiceTranslations;
-DROP TABLE SecondaryServices;
-DROP TABLE MainServiceTranslations;
-DROP TABLE MainServices;
 
 DROP TABLE DoctorWorkPeriods;
 DROP TABLE DoctorVisitPrices;
@@ -30,6 +20,9 @@ DROP TABLE TypesVisitTranslations;
 DROP TABLE TypesVisit;
 DROP TABLE PriceCategoryTranslations;
 DROP TABLE PriceCategories;
+
+DROP TABLE WeekdaysTranslations;
+DROP TABLE Weekdays;
 
 DROP TABLE WorkingPeriodTranslations;
 DROP TABLE WorkingPeriod;
@@ -70,12 +63,13 @@ DROP TABLE HospitalTranslations;
 DROP TABLE HospitalFeatureTranslations;
 DROP TABLE HospitalFeatures;
 DROP TABLE ContactForm;
+DROP TABLE CountriesTranslations;
+DROP TABLE Countries;
 DROP TABLE Hospitals;
-DROP TABLE Currencies;
 DROP TABLE Languages;
-DROP TABLE UserRoles;
-DROP TABLE Roles;
-DROP TABLE Users;
+--DROP TABLE UserRoles;
+--DROP TABLE Roles;
+--DROP TABLE Users;
 DROP TABLE ConfirmationOptions;
 
 SELECT TABLE_NAME

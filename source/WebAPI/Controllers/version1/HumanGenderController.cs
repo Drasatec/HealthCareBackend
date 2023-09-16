@@ -21,7 +21,6 @@ public class HumanGenderController : ControllerBase
 
     // ============================= post ============================= 
 
-
     [HttpPost("add", Order = 0801)]
     public async Task<IActionResult> AddSingle([FromForm] Gender model)
     {

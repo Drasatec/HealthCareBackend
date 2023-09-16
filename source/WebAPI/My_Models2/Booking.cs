@@ -27,7 +27,7 @@ public partial class Booking
 
     public int? PriceCategoryId { get; set; }
 
-    public int? CurrencyId { get; set; }
+    public string? CurrencyCode { get; set; }
 
     public int? Price { get; set; }
 
@@ -35,15 +35,15 @@ public partial class Booking
 
     public DateTimeOffset? VisitingDate { get; set; }
 
+    public DateTimeOffset? CreateOn { get; set; }
+
     public string? BookingReason { get; set; }
 
-    public DateTimeOffset? CreateOn { get; set; }
+    public string? StatusReason { get; set; }
 
     public virtual BookingStatus BookingStatus { get; set; } = null!;
 
     public virtual Clinic Clinic { get; set; } = null!;
-
-    public virtual Currency? Currency { get; set; }
 
     public virtual Doctor Doctor { get; set; } = null!;
 

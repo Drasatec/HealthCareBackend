@@ -207,7 +207,6 @@ public class PatientController : ControllerBase
 
     // ============================= delete ============================= 
 
-
     [HttpDelete("delete-translat", Order = 0930)]
     public async Task<IActionResult> DeleteTraslate([FromQuery] params int[] translteId)
     {

@@ -24,7 +24,7 @@ public class BookingResponseDto
 
     public int? PriceCategoryId { get; set; }
 
-    public int? CurrencyId { get; set; }
+    public string? CurrencyCode { get; set; }
 
     public short? BookingStatusId { get; set; }
 
@@ -77,7 +77,7 @@ public class BookingResponseDto
             BookingStatusId = arg.BookingStatusId,
             ClinicId = arg.ClinicId,
             CreateOn = arg.CreateOn,
-            CurrencyId = arg.CurrencyId,
+            CurrencyCode = arg.CurrencyCode,
             HospitalId = arg.HospitalId,
             PatientId = arg.PatientId,
             SpecialtyId = arg.SpecialtyId,

@@ -7,37 +7,33 @@ public class PatientDto
 {
     public int Id { get; set; }
 
-    public string MedicalFileNumber { get; set; } = string.Empty;
-
-    public string PhoneNumber { get; set; } = string.Empty;
-
-    public byte? Gender { get; set; }
-
     public DateTime? BirthDate { get; set; }
 
-    public byte? MaritalStatus { get; set; }
+    public byte? NationalId { get; set; }
+
+    public byte? Ssn { get; set; }
 
     public string? BloodType { get; set; }
 
+    public byte? PatientStatus { get; set; }
+
     public string? Photo { get; set; }
+
+    public int? SsntypeId { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    public int? ClientId { get; set; }
+
+    public int? ClientGroupId { get; set; }
 
     public int? NationalityId { get; set; }
 
-    public byte? PatientStatus { get; set; }
+    public short? GenderId { get; set; }
 
+    public short? ReligionId { get; set; }
 
-    //public byte? Ssn { get; set; }
-
-    //public byte? NationalId { get; set; }
-
-
-    //public int? SsntypeId { get; set; }
-
-    //public bool IsDeleted { get; set; }
-
-    //public int? ClientId { get; set; }
-
-    //public int? ClientGroupId { get; set; }
+    public short? MaritalStatusId { get; set; }
 
 
     public ICollection<PatientTranslation> PatientTranslations { get; set; } = new List<PatientTranslation>();
@@ -54,12 +50,10 @@ public class PatientDto
             PatientTranslations = arg.PatientTranslations,
             NationalityId = arg.NationalityId,
             BirthDate = arg.BirthDate,
-            MaritalStatus = arg.MaritalStatus,
+            MaritalStatusId = arg.MaritalStatusId,
             BloodType = arg.BloodType,
             Photo = arg.Photo,
-            Gender = arg.Gender,
-            MedicalFileNumber   = arg.MedicalFileNumber,
-            PhoneNumber = arg.PhoneNumber,
+            GenderId = arg.GenderId,
             PatientStatus = arg.PatientStatus,
 
             //Ssn = arg.Ssn,
@@ -88,12 +82,10 @@ public class PatientDto
             PatientTranslations = listTranc,
             NationalityId = arg.NationalityId,
             BirthDate = arg.BirthDate,
-            MaritalStatus = arg.MaritalStatus,
+            MaritalStatusId = arg.MaritalStatusId,
             BloodType = arg.BloodType,
             Photo = arg.Photo,
-            Gender = arg.Gender,
-            MedicalFileNumber = arg.MedicalFileNumber,
-            PhoneNumber = arg.PhoneNumber,
+            GenderId = arg.GenderId,
 
             //Address = arg.Address,
             //Ssn = arg.Ssn,

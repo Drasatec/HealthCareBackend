@@ -15,7 +15,5 @@ public partial class ClientGroup
 
     public virtual HosClient? Client { get; set; }
 
-    public virtual ICollection<ClientsSubscription> ClientsSubscriptions { get; set; } = new List<ClientsSubscription>();
-
     public virtual ICollection<Patient> Patients { get; set; } = new List<Patient>();
 }

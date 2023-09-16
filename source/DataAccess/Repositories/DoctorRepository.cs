@@ -1,4 +1,5 @@
 ﻿using DataAccess.Contexts;
+using DomainModel.Entities.DoctorEntities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
@@ -6,9 +7,7 @@ using DomainModel.Models;
 using DomainModel.Models.Doctors;
 using DomainModel.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.Linq;
-using DomainModel.Entities.DoctorEntities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DataAccess.Repositories;
 
@@ -138,7 +137,6 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
     }
     #endregion
 
-
     #region Read
     public async Task<DoctorDto?> ReadById(int? Id, string? lang = null)
     {
@@ -167,7 +165,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
     {
         IQueryable<DoctorTranslation> query = Context.DoctorTranslations;
         query = query.Where(l => l.LangCode == lang);
-        
+
         if (hosId.HasValue)
         {
             query = query.Where(s => s.Doctor != null && s.Doctor.DoctorsWorkHospitals.Any(i => i.HospitalId == hosId));
@@ -383,7 +381,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                 ClinicId = h.ClinicId,
                 HospitalId = h.HospitalId,
                 WorkingPeriodId = h.WorkingPeriodId,
-                OnDay = h.OnDay,
+                DayId = h.DayId,
             });
         else
             query = from h in Context.DoctorWorkPeriods
@@ -400,7 +398,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                     join wpt in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wpt.WorkingPeriodId
                     where wpt.LangCode == lang
 
-                    join dy in Context.WeekdaysTranslations on h.OnDay equals dy.WeekdayId
+                    join dy in Context.WeekdaysTranslations on h.DayId equals dy.WeekdayId
                     where dy.LangCode == lang
 
                     select new PeriodWorkDoctorClinicDto
@@ -411,7 +409,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                         ClinicId = h.ClinicId,
                         HospitalId = h.HospitalId,
                         WorkingPeriodId = h.WorkingPeriodId,
-                        OnDay = h.OnDay,
+                        DayId = h.DayId,
 
                         DayName = dy.Name,
                         Doctor = dt.FullName,
@@ -448,20 +446,22 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
 
             if (day.HasValue)
             {
-                query = query.Where(p => p.OnDay.Equals(day));
+                query = query.Where(p => p.DayId.Equals(day));
             }
         }
 
         return await query.OrderByDescending(h => h.Id).ToListAsync();
     }
 
-
     public async Task<PagedResponse<DoctorWorkPeriodDto>?> FindDoctor(int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
     {
         IQueryable<DoctorWorkPeriod> query = Context.DoctorWorkPeriods;
         IQueryable<DoctorWorkPeriodDto> result;
 
+        // addd status *
+
         var totalCount = 0;
+        query = query.Where(d => d.Doctor != null && d.Doctor.IsDeleted == false);
 
         if (hosId.HasValue)
         {
@@ -471,7 +471,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         {
             query = query.Where(d => d.SpecialtyId.Equals(specialtyId));
         }
-        if (docId.HasValue)
+        if (docId.HasValue && docId.Value > 0)
         {
             query = query.Where(d => d.DoctorId.Equals(docId));
         }
@@ -482,7 +482,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         }
         if (day.HasValue)
         {
-            query = query.Where(d => d.OnDay.Equals(day));
+            query = query.Where(d => d.DayId.Equals(day));
         }
 
         if (doctorsDegreeId.HasValue)
@@ -527,7 +527,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                              ClinicId = h.ClinicId,
                              DoctorId = h.DoctorId,
                              WorkingPeriodId = h.WorkingPeriodId,
-                             OnDay = h.OnDay,
+                             DayId = h.DayId,
                              WorkingPeriod = wpt.Name,
                              Hospital = hos.Name
                          },
@@ -549,13 +549,13 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                              ClinicId = h.ClinicId,
                              DoctorId = h.DoctorId,
                              WorkingPeriodId = h.WorkingPeriodId,
-                             OnDay = h.OnDay,
+                             DayId = h.DayId,
                          },
                          Doctor = h.Doctor
                      };
         }
 
-        await query.ToListAsync();
+        //await query.ToListAsync();
 
         //result = DoctorWorkPeriodDto.ToList(query);
         var all = new PagedResponse<DoctorWorkPeriodDto>
@@ -563,12 +563,210 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             Total = totalCount,
             Page = page,
             PageSize = pageSize,
-            Data = result.ToList()
+            Data = await result.ToListAsync()
+        };
+
+        return all;
+
+    }
+
+    public async Task<PagedResponse<DoctorWorkPeriodDto>?> FindDoctor3(int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
+    {
+        IQueryable<DoctorWorkPeriod> query = Context.DoctorWorkPeriods;
+        IQueryable<DoctorWorkPeriodDto> result;
+
+        // addd status *
+
+        var totalCount = 0;
+        query = query.Where(d => d.Doctor != null && d.Doctor.IsDeleted == false);
+
+        if (hosId.HasValue)
+        {
+            query = query.Where(d => d.HospitalId.Equals(hosId));
+        }
+        if (specialtyId.HasValue)
+        {
+            query = query.Where(d => d.SpecialtyId.Equals(specialtyId));
+        }
+        if (docId.HasValue && docId.Value > 0)
+        {
+            query = query.Where(d => d.DoctorId.Equals(docId));
+        }
+
+        if (workingPeriodId.HasValue)
+        {
+            query = query.Where(d => d.WorkingPeriodId.Equals(workingPeriodId));
+        }
+        if (day.HasValue)
+        {
+            query = query.Where(d => d.DayId.Equals(day));
+        }
+
+        if (doctorsDegreeId.HasValue)
+        {
+            query = query.Where(d => d.Doctor != null && d.Doctor.DoctorsDegreeId.Equals(doctorsDegreeId));
+        }
+
+        if (gender.HasValue)
+        {
+            query = query.Where(d => d.Doctor != null && d.Doctor.Gender.Equals(gender));
+        }
+
+        query = query.OrderByDescending(o => o.Id);
+
+        totalCount = query.Count();
+        if (totalCount < 0)
+            return null;
+
+        // page size
+        GenericPagination(ref query, ref pageSize, ref page, totalCount);
+        // lang
+
+        query = query.Include(d1 => d1.Doctor).ThenInclude(td => td.DoctorTranslations.Where(l => l.LangCode == lang));
+
+        var groupedResult = from h in query
+
+                            join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
+                            where hos.LangCode == lang
+
+                            join wpt in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wpt.WorkingPeriodId
+                            where wpt.LangCode == lang
+
+                            group h by h.DoctorId;
+
+        var newPeriod = new List<DoctorWorkPeriodDto>();
+
+        foreach (var docGroup in groupedResult)
+        {
+            foreach (var h in docGroup)
+            {
+                var item = new DoctorWorkPeriodDto()
+                {
+                    doctorWorkPeriod = new PeriodWorkDoctorClinicDto()
+                    {
+                        Id = h.Id,
+                        HospitalId = h.HospitalId,
+                        SpecialtyId = h.SpecialtyId,
+                        ClinicId = h.ClinicId,
+                        DoctorId = h.DoctorId,
+                        WorkingPeriodId = h.WorkingPeriodId,
+                        DayId = h.DayId,
+
+                    },
+                    Doctor = h.Doctor,
+
+                };
+                newPeriod.Add(item);
+            };
+        }
+
+        var all = new PagedResponse<DoctorWorkPeriodDto>
+        {
+            Total = totalCount,
+            Page = page,
+            PageSize = pageSize,
+            Data = newPeriod
+        };
+        return all;
+
+    }
+
+
+    public async Task<PagedResponse<DoctorDtoV2>?> FindDoctor2(int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
+    {
+        IQueryable<Doctor> query = Context.Doctors;
+        //IQueryable<DoctorWorkPeriodDto> result;
+
+        // addd status *
+
+        var totalCount = 0;
+
+        query = query.Where(d => d.IsDeleted == false);
+
+        if (docId.HasValue)
+        {
+            query = query.Where(d => d.Id == docId);
+        }
+        if (hosId.HasValue)
+        {
+            query = query.Where(d => d.DoctorWorkPeriods.Any(dhos => dhos.HospitalId == hosId));
+        }
+
+        if (specialtyId.HasValue)
+        {
+            query = query.Where(d => d.DoctorWorkPeriods.Any(dhos => dhos.SpecialtyId == specialtyId));
+        }
+
+        if (workingPeriodId.HasValue)
+        {
+            query = query.Where(d => d.DoctorWorkPeriods.Any(dwp => dwp.WorkingPeriodId.Equals(workingPeriodId)));
+        }
+
+        if (day.HasValue)
+        {
+            query = query.Where(d => d.DoctorWorkPeriods.Any(dwp => dwp.DayId.Equals(day)));
+        }
+
+        if (doctorsDegreeId.HasValue)
+        {
+            query = query.Where(d => d.DoctorsDegreeId.Equals(doctorsDegreeId));
+        }
+
+        if (gender.HasValue)
+        {
+            query = query.Where(d => d.Gender.Equals(gender));
+        }
+
+        query = query.Include(d1 => d1.DoctorTranslations.Where(l => l.LangCode == lang));
+
+        query = query.Include(dwp => dwp.DoctorWorkPeriods);
+        //query = query.Include(dwp => dwp.DoctorsWorkHospitals).ThenInclude(x => x.Hospital.HospitalTranslations);
+
+        query = query.OrderByDescending(o => o.Id);
+
+        totalCount = query.Count();
+        if (totalCount < 0)
+            return null;
+
+        GenericPagination(ref query, ref pageSize, ref page, totalCount);
+
+        var resultQ = from doct in query
+
+                      select new DoctorDtoV2
+                      {
+                          Id = doct.Id,
+                          Photo = doct.Photo,
+                          DoctorTranslations = doct.DoctorTranslations,
+                          DoctorWorkPeriods = doct.DoctorWorkPeriods,
+                          DoctorsWorkHospitals = doct.DoctorsWorkHospitals,
+                      };
+
+        var all = new PagedResponse<DoctorDtoV2>
+        {
+            Total = totalCount,
+            Page = page,
+            PageSize = pageSize,
+            Data = await resultQ.ToListAsync()
         };
 
         return all;
 
     }
     #endregion
+}
 
+public class DoctorWorkPeriodDtoComparer : IEqualityComparer<DoctorWorkPeriodDto>
+{
+    public bool Equals(DoctorWorkPeriodDto? x, DoctorWorkPeriodDto? y)
+    {
+        if (x.Doctor == y.Doctor)
+            return true;
+
+        return false;
+    }
+
+    public int GetHashCode([DisallowNull] DoctorWorkPeriodDto obj)
+    {
+        return obj.Doctor.GetHashCode();
+    }
 }

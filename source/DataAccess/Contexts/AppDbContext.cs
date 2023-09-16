@@ -19,6 +19,10 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     #region DbSets
+    public virtual DbSet<UserAccount> UserAccounts { get; set; }
+    public virtual DbSet<CountriesTranslation> CountriesTranslations { get; set; }
+
+    public virtual DbSet<Country> Countries { get; set; }
 
     public virtual DbSet<WeekdaysTranslation> WeekdaysTranslations { get; set; }
     public virtual DbSet<GendersTranslation> GendersTranslations { get; set; }
@@ -50,7 +54,7 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<HospitalFeatureTranslation> HospitalFeatureTranslations { get; set; }
 
-    public virtual DbSet<Currency> Currencies { get; set; }
+    //public virtual DbSet<Currency> Currencies { get; set; }
 
     public virtual DbSet<EmployeesStatus> EmployeesStatuses { get; set; }
 
@@ -69,7 +73,6 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<ClientGroup> ClientGroups { get; set; }
 
-    public virtual DbSet<ClientsSubscription> ClientsSubscriptions { get; set; }
 
     public virtual DbSet<Clinic> Clinics { get; set; }
 
@@ -106,9 +109,7 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<Weekday> Weekdays { get; set; }
 
-    public virtual DbSet<MainService> MainServices { get; set; }
 
-    public virtual DbSet<MainServiceTranslation> MainServiceTranslations { get; set; }
 
     public virtual DbSet<MedicalSpecialty> MedicalSpecialties { get; set; }
 
@@ -137,14 +138,6 @@ public class AppDbContext : DbContext
     public virtual DbSet<RoomType> RoomTypes { get; set; }
 
     public virtual DbSet<RoomTypeTranslation> RoomTypeTranslations { get; set; }
-
-    public virtual DbSet<SecondaryService> SecondaryServices { get; set; }
-
-    public virtual DbSet<SecondaryServiceTranslation> SecondaryServiceTranslations { get; set; }
-
-    public virtual DbSet<Service> Services { get; set; }
-
-    public virtual DbSet<ServiceTranslation> ServiceTranslations { get; set; }
 
     public virtual DbSet<SpecialtiesDoctor> SpecialtiesDoctors { get; set; }
 
@@ -185,50 +178,15 @@ public class AppDbContext : DbContext
             entity.Property(e => e.OptionName).HasMaxLength(112);
         });
 
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.Property(e => e.Name).HasMaxLength(256);
-        });
-
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.Property(e => e.CreateOn).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Email).HasMaxLength(256);
-            entity.Property(e => e.FullName).HasMaxLength(100);
-            //entity.Property(e => e.UserName).HasMaxLength(256);
-            entity.Property(e => e.VerificationCode)
-                .HasMaxLength(8)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<UserRole>(entity =>
-        {
-            entity.Property(e => e.CreateOn)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.RoleId).HasMaxLength(450);
-            entity.Property(e => e.UserId).HasMaxLength(450);
-
-            entity.HasOne(d => d.Role).WithMany(p => p.UserRoles)
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK_UserRoles_RoleId");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserRoles)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_UserRoles_UserId");
-        });
-
-
-
         modelBuilder.Entity<Booking>(entity =>
         {
             entity.ToTable("Booking");
 
             entity.Property(e => e.CreateOn).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.VisitingDate).HasDefaultValueSql("(getutcdate())");
-
             entity.Property(e => e.BookingReason).HasMaxLength(500);
             entity.Property(e => e.StatusReason).HasMaxLength(500);
+            
 
             entity.HasOne(d => d.Clinic).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.ClinicId)
@@ -753,12 +711,6 @@ public class AppDbContext : DbContext
             entity.Property(e => e.LanguageName).HasMaxLength(20);
         });
 
-        modelBuilder.Entity<MainService>(entity =>
-        {
-            entity.Property(e => e.Photo)
-                .HasMaxLength(55)
-                .IsUnicode(false);
-        });
 
         modelBuilder.Entity<MedicalSpecialty>(entity =>
         {
@@ -807,24 +759,11 @@ public class AppDbContext : DbContext
         {
             entity.HasIndex(e => new { e.ClientId, e.ClientGroupId }, "IX_Patients_Client_ClientGroup");
 
-            entity.HasIndex(e => e.MedicalFileNumber, "IX_Patients_MedicalFileNumber");
-
-            entity.HasIndex(e => e.PhoneNumber, "IX_Patients_PhoneNumber");
-
-            entity.HasIndex(e => e.MedicalFileNumber, "UK_Patients_MedicalFileNumber").IsUnique();
-
             entity.Property(e => e.BirthDate).HasColumnType("date");
             entity.Property(e => e.BloodType)
                 .HasMaxLength(10)
                 .IsUnicode(false);
-            entity.Property(e => e.Gender).HasColumnName("gender");
-            entity.Property(e => e.MedicalFileNumber)
-                .HasMaxLength(16)
-                .IsUnicode(false);
             entity.Property(e => e.NationalId).HasColumnName("NationalID");
-            entity.Property(e => e.PhoneNumber)
-                .HasMaxLength(25)
-                .IsUnicode(false);
             entity.Property(e => e.Photo)
                 .HasMaxLength(55)
                 .IsUnicode(false);
@@ -839,14 +778,21 @@ public class AppDbContext : DbContext
                 .HasForeignKey(d => d.ClientId)
                 .HasConstraintName("FK_Patients_ClientId");
 
-            //entity.HasOne(d => d.User)
-            //    .WithOne(u=>u.Patient)
-            //    .HasForeignKey<User>(d => d.Id)
-            //    .HasConstraintName("FK_Patients_UserId");
+            //entity.HasOne(d => d.Gender).WithMany(p => p.Patients)
+            //    .HasForeignKey(d => d.GenderId)
+            //    .HasConstraintName("FK_Patients_GenderId");
+
+            //entity.HasOne(d => d.MaritalStatus).WithMany(p => p.Patients)
+            //    .HasForeignKey(d => d.MaritalStatusId)
+            //    .HasConstraintName("FK_Patients_MaritalStatus");
 
             //entity.HasOne(d => d.Nationality).WithMany(p => p.Patients)
             //    .HasForeignKey(d => d.NationalityId)
             //    .HasConstraintName("FK_Patients_NationalityId");
+
+            //entity.HasOne(d => d.Religion).WithMany(p => p.Patients)
+            //    .HasForeignKey(d => d.ReligionId)
+            //    .HasConstraintName("FK_Patients_ReligionId");
 
             //entity.HasOne(d => d.Ssntype).WithMany(p => p.Patients)
             //    .HasForeignKey(d => d.SsntypeId)
@@ -859,11 +805,11 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => e.DoctorId, "IX_PeriodWorkDoctorClinic_DoctorId");
 
-            entity.HasIndex(e => new { e.DoctorId, e.OnDay }, "IX_PeriodWorkDoctorClinic_DoctorId_OnDay");
+            entity.HasIndex(e => new { e.DoctorId, e.DayId }, "IX_PeriodWorkDoctorClinic_DoctorId_OnDay");
 
-            entity.HasIndex(e => new { e.HospitalId, e.ClinicId, e.OnDay }, "IX_PeriodWorkDoctorClinic_Hospital_Clinic_OnDay");
+            entity.HasIndex(e => new { e.HospitalId, e.ClinicId, e.DayId }, "IX_PeriodWorkDoctorClinic_Hospital_Clinic_OnDay");
 
-            entity.HasIndex(e => new { e.HospitalId, e.SpecialtyId, e.DoctorId, e.ClinicId, e.WorkingPeriodId, e.OnDay }, "UK_PeriodWorkDoctorClinic_AllProperty").IsUnique();
+            entity.HasIndex(e => new { e.HospitalId, e.SpecialtyId, e.DoctorId, e.ClinicId, e.WorkingPeriodId, e.DayId }, "UK_PeriodWorkDoctorClinic_AllProperty").IsUnique();
 
             //entity.HasOne(d => d.Clinic).WithMany(p => p.DoctorWorkPeriods)
             //    .HasForeignKey(d => d.ClinicId)
@@ -943,59 +889,6 @@ public class AppDbContext : DbContext
                 .HasColumnType("datetime");
         });
 
-        modelBuilder.Entity<SecondaryService>(entity =>
-        {
-            entity.Property(e => e.Photo)
-                .HasMaxLength(40)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.MainService).WithMany(p => p.SecondaryServices)
-                .HasForeignKey(d => d.MainServiceId)
-                .HasConstraintName("FK_SecondaryServices_MainServiceId");
-        });
-
-        modelBuilder.Entity<Service>(entity =>
-        {
-            entity.Property(e => e.Code).HasMaxLength(40);
-            entity.Property(e => e.CodeNumber)
-                .HasMaxLength(16)
-                .IsUnicode(false);
-            entity.Property(e => e.IsActive)
-                .IsRequired()
-                .HasDefaultValueSql("((1))");
-            entity.Property(e => e.Photo)
-                .HasMaxLength(55)
-                .IsUnicode(false);
-            entity.Property(e => e.Reason).HasMaxLength(60);
-
-            entity.HasOne(d => d.MainService).WithMany(p => p.Services)
-                .HasForeignKey(d => d.MainServiceId)
-                .HasConstraintName("FK_Services_MainServiceId");
-
-            entity.HasOne(d => d.SecondaryService).WithMany(p => p.Services)
-                .HasForeignKey(d => d.SecondaryServiceId)
-                .HasConstraintName("FK_Services_SecondaryServiceId");
-        });
-
-        modelBuilder.Entity<ServicePrice>(entity =>
-        {
-            entity.HasKey(e => new { e.ServiceId, e.PriceCategoryId });
-
-            entity.Property(e => e.Note).HasMaxLength(70);
-            entity.Property(e => e.PriceCurrency)
-                .HasMaxLength(10)
-                .IsUnicode(false);
-
-            //entity.HasOne(d => d.PriceCategory).WithMany(p => p.ServicePrices)
-            //    .HasForeignKey(d => d.PriceCategoryId)
-            //    .OnDelete(DeleteBehavior.ClientSetNull)
-            //    .HasConstraintName("FK_ServicePrices_PriceCategoryId");
-
-            //entity.HasOne(d => d.Service).WithMany(p => p.ServicePrices)
-            //    .HasForeignKey(d => d.ServiceId)
-            //    .OnDelete(DeleteBehavior.ClientSetNull)
-            //    .HasConstraintName("FK_ServicePrices_ServiceId");
-        });
 
         modelBuilder.Entity<Promotion>(entity =>
         {
@@ -1115,41 +1008,6 @@ public class AppDbContext : DbContext
             //    .HasConstraintName("FK_ClinicTranslations_LangCode");
         });
 
-        modelBuilder.Entity<ClientsSubscription>(entity =>
-        {
-            entity.HasKey(e => new { e.ClientId, e.ClientGroupId });
-
-            entity.ToTable("ClientsSubscription");
-
-            entity.HasIndex(e => e.ClientId, "IX_ClientsSubscription_ClientId");
-
-            entity.Property(e => e.CreateOn)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Duration).HasColumnType("date");
-            entity.Property(e => e.Notes).HasMaxLength(100);
-            entity.Property(e => e.PriceCurrency)
-                .HasMaxLength(10)
-                .IsUnicode(false);
-            entity.Property(e => e.Specification).HasMaxLength(100);
-            entity.Property(e => e.StartDate).HasPrecision(0);
-            entity.Property(e => e.Status).HasDefaultValueSql("((1))");
-
-            entity.HasOne(d => d.ClientGroup).WithMany(p => p.ClientsSubscriptions)
-                .HasForeignKey(d => d.ClientGroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ClientsSubscription_ClientGroupId");
-
-            entity.HasOne(d => d.Client).WithMany(p => p.ClientsSubscriptions)
-                .HasForeignKey(d => d.ClientId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ClientsSubscription_ClientId");
-
-            //entity.HasOne(d => d.PriceCategory).WithMany(p => p.ClientsSubscriptions)
-            //    .HasForeignKey(d => d.PriceCategoryId)
-            //    .HasConstraintName("FK_ClientsSubscription_PriceCategoryId");
-        });
-
         modelBuilder.Entity<RoomTypeTranslation>(entity =>
         {
             entity.HasIndex(e => new { e.RoomTypeId, e.LangCode }, "UK_RoomTypeTranslations_LangCode_RoomTypeId").IsUnique();
@@ -1168,23 +1026,6 @@ public class AppDbContext : DbContext
             //    .HasConstraintName("FK_RoomTypeTranslations_RoomTypeId");
         });
 
-        modelBuilder.Entity<SecondaryServiceTranslation>(entity =>
-        {
-            entity.HasIndex(e => new { e.SecondaryServiceId, e.LangCode }, "UK_SecondaryServiceTranslations_LangCode_SecondaryServiceId").IsUnique();
-
-            entity.Property(e => e.LangCode)
-                .HasMaxLength(6)
-                .IsUnicode(false);
-            entity.Property(e => e.Name).HasMaxLength(30);
-
-            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.SecondaryServiceTranslations)
-            //    .HasForeignKey(d => d.LangCode)
-            //    .HasConstraintName("FK_SecondaryServiceTranslations_LangCode");
-
-            //entity.HasOne(d => d.SecondaryService).WithMany(p => p.SecondaryServiceTranslations)
-            //    .HasForeignKey(d => d.SecondaryServiceId)
-            //    .HasConstraintName("FK_SecondaryServiceTranslations_SecondaryServiceId");
-        });
 
         modelBuilder.Entity<PriceCategoryTranslation>(entity =>
         {
@@ -1224,23 +1065,6 @@ public class AppDbContext : DbContext
             //    .HasConstraintName("FK_RoomTranslations_RoomId");
         });
 
-        modelBuilder.Entity<ServiceTranslation>(entity =>
-        {
-            entity.HasIndex(e => new { e.ServiceId, e.LangCode }, "UK_ServiceTranslations_LangCode_ServiceId").IsUnique();
-
-            entity.Property(e => e.LangCode)
-                .HasMaxLength(6)
-                .IsUnicode(false);
-            entity.Property(e => e.Name).HasMaxLength(30);
-
-            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.ServiceTranslations)
-            //    .HasForeignKey(d => d.LangCode)
-            //    .HasConstraintName("FK_ServiceTranslations_LangCode");
-
-            //entity.HasOne(d => d.Service).WithMany(p => p.ServiceTranslations)
-            //    .HasForeignKey(d => d.ServiceId)
-            //    .HasConstraintName("FK_ServiceTranslations_ServiceId");
-        });
 
         modelBuilder.Entity<TypesVisitTranslation>(entity =>
         {
@@ -1278,23 +1102,6 @@ public class AppDbContext : DbContext
             //    .HasConstraintName("FK_WorkingPeriodTranslations_WorkingPeriodId");
         });
 
-        modelBuilder.Entity<MainServiceTranslation>(entity =>
-        {
-            entity.HasIndex(e => new { e.MainServiceId, e.LangCode }, "UK_MainServiceTranslations_LangCode_MainServiceId").IsUnique();
-
-            entity.Property(e => e.LangCode)
-                .HasMaxLength(6)
-                .IsUnicode(false);
-            entity.Property(e => e.Name).HasMaxLength(30);
-
-            //entity.HasOne(d => d.LangCodeNavigation).WithMany(p => p.MainServiceTranslations)
-            //    .HasForeignKey(d => d.LangCode)
-            //    .HasConstraintName("FK_MainServiceTranslations_LangCode");
-
-            //entity.HasOne(d => d.MainService).WithMany(p => p.MainServiceTranslations)
-            //    .HasForeignKey(d => d.MainServiceId)
-            //    .HasConstraintName("FK_MainServiceTranslations_MainServiceId");
-        });
 
         modelBuilder.Entity<MedicalSpecialtyTranslation>(entity =>
         {
@@ -1439,7 +1246,7 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("WK_WeekdaysTranslations");
 
-            entity.HasIndex(e => new { e.WeekdayId, e.LangCode }, "WK_WeekdaysTranslations_LangCode_WeekdayId").IsUnique();
+            entity.HasIndex(e => new { e.WeekdayId, e.LangCode }, "FK_WeekdaysTranslations_LangCode_WeekdayId").IsUnique();
 
             entity.Property(e => e.LangCode)
                 .HasMaxLength(6)

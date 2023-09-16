@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities.SettingsEntities;
+﻿using DomainModel.Entities.HospitalBody;
+using DomainModel.Entities.SettingsEntities;
 using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.DoctorEntities;
@@ -17,11 +18,23 @@ public partial class DoctorWorkPeriod
 
     public int WorkingPeriodId { get; set; }
 
-    public byte OnDay { get; set; }
+    public byte DayId { get; set; }
 
     [JsonIgnore]
-    public virtual Doctor? Doctor { get; set; } = null!;
+    public virtual Weekday Day { get; set; } = null!;
+
+    //[JsonIgnore]
+    public virtual Clinic Clinic { get; set; } = null!;
 
     [JsonIgnore]
-    public virtual WorkingPeriod? WorkingPeriod { get; set; } = null!;
+    public virtual Doctor Doctor { get; set; } = null!;
+
+    [JsonIgnore]
+    public virtual Hospital Hospital { get; set; } = null!;
+
+    [JsonIgnore]
+    public virtual MedicalSpecialty Specialty { get; set; } = null!;
+
+    [JsonIgnore]
+    public virtual WorkingPeriod WorkingPeriod { get; set; } = null!;
 }

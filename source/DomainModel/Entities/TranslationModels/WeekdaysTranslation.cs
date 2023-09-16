@@ -9,7 +9,7 @@ public partial class WeekdaysTranslation
 
     public string Name { get; set; } = string.Empty;
 
-    public short WeekdayId { get; set; }
+    public byte? WeekdayId { get; set; }
 
     public string LangCode { get; set; } = null!;
 

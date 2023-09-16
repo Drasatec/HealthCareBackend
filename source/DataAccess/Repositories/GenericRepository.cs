@@ -139,6 +139,7 @@ public class GenericRepository : IGenericRepository
             return res;
         }
     }
+
     public async Task<Response> GenericUpdateSinglePropertyById<TEntity>(int id, TEntity entity, Expression<Func<TEntity, object>> propertyExpression) where TEntity : class
     {
         try
@@ -177,8 +178,6 @@ public class GenericRepository : IGenericRepository
         }
     }
 
-   
-
     public async Task<Response> GenericUpdatePropertiesById<TEntity>(int id, TEntity entity, params Expression<Func<TEntity, object>>[]? propertiesIsModified) where TEntity : class
     {
         try
@@ -201,7 +200,6 @@ public class GenericRepository : IGenericRepository
         }
     }
 
-
     public async Task<Response> UpdateSinglePropertyInEntities<TEntity>(Expression<Func<TEntity, bool>> filter, Action<TEntity> updateAction) where TEntity : class
     {
         var entities = await Context.Set<TEntity>().Where(filter).ToListAsync();
@@ -220,11 +218,7 @@ public class GenericRepository : IGenericRepository
     }
 
     // read
-    public async Task<PagedResponse<TEntity>?> GenericReadAllWihInclude<TEntity>(
-       Expression<Func<TEntity, bool>>? filter,
-       Expression<Func<TEntity, object>>? orderBy,
-       Expression<Func<TEntity, object>>? include,
-       int? page, int? pageSize) where TEntity : class
+    public async Task<PagedResponse<TEntity>?> GenericReadAllWihInclude<TEntity>(Expression<Func<TEntity, bool>>? filter,Expression<Func<TEntity, object>>? orderBy,Expression<Func<TEntity, object>>? include,int? page, int? pageSize) where TEntity : class
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
@@ -258,7 +252,6 @@ public class GenericRepository : IGenericRepository
         };
         return all;
     }
-
 
     public async Task<TEntity?> GenericReadById<TEntity>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, object>>? include) where TEntity : class
     {

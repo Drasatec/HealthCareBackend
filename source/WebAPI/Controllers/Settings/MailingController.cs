@@ -1,5 +1,11 @@
 ﻿using DomainModel.Interfaces.Services;
+using DomainModel.Models.AppSettings;
 using DomainModel.Models.Mails;
+using System.Net.Mail;
+using System.Net;
+using Twilio.TwiML.Messaging;
+using MailKit.Security;
+using MimeKit;
 
 namespace WebAPI.Controllers.Settings;
 
@@ -18,23 +24,43 @@ public class MailingController : ControllerBase
     [HttpPost("send")]
     public async Task<IActionResult> SendMail(IFormFileCollection files, [FromForm] MailRequestDto dto)
     {
-
-        await _mailingService.SendVerificationCodeAsync(dto.ToEmail,null,"mohamed fawzy", null!);
-        return Ok();
+        await _mailingService.SendVerificationCodeAsync("mofawzyhelal@gmail.com","000000");
+        return Ok(dto);
     }
 
-    //[HttpPost("welcome")]
-    //public async Task<IActionResult> SendWelcomeEmail([FromBody] WelcomeRequestDto dto)
+    //public async Task<IActionResult> ttt()
     //{
-    //    var filePath = $"{Directory.GetCurrentDirectory()}\\Templates\\EmailTemplate.html";
-    //    var str = new StreamReader(filePath);
+    //    // Sender's email and password
+    //    string senderEmail = "customersservice@alrahmavip.com";
+    //    string senderPassword = "Aa22.#33Aa";
 
-    //    var mailText = str.ReadToEnd();
-    //    str.Close();
+    //    var email = new MimeMessage
+    //    {
+    //        Sender = MailboxAddress.Parse(senderEmail),
+    //        Subject = "Subject"
+    //    };
 
-    //    mailText = mailText.Replace("[username]", dto.UserName).Replace("[email]", dto.Email);
+    //    email.To.Add(MailboxAddress.Parse("mofawzyhelal@gmail.com"));
 
-    //    await _mailingService.SendEmailAsync(dto.Email, "Welcome to our channel", mailText);
-    //    return Ok();
+    //    var builder = new BodyBuilder();
+
+    //    builder.TextBody = "text body body";
+    //    email.Body = builder.ToMessageBody();
+    //    email.From.Add(new MailboxAddress("Drasate", senderEmail));
+
+    //    try
+    //    {
+    //        using var smtp = new SmtpClient();
+    //        smtp.Connect("mail.alrahmavip.com", 25, SecureSocketOptions.StartTls);
+    //        smtp.Authenticate(senderEmail, senderPassword);
+    //        await smtp.SendAsync(email);
+    //        smtp.Disconnect(true);
+    //        return Ok("Email sent successfully.");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return Ok($"Error sending email: {ex.Message}, {ex.InnerException?.Message}");
+
+    //    }
     //}
 }

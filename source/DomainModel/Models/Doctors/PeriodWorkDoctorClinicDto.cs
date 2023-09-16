@@ -17,7 +17,7 @@ public class PeriodWorkDoctorClinicDto
 
     public int WorkingPeriodId { get; set; }
 
-    public byte? OnDay { get; set; }
+    public byte? DayId { get; set; }
 
 
     public string? Hospital { get; set; }

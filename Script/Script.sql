@@ -7,57 +7,77 @@
 -- GO
 
 --GO
-CREATE TABLE Users(
-	[Id] [nvarchar](450) NOT NULL, --*
-	[FullName] [nvarchar](100) NOT NULL, --*
-	[PhoneNumber] [nvarchar](max) NULL,
-	[Email] [nvarchar](256) NULL,
-	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
-	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
-    [VerificationCode] VARCHAR(8), -- new
-    [ExpirationTime] DATETIMEOFFSET(7), -- new
-    [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
-	[PasswordHash] [nvarchar](max) NULL,
+-- CREATE TABLE Users(
+-- 	[Id] [nvarchar](36) NOT NULL, --*
+-- 	[FullName] [nvarchar](100) NOT NULL, --*
+-- 	[PhoneNumber] [nvarchar](max) NULL,
+-- 	[Email] [nvarchar](256) NULL,
+-- 	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
+-- 	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
+--     [VerificationCode] VARCHAR(8), -- new
+--     [ExpirationTime] DATETIMEOFFSET(7), -- new
+--     [CreateOn] DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
+-- 	[PasswordHash] [nvarchar](max) NULL,
 	
-    -- [UserName] [nvarchar](256) NULL,
-	-- [SecurityStamp] [nvarchar](max) NULL,
-	-- [ConcurrencyStamp] [nvarchar](max) NULL,
-	-- [TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
-	-- [LockoutEnd] [DATETIMEOFFSET](7) NULL,
-	-- [LockoutEnabled] [bit] NOT NULL DEFAULT 0,
-	-- [AccessFailedCount] [int] NOT NULL DEFAULT 0,
+--     -- [UserName] [nvarchar](256) NULL,
+-- 	-- [SecurityStamp] [nvarchar](max) NULL,
+-- 	-- [ConcurrencyStamp] [nvarchar](max) NULL,
+-- 	-- [TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
+-- 	-- [LockoutEnd] [DATETIMEOFFSET](7) NULL,
+-- 	-- [LockoutEnabled] [bit] NOT NULL DEFAULT 0,
+-- 	-- [AccessFailedCount] [int] NOT NULL DEFAULT 0,
 
-	CONSTRAINT PK_Users PRIMARY KEY (Id),
-);
-GO
-CREATE TABLE Roles(
-	[Id] [nvarchar](450) NOT NULL,
-	[Name] [nvarchar](256) NULL,
-	[ConcurrencyStamp] [nvarchar](max) NULL,
+-- 	CONSTRAINT PK_Users PRIMARY KEY (Id),
+-- );
+-- CREATE TABLE Users(
+-- 	[Id] [nvarchar](450) NOT NULL, --*
+-- 	[FullName] [nvarchar](100) NOT NULL, --*
+-- 	[PhoneNumber] [nvarchar](max) NULL,
+	
+--     [Email] [nvarchar](256) NULL,
+-- 	[EmailConfirmed] [bit] NOT NULL DEFAULT 0,
+-- 	[PhoneNumberConfirmed] [bit] NOT NULL DEFAULT 0,
+--     [VerificationCode] VARCHAR(8), -- new
+--     [ExpirationTime] DATETIMEOFFSET(7), -- new
+-- 	[PasswordHash] [nvarchar](max) NULL,
+--     -- [UserName] [nvarchar](256) NULL,
+-- 	-- [SecurityStamp] [nvarchar](max) NULL,
+-- 	-- [ConcurrencyStamp] [nvarchar](max) NULL,
+-- 	-- [TwoFactorEnabled] [bit] NOT NULL DEFAULT 0,
+-- 	-- [LockoutEnd] [DATETIMEOFFSET](7) NULL,
+-- 	-- [LockoutEnabled] [bit] NOT NULL DEFAULT 0,
+-- 	-- [AccessFailedCount] [int] NOT NULL DEFAULT 0,
+-- 	CONSTRAINT PK_Users PRIMARY KEY (Id),
+-- );
+--GO
+-- CREATE TABLE Roles(
+-- 	[Id] [nvarchar](450) NOT NULL,
+-- 	[Name] [nvarchar](256) NULL,
+-- 	[ConcurrencyStamp] [nvarchar](max) NULL,
 
-	CONSTRAINT PK_Roles PRIMARY KEY (Id),
-);
+-- 	CONSTRAINT PK_Roles PRIMARY KEY (Id),
+-- );
 
-GO
-CREATE TABLE UserRoles(
-	[Id] [BIGINT] IDENTITY(1,1),
-	[UserId] [nvarchar](450) NOT NULL,
-	[RoleId] [nvarchar](450) NOT NULL,
-	[CreateOn] DATETIME DEFAULT GETDATE(),
+-- GO
+-- CREATE TABLE UserRoles(
+-- 	[Id] [BIGINT] IDENTITY(1,1),
+-- 	[UserId] [nvarchar](450) NOT NULL,
+-- 	[RoleId] [nvarchar](450) NOT NULL,
+-- 	[CreateOn] DATETIME DEFAULT GETDATE(),
 
-	CONSTRAINT PK_UserRoles PRIMARY KEY (Id),
+-- 	CONSTRAINT PK_UserRoles PRIMARY KEY (Id),
 
-	CONSTRAINT FK_UserRoles_UserId
-    FOREIGN KEY (UserId)
-      REFERENCES Users(Id)
-		ON DELETE CASCADE,
+-- 	CONSTRAINT FK_UserRoles_UserId
+--     FOREIGN KEY (UserId)
+--       REFERENCES Users(Id)
+-- 		ON DELETE CASCADE,
 
-    CONSTRAINT FK_UserRoles_RoleId
-    FOREIGN KEY (RoleId)
-      REFERENCES Roles(Id)
-		ON DELETE CASCADE,
-);
-GO
+--     CONSTRAINT FK_UserRoles_RoleId
+--     FOREIGN KEY (RoleId)
+--       REFERENCES Roles(Id)
+-- 		ON DELETE CASCADE,
+-- );
+-- GO
 ----------------
 CREATE TABLE EmployeeAccounts(
 	[Id] [nvarchar](450) NOT NULL, --*
@@ -93,19 +113,45 @@ GO
 INSERT INTO Languages VALUES('ar','عربي',1),('en','English',0),('fr','française',0),('es','España',0);
 GO
 ----------------
-CREATE TABLE Currencies
+CREATE TABLE Countries
 (
-    [Id] INT IDENTITY(1,1),
-    [CurrencyCode] VARCHAR(3) NOT NULL ,-- USA
-    [CurrencyName] VARCHAR(50) NOT NULL, --US Dollar
-    [Symbol] VARCHAR(10) NOT NULL, -- $
-    [country] VARCHAR(50) NOT NULL, -- United States
-    [Longitude] DECIMAL(12, 9),
-    [Latitude] DECIMAL(12, 9),
+    Id SMALLINT IDENTITY(1,1),
+    CallingCode VARCHAR(5) UNIQUE, -- +20
+    NumberOfDigits TINYINT, -- 10
+    CountryCode CHAR(2) UNIQUE, --EG
+    CurrencyCode CHAR(3) NOT NULL ,-- EGP
+    CurrencySymbol VARCHAR(2) NOT NULL, -- Le
+    NationalFlag VARCHAR(52), -- photo
+    Longitude DECIMAL(12, 9),
+    Latitude DECIMAL(12, 9),
 
     CONSTRAINT PK_Currencies PRIMARY KEY (Id),
-    CONSTRAINT UK_Currencies_CurrencyCode UNIQUE (CurrencyCode),
-	INDEX IX_Currencies_CurrencyName NONCLUSTERED (CurrencyName)
+);
+GO
+----------------
+CREATE TABLE CountriesTranslations --MM
+(
+    Id SMALLINT IDENTITY (1,1),
+    CountryName NVARCHAR(70), --Egypt
+    CurrencyName NVARCHAR(70), -- Egyptian pound
+    CapitalName NVARCHAR(50), -- Cairo
+    CountryId SMALLINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_CountriesTranslations PRIMARY KEY (Id),
+    CONSTRAINT FK_CountriesTranslations_LangCode_CountryId UNIQUE (CountryId, LangCode),
+
+	CONSTRAINT FK_CountriesTranslations_CountryId
+    FOREIGN KEY (CountryId)
+      REFERENCES Countries(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_CountriesTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+    
+  	INDEX IX_CountriesTranslations_FullName NONCLUSTERED (CountryName)
 );
 GO
 ----------------
@@ -827,7 +873,7 @@ CREATE TABLE GendersTranslations --MM
 GO
 ----------------
 CREATE TABLE Weekdays (
-    Id SMALLINT NOT NULL,
+    Id TINYINT NOT NULL,
     CONSTRAINT PK_Weekdays PRIMARY KEY (Id),
 );
 GO
@@ -836,18 +882,18 @@ CREATE TABLE WeekdaysTranslations --MM
 (
     Id SMALLINT IDENTITY (1,1),
     Name NVARCHAR(30),
-    WeekdayId SMALLINT,
+    WeekdayId TINYINT,
     LangCode VARCHAR(6),
 
-	CONSTRAINT WK_WeekdaysTranslations PRIMARY KEY (Id),
-    CONSTRAINT WK_WeekdaysTranslations_LangCode_WeekdayId UNIQUE (WeekdayId, LangCode),
+	CONSTRAINT PK_WeekdaysTranslations PRIMARY KEY (Id),
+    CONSTRAINT FK_WeekdaysTranslations_LangCode_WeekdayId UNIQUE (WeekdayId, LangCode),
 
-	CONSTRAINT WK_WeekdaysTranslations_WeekdayId
+	CONSTRAINT FK_WeekdaysTranslations_WeekdayId
     FOREIGN KEY (WeekdayId)
       REFERENCES Weekdays(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	CONSTRAINT WK_WeekdaysTranslations_LangCode
+	CONSTRAINT FK_WeekdaysTranslations_LangCode
     FOREIGN KEY (LangCode)
       REFERENCES Languages(Code)
 		ON DELETE NO ACtion ON UPDATE NO ACTION
@@ -885,7 +931,44 @@ CREATE TABLE EmployeesStatusTranslations --MM
     INDEX IX_EmployeesStatusTranslations_StatusName NONCLUSTERED (StatusName)
 );
 GO
+----------------
+CREATE TABLE Promotions (
+    Id INT IDENTITY(1,1),
+    Photo VARCHAR(55),
+    Position INT,
+    Link VARCHAR(255)
+    CONSTRAINT PK_Promotions PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE PromotionsTranslations --MM
+(
+    Id INT IDENTITY (1,1),
+    Title VARCHAR(255),
+    Description NVARCHAR(500),
+
+    PromotionId INT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_PromotionsTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_Promotions_LangCode_PromotionId UNIQUE (PromotionId, LangCode),
+
+	CONSTRAINT FK_Promotions_PromotionId
+    FOREIGN KEY (PromotionId)
+      REFERENCES Promotions(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_Promotions_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+);
 -- ================================================================================= DOCTOR =================================================================================
+-- ================================================================================= DOCTOR =================================================================================
+-- ================================================================================= DOCTOR =================================================================================
+-- ================================================================================= DOCTOR =================================================================================
+-- ================================================================================= DOCTOR =================================================================================
+GO
 ----------------
 CREATE TABLE Doctors
 (
@@ -1032,11 +1115,10 @@ CREATE TABLE DoctorWorkPeriods --MM
     ClinicId INT NOT NULL,
     DoctorId INT NOT NULL,
     WorkingPeriodId INT NOT NULL,
-    OnDay TINYINT NOT NULL,
+    DayId TINYINT NOT NULL,
 
     CONSTRAINT PK_DoctorWorkPeriods PRIMARY KEY (Id),
-    CONSTRAINT UK_DoctorWorkPeriods_AllProperty UNIQUE (HospitalId,SpecialtyId,DoctorId,ClinicId,WorkingPeriodId,OnDay),
-    CONSTRAINT CHECK_DoctorWorkPeriods_OnDay CHECK(OnDay between 1 and 7),
+    CONSTRAINT UK_DoctorWorkPeriods_AllProperty UNIQUE (HospitalId,SpecialtyId,DoctorId,ClinicId,WorkingPeriodId,DayId),
 
     CONSTRAINT FK_DoctorWorkPeriods_HospitalId
     FOREIGN KEY (HospitalId)
@@ -1062,9 +1144,14 @@ CREATE TABLE DoctorWorkPeriods --MM
     FOREIGN KEY (WorkingPeriodId)
       REFERENCES WorkingPeriod(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    CONSTRAINT FK_DoctorWorkPeriods_DayId
+    FOREIGN KEY (DayId)
+      REFERENCES Weekdays(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
     
-    INDEX IX_DoctorWorkPeriods_Hospital_Clinic_OnDay NONCLUSTERED (HospitalId,ClinicId,OnDay),
-    INDEX IX_DoctorWorkPeriods_DoctorId_OnDay NONCLUSTERED (DoctorId,OnDay),
+    INDEX IX_DoctorWorkPeriods_Hospital_Clinic_DayId NONCLUSTERED (HospitalId,ClinicId,DayId),
+    INDEX IX_DoctorWorkPeriods_DoctorId_DayId NONCLUSTERED (DoctorId,DayId),
     INDEX IX_DoctorWorkPeriods_DoctorId NONCLUSTERED (DoctorId)
 );
 GO
@@ -1086,142 +1173,6 @@ CREATE TABLE DoctorAttachments
       REFERENCES Doctors(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-);
-GO
----------------- 
-CREATE TABLE MainServices
-(
-    Id INT IDENTITY (1,1),
-    Photo VARCHAR(55),
-    CONSTRAINT PK_MainServices PRIMARY KEY (Id)
-);
-GO
-CREATE TABLE MainServiceTranslations --MM
-(
-    Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
-    MainServiceId INT,
-    LangCode VARCHAR(6),
-
-	CONSTRAINT PK_MainServiceTranslations PRIMARY KEY (Id),
-    CONSTRAINT UK_MainServiceTranslations_LangCode_MainServiceId UNIQUE (MainServiceId, LangCode),
-
-	CONSTRAINT FK_MainServiceTranslations_MainServiceId
-    FOREIGN KEY (MainServiceId)
-      REFERENCES MainServices(Id) 
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-	CONSTRAINT FK_MainServiceTranslations_LangCode
-    FOREIGN KEY (LangCode)
-      REFERENCES Languages(Code)
-		ON DELETE NO ACtion ON UPDATE NO ACTION
-
-
-);
-GO
-----------------
-CREATE TABLE SecondaryServices
-(
-    Id INT IDENTITY (1,1),  
-    Photo VARCHAR(40),
-    MainServiceId INT,
-
-	CONSTRAINT PK_SecondaryServices PRIMARY KEY (Id),
-    
-    CONSTRAINT FK_SecondaryServices_MainServiceId
-    FOREIGN KEY (MainServiceId)
-      REFERENCES MainServices(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION
-
-);
-CREATE TABLE SecondaryServiceTranslations --MM
-(
-    Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
-    SecondaryServiceId INT,
-    LangCode VARCHAR(6),
-
-	CONSTRAINT PK_SecondaryServiceTranslations PRIMARY KEY (Id),
-    CONSTRAINT UK_SecondaryServiceTranslations_LangCode_SecondaryServiceId UNIQUE (SecondaryServiceId, LangCode),
-
-	CONSTRAINT FK_SecondaryServiceTranslations_SecondaryServiceId
-    FOREIGN KEY (SecondaryServiceId)
-      REFERENCES SecondaryServices(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-	CONSTRAINT FK_SecondaryServiceTranslations_LangCode
-    FOREIGN KEY (LangCode)
-      REFERENCES Languages(Code)
-		ON DELETE NO ACtion ON UPDATE NO ACTION
-);
-GO
-----------------
-CREATE TABLE Services
-(
-    Id INT IDENTITY (1,1),
-    CodeNumber VARCHAR(16),
-    Code NVARCHAR(40),
-    Photo VARCHAR(55),
-    IsActive BIT NOT NULL DEFAULT 1,
-    Reason NVARCHAR(60),
-    SecondaryServiceId INT,
-    MainServiceId INT,
-
-	CONSTRAINT PK_Services PRIMARY KEY (Id),
-
-    CONSTRAINT FK_Services_SecondaryServiceId
-        FOREIGN KEY (SecondaryServiceId)
-        REFERENCES SecondaryServices(Id)
-            ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-    CONSTRAINT FK_Services_MainServiceId
-    FOREIGN KEY (MainServiceId)
-      REFERENCES MainServices(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-);
-GO
-CREATE TABLE ServiceTranslations --MM
-(
-    Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
-    ServiceId INT,
-    LangCode VARCHAR(6),
-
-	CONSTRAINT PK_ServiceTranslations PRIMARY KEY (Id),
-    CONSTRAINT UK_ServiceTranslations_LangCode_ServiceId UNIQUE (ServiceId, LangCode),
-
-	CONSTRAINT FK_ServiceTranslations_ServiceId
-    FOREIGN KEY (ServiceId)
-      REFERENCES Services(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-	CONSTRAINT FK_ServiceTranslations_LangCode
-    FOREIGN KEY (LangCode)
-      REFERENCES Languages(Code)
-		ON DELETE NO ACtion ON UPDATE NO ACTION
-);
-GO
--- lowest price
--- The higher price
-----------------
-CREATE TABLE ServicePrices --MM
-(
-    ServiceId INT,
-    PriceCategoryId INT,
-    Price SMALLINT,
-    PriceCurrency VARCHAR(10),
-    Note NVARCHAR(70),
-	CONSTRAINT PK_ServicePrices PRIMARY KEY (ServiceId,PriceCategoryId),
-
-    CONSTRAINT FK_ServicePrices_ServiceId
-    FOREIGN KEY (ServiceId)
-      REFERENCES Services(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-    
-    CONSTRAINT FK_ServicePrices_PriceCategoryId
-    FOREIGN KEY (PriceCategoryId)
-      REFERENCES PriceCategories(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
 );
 GO
 ----------------
@@ -1271,12 +1222,10 @@ GO
 CREATE TABLE Patients
 (
     Id INT IDENTITY (1,1),
-    MedicalFileNumber VARCHAR(16) NOT NULL,
-    PhoneNumber VARCHAR(25),
-    gender TINYINT,
+    --MedicalFileNumber VARCHAR(16) NOT NULL,
     BirthDate DATE,
-    SSN TINYINT, --Social Security number
     NationalID TINYINT,
+    SSN TINYINT, --Social Security number
     BloodType VARCHAR (10),
     PatientStatus TINYINT, -- active=0  inactive=1  attitude=2)
     Photo VARCHAR(55),
@@ -1285,14 +1234,12 @@ CREATE TABLE Patients
     ClientId INT NULL,
     ClientGroupId INT,
     NationalityId INT,
-    MaritalStatus TINYINT, --(single - married - divorced - widower)
-    Religion TINYINT,
-    UserId nvarchar (450) NULL
+
+    GenderId SMALLINT,
+    ReligionId SMALLINT,
+    MaritalStatusId SMALLINT,
 
 	CONSTRAINT PK_Patients PRIMARY KEY (Id),
-    CONSTRAINT UK_Patients_MedicalFileNumber UNIQUE (MedicalFileNumber),
-    CONSTRAINT CHECK_PatientSex CHECK(gender between 1 and 4),
-    CONSTRAINT CHECK_PatientsMaritalStatus CHECK(MaritalStatus between 1 and 4),
 
     CONSTRAINT FK_Patients_SSNTypeId
         FOREIGN KEY (SSNTypeId)
@@ -1314,13 +1261,21 @@ CREATE TABLE Patients
       REFERENCES Nationalities(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-    CONSTRAINT FK_Patients_UserId
-    FOREIGN KEY (UserId)
-      REFERENCES Users(Id)
+    CONSTRAINT FK_Patients_GenderId
+    FOREIGN KEY (GenderId)
+      REFERENCES Genders(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	INDEX IX_Patients_MedicalFileNumber NONCLUSTERED (MedicalFileNumber),
-	INDEX IX_Patients_PhoneNumber NONCLUSTERED (PhoneNumber),
+    CONSTRAINT FK_Patients_ReligionId
+    FOREIGN KEY (ReligionId)
+      REFERENCES Religions(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    CONSTRAINT FK_Patients_MaritalStatus
+    FOREIGN KEY (MaritalStatusId)
+      REFERENCES MaritalStatus(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
 	INDEX IX_Patients_Client_ClientGroup NONCLUSTERED (ClientId,ClientGroupId),
 );
 GO
@@ -1353,74 +1308,31 @@ CREATE TABLE PatientTranslations --MM
 );
 GO
 ----------------
-CREATE TABLE ClientsSubscription --MM
-(
-    Specification NVARCHAR(100),
-    NumberOfSubscribers SMALLINT,
-    Duration DATE,
-    StartDate TIME(0),
-    PriceOfSubscription SMALLINT,
-    PriceCurrency VARCHAR(10),
-    Status TINYINT NOT NULL DEFAULT 1,
-    Notes NVARCHAR(100),
-    IsDeleted BIT NOT NULL DEFAULT 0,
-    CreateOn DATETIME DEFAULT GETDATE(),
-
-    PriceCategoryId INT,
-    ClientId INT,
-    ClientGroupId INT,
-
-	CONSTRAINT PK_ClientsSubscription PRIMARY KEY (ClientId,ClientGroupId),
-
-    CONSTRAINT FK_ClientsSubscription_PriceCategoryId
-    FOREIGN KEY (PriceCategoryId)
-      REFERENCES PriceCategories(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-    CONSTRAINT FK_ClientsSubscription_ClientId
-    FOREIGN KEY (ClientId)
-      REFERENCES HosClients(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-    CONSTRAINT FK_ClientsSubscription_ClientGroupId
-    FOREIGN KEY (ClientGroupId)
-      REFERENCES ClientGroups(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-	INDEX IX_ClientsSubscription_ClientId NONCLUSTERED(ClientId)
-);
-GO
-----------------
-CREATE TABLE Promotions (
-    Id INT IDENTITY(1,1),
-    Photo VARCHAR(55),
-    Position INT,
-    Link VARCHAR(255)
-    CONSTRAINT PK_Promotions PRIMARY KEY (Id),
-);
-GO
-----------------
-CREATE TABLE PromotionsTranslations --MM
-(
+CREATE TABLE UserAccount (
     Id INT IDENTITY (1,1),
-    Title VARCHAR(255),
-    Description NVARCHAR(500),
+    UserName [nvarchar](36) NULL, -- MedicalFileNumber
+    PhoneNumber VARCHAR(20),
+    CallingCode VARCHAR(5), -- +20
+    Email NVARCHAR(255) NOT NULL,
+    EmailConfirmed BIT NOT NULL DEFAULT 0,
+    PhoneNumberConfirmed BIT NOT NULL DEFAULT 0,
+    VerificationCode VARCHAR(8),
+    ExpirationTime DATETIMEOFFSET(7), -- new
+    PasswordHash NVARCHAR(255) NOT NULL,
+    UserType TINYINT NOT NULL, -- "Patient" or "Doctor"
+    UserReferenceID INT NOT NULL, -- PatientID or DoctorID
 
-    PromotionId INT,
-    LangCode VARCHAR(6),
+    CONSTRAINT PK_UserAccount PRIMARY KEY (Id),
+    CONSTRAINT UK_UserAccount_PhoneNumber UNIQUE (PhoneNumber),
+    CONSTRAINT UK_UserAccount_Email UNIQUE (Email),
 
-	CONSTRAINT PK_PromotionsTranslations PRIMARY KEY (Id),
-    CONSTRAINT UK_Promotions_LangCode_PromotionId UNIQUE (PromotionId, LangCode),
-
-	CONSTRAINT FK_Promotions_PromotionId
-    FOREIGN KEY (PromotionId)
-      REFERENCES Promotions(Id)
+	CONSTRAINT FK_UserAccount_UserReferenceID
+    FOREIGN KEY (UserReferenceID)
+      REFERENCES Patients(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	CONSTRAINT FK_Promotions_LangCode
-    FOREIGN KEY (LangCode)
-      REFERENCES Languages(Code)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
+	INDEX IX_UserAccount_UserName NONCLUSTERED (UserName),
+	INDEX IX_UserAccount_PhoneNumber NONCLUSTERED (PhoneNumber)
 );
 GO
 ----------------
@@ -1478,7 +1390,7 @@ CREATE TABLE Booking
 	ClinicId INT NOT NULL, 
     BookingStatusId SMALLINT NOT NULL DEFAULT 1,
     PriceCategoryId INT,
-    CurrencyId INT,
+    CurrencyCode CHAR(3) ,-- EGP
     Price INT,
     DayNumber TINYINT,
 	VisitingDate DATETIMEOFFSET(7),
@@ -1529,17 +1441,13 @@ CREATE TABLE Booking
       REFERENCES PriceCategories(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-    CONSTRAINT FK_Booking_CurrencyId
-    FOREIGN KEY (CurrencyId)
-      REFERENCES Currencies(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
     CONSTRAINT FK_Booking_BookingStatusId
     FOREIGN KEY (BookingStatusId)
       REFERENCES BookingStatuses(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION
 );
 GO
+
 ----------------
 
 -- CREATE TABLE Visits

@@ -60,7 +60,7 @@ public static class DataAccessImageService
     }
     private static void RemoveImage(string name)
     {
-        File.Delete(path + "original\\" + name);
+        //File.Delete(path + "original\\" + name);
         File.Delete(path + "medium\\" + name);
         File.Delete(path + "small\\" + name);
     }

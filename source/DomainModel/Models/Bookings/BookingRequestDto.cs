@@ -24,7 +24,7 @@ public class BookingRequestDto
 
     public int? PriceCategoryId { get; set; }
 
-    public int? CurrencyId { get; set; }
+    public string? CurrencyCode { get; set; }
 
     public short BookingStatusId { get; set; }
     
@@ -50,7 +50,7 @@ public class BookingRequestDto
             TypeVisitId = arg.TypeVisitId,
             ClinicId = arg.ClinicId,
             PriceCategoryId = arg.PriceCategoryId,
-            CurrencyId = arg.CurrencyId,
+            CurrencyCode = arg.CurrencyCode,
             BookingStatusId = arg.BookingStatusId,
             VisitingDate = arg.VisitingDate,//Value.ToUniversalTime()
             Price = arg.Price,

@@ -15,11 +15,7 @@ public partial class PriceCategory
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
-    public virtual ICollection<ClientsSubscription> ClientsSubscriptions { get; set; } = new List<ClientsSubscription>();
-
     public virtual ICollection<DoctorVisitPrice> DoctorVisitPrices { get; set; } = new List<DoctorVisitPrice>();
 
     public virtual ICollection<PriceCategoryTranslation> PriceCategoryTranslations { get; set; } = new List<PriceCategoryTranslation>();
-
-    public virtual ICollection<ServicePrice> ServicePrices { get; set; } = new List<ServicePrice>();
 }

@@ -1,13 +1,8 @@
-﻿using DomainModel.Entities.TranslationModels;
-using DomainModel.Models.Dtos;
-using DomainModel.Models;
-using System.Linq.Expressions;
-using DomainModel.Contracts;
-using DomainModel.Models.Doctors;
-using DomainModel.Services;
-using DomainModel.Helpers;
+﻿using DomainModel.Contracts;
 using DomainModel.Entities.DoctorEntities;
-using DomainModel.Entities.HospitalBody;
+using DomainModel.Entities.TranslationModels;
+using DomainModel.Models;
+using DomainModel.Models.Doctors;
 
 namespace WebAPI.Controllers.version1.DoctorControllers;
 
@@ -119,6 +114,17 @@ public class DoctorController : ControllerBase
     public async Task<IActionResult> FindDoctor([FromQuery] int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
     {
         var resutl = await Data.Doctors.FindDoctor(hosId, specialtyId, docId, workingPeriodId, day, doctorsDegreeId, gender, page, pageSize, lang);
+        if (resutl is null)
+        {
+            return Ok(new Response(true, "no content"));
+        }
+        return Ok(resutl);
+    }
+    
+    [HttpGet("find-doctor_update", Order = 0914)]
+    public async Task<IActionResult> FindDoctor2([FromQuery] int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
+    {
+        var resutl = await Data.Doctors.FindDoctor2(hosId, specialtyId, docId, workingPeriodId, day, doctorsDegreeId, gender, page, pageSize, lang);
         if (resutl is null)
         {
             return Ok(new Response(true, "no content"));

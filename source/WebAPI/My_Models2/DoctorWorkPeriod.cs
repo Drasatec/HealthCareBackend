@@ -17,9 +17,11 @@ public partial class DoctorWorkPeriod
 
     public int WorkingPeriodId { get; set; }
 
-    public byte OnDay { get; set; }
+    public byte DayId { get; set; }
 
     public virtual Clinic Clinic { get; set; } = null!;
+
+    public virtual Weekday Day { get; set; } = null!;
 
     public virtual Doctor Doctor { get; set; } = null!;
 

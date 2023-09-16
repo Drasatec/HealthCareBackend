@@ -1,5 +1,7 @@
 ﻿using DomainModel.Models;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 using System.IO;
 
 namespace WebAPI.ServicesAPI;

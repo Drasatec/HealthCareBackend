@@ -25,7 +25,7 @@ public partial class Booking
 
     public int? PriceCategoryId { get; set; }
 
-    public int? CurrencyId { get; set; }
+    public string? CurrencyCode { get; set; }
 
     public short BookingStatusId { get; set; }
 
@@ -46,7 +46,7 @@ public partial class Booking
 
     public virtual Clinic? Clinic { get; set; }
 
-    public virtual Currency? Currency { get; set; }
+    //public virtual Currency? Currency { get; set; }
 
     public virtual Doctor Doctor { get; set; } = null!;
 

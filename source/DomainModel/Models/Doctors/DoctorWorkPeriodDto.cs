@@ -6,14 +6,7 @@ public class DoctorWorkPeriodDto
 {
     public PeriodWorkDoctorClinicDto? doctorWorkPeriod { get; set; }
 
-    //public DoctorWorkPeriod? DoctorWorkPeriod { get; set; }
-
-    //public WorkingPeriod? WorkingPeriod { get; set; } = null!;
-
     public DoctorDto? Doctor { get; set; }
-
-    //public ICollection<DoctorTranslation> DoctorTranslations { get; set; } = null!;
-
 
     public static implicit operator DoctorWorkPeriodDto(DoctorWorkPeriod arg)
     {
@@ -22,12 +15,7 @@ public class DoctorWorkPeriodDto
 
         return new DoctorWorkPeriodDto
         {
-            //DoctorWorkPeriod = arg,
-            //WorkingPeriodId = arg.WorkingPeriodId,
-            //doctorWorkPeriod = (PeriodWorkDoctorClinicDto)arg.WorkingPeriod,
             Doctor = (DoctorDto)arg.Doctor,
-            //WorkingPeriod = arg.WorkingPeriod,
-
         };
     }
 

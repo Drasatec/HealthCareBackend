@@ -7,27 +7,17 @@ public partial class Patient
 {
     public int Id { get; set; }
 
-    public string MedicalFileNumber { get; set; } = null!;
-
-    public string? PhoneNumber { get; set; }
-
-    public byte? Gender { get; set; }
-
     public DateTime? BirthDate { get; set; }
 
-    public byte? MaritalStatus { get; set; }
+    public byte? NationalId { get; set; }
 
     public byte? Ssn { get; set; }
-
-    public byte? NationalId { get; set; }
 
     public string? BloodType { get; set; }
 
     public byte? PatientStatus { get; set; }
 
     public string? Photo { get; set; }
-
-    public byte? Religion { get; set; }
 
     public int? SsntypeId { get; set; }
 
@@ -39,7 +29,11 @@ public partial class Patient
 
     public int? NationalityId { get; set; }
 
-    public string? UserId { get; set; }
+    public short? GenderId { get; set; }
+
+    public short? ReligionId { get; set; }
+
+    public short? MaritalStatusId { get; set; }
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
@@ -47,11 +41,17 @@ public partial class Patient
 
     public virtual ClientGroup? ClientGroup { get; set; }
 
+    public virtual Gender? Gender { get; set; }
+
+    public virtual MaritalStatus? MaritalStatus { get; set; }
+
     public virtual Nationality? Nationality { get; set; }
 
     public virtual ICollection<PatientTranslation> PatientTranslations { get; set; } = new List<PatientTranslation>();
 
+    public virtual Religion? Religion { get; set; }
+
     public virtual Ssntype? Ssntype { get; set; }
 
-    public virtual User? User { get; set; }
+    public virtual ICollection<UserAccount> UserAccounts { get; set; } = new List<UserAccount>();
 }

@@ -1,14 +1,12 @@
 ﻿using DomainModel.Helpers;
 using DomainModel.Interfaces.Services;
 using DomainModel.Models.AppSettings;
-//using MailKit.Net.Smtp;
-//using MailKit.Net.Smtp;
-//using MailKit.Security;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Options;
-using Org.BouncyCastle.Tls;
 using System.Net;
-using System.Net.Mail;
-//using MimeKit;
+//using System.Net.Mail;
+using MimeKit;
 
 namespace WebAPI.Services;
 
@@ -104,64 +102,31 @@ public class MailingService : IMailingService
         return verificationCode;
     }
 
-    //private async Task SendEmail(string mailTo, string subject, string body)
-    //{
-    //    var email = new MimeMessage
-    //    {
-    //        Sender = MailboxAddress.Parse(_mailSettings.Email),
-    //        Subject = subject
-    //    };
-
-    //    email.To.Add(MailboxAddress.Parse(mailTo));
-
-    //    var builder = new BodyBuilder();
-
-    //    builder.HtmlBody = body;
-    //    email.Body = builder.ToMessageBody();
-    //    email.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Email));
-
-    //    using var smtp = new SmtpClient();
-    //    smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
-    //    smtp.Authenticate(_mailSettings.Email, _mailSettings.Password);
-    //    await smtp.SendAsync(email);
-    //    smtp.Disconnect(true);
-
-    //}
-
     private async Task SendEmail(string mailTo, string subject, string body)
     {
-        // Sender's email and password
-        string senderEmail = _mailSettings.Email;
-        string senderPassword = _mailSettings.Password;
-
-        // Create SMTP client
-        var smtpClient = new System.Net.Mail.SmtpClient("smtp.office365.com")
+        var email = new MimeMessage
         {
-            Port = 587,
-            Credentials = new NetworkCredential(senderEmail, senderPassword),
-            EnableSsl = true,
+            Sender = MailboxAddress.Parse(_mailSettings.Email),
+            Subject = subject
         };
 
-        // Create email message
-        var mailMessage = new MailMessage(senderEmail, mailTo)
-        {
-            From = new MailAddress(senderEmail, _mailSettings.DisplayName),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = true
-        };
+        email.To.Add(MailboxAddress.Parse(mailTo));
 
-        try
-        {
-            await smtpClient.SendMailAsync(mailMessage);
-            Console.WriteLine("Email sent successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error sending email: {ex.Message}");
-        }
+        var builder = new BodyBuilder();
+
+        builder.HtmlBody = body;
+        email.Body = builder.ToMessageBody();
+        email.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Email));
+
+        using var smtp = new SmtpClient();
+        smtp.Connect(_mailSettings.Host, _mailSettings.Port,true);
+        smtp.Authenticate(_mailSettings.Email, _mailSettings.Password);
+        await smtp.SendAsync(email);
+        smtp.Disconnect(true);
 
     }
+
+
 
     private async Task SendEmail(string mailTo, string subject, string body, IList<Stream>? attachments)
     {

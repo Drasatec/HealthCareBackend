@@ -32,8 +32,13 @@ public class DoctorDto
 
     public int? NationalityId { get; set; }
 
-    public ICollection<DoctorTranslation> DoctorTranslations { get; set; } = null!;
+    public ICollection<DoctorWorkPeriod>? DoctorWorkPeriods = new List<DoctorWorkPeriod>();
 
+
+    public ICollection<DoctorTranslation> DoctorTranslations { get; set; } = null!;
+    //public ICollection<SpecialtiesDoctor> SpecialtiesDoctors { get; set; } = new List<SpecialtiesDoctor>();
+    //public ICollection<DoctorWorkPeriodDto> DoctorWorkPeriods { get; set; } = new List<DoctorWorkPeriodDto>();
+    public ICollection<PeriodWorkDoctorClinicDto>? PeriodWorkDoctorClinics;
 
 
     public static implicit operator DoctorDto(Doctor arg)
@@ -57,7 +62,9 @@ public class DoctorDto
             IsDeleted = arg.IsDeleted,
             IsAppearanceOnSite  = arg.IsAppearanceOnSite,
             NationalityId = arg.NationalityId,
-            DoctorTranslations = arg.DoctorTranslations
+            DoctorTranslations = arg.DoctorTranslations,
+            DoctorWorkPeriods = arg.DoctorWorkPeriods
+
         };
     }
 
@@ -94,10 +101,10 @@ public class DoctorDto
         return doctor;
     }
 
-    public static List<DoctorDto> ToList(IEnumerable<Doctor> hospitals)
+    public static List<DoctorDto> ToList(IEnumerable<Doctor> entities)
     {
-        var listDto = new List<DoctorDto>(hospitals.Count());
-        foreach (var entity in hospitals)
+        var listDto = new List<DoctorDto>(entities.Count());
+        foreach (var entity in entities)
         {
             var dto = (DoctorDto)entity;
             listDto.Add(dto);

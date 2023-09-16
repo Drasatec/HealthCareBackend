@@ -31,8 +31,8 @@ public class PatientRepository : GenericRepository, IPatientRepository
             else
                 entity.Photo = null;
 
-            if (string.IsNullOrEmpty(entity.MedicalFileNumber))
-                entity.MedicalFileNumber = "patient-" + Context.Patients.Count().ToString();
+            //if (string.IsNullOrEmpty(entity.MedicalFileNumber))
+            //    entity.MedicalFileNumber = "patient-" + Context.Patients.Count().ToString();
             entity.PatientStatus = 1;
             var result = await Context.Patients.AddAsync(entity);
             var row = await Context.SaveChangesAsync();
@@ -57,16 +57,16 @@ public class PatientRepository : GenericRepository, IPatientRepository
         }
         try
         {
-            entity.UserId = userId;
-            entity.Photo = null;
-            entity.MedicalFileNumber = "patient-" + Context.Patients.Count().ToString();
-            entity.PatientStatus = 0;
-            var result = await Context.Patients.AddAsync(entity);
-            var row = await Context.SaveChangesAsync();
-            if (row > 0)
-            {
-                return new ResponseId(true, "created ", result.Entity.Id);
-            }
+            //entity.UserId = userId;
+            //entity.Photo = null;
+            //entity.MedicalFileNumber = "patient-" + Context.Patients.Count().ToString();
+            //entity.PatientStatus = 0;
+            //var result = await Context.Patients.AddAsync(entity);
+            //var row = await Context.SaveChangesAsync();
+            //if (row > 0)
+            //{
+            //    return new ResponseId(true, "created ", result.Entity.Id);
+            //}
             return new ResponseId(false, "No row effected ", 0);
         }
         catch (Exception ex)
@@ -145,12 +145,19 @@ public class PatientRepository : GenericRepository, IPatientRepository
 
     public async Task<PatientToLoginDto?> FindPatientByUserId(string userId)
     {
-        return await GenericReadSingle<Patient, PatientToLoginDto>(uId => uId.UserId == userId, (patient) =>
+        return await GenericReadSingle<Patient, PatientToLoginDto>(null, (patient) =>
         new PatientToLoginDto() 
         { 
             PatientId = patient.Id,
-            UserId = patient.UserId
+            //UserId = patient.UserId
         });
+        
+        //return await GenericReadSingle<Patient, PatientToLoginDto>(uId => uId.UserId == userId, (patient) =>
+        //new PatientToLoginDto() 
+        //{ 
+        //    PatientId = patient.Id,
+        //    UserId = patient.UserId
+        //});
     }
 
 
@@ -203,7 +210,7 @@ public class PatientRepository : GenericRepository, IPatientRepository
     {
         var query = from h in Context.Patients
                     join t in Context.PatientTranslations on h.Id equals t.PatientId
-                    where (h.MedicalFileNumber.Contains(searchTerm) || t.FullName.Contains(searchTerm))
+                    where (t.FullName.Contains(searchTerm))
                           && t.LangCode == lang
                     select new PatientDto
                     {
@@ -211,22 +218,11 @@ public class PatientRepository : GenericRepository, IPatientRepository
                         Photo = h.Photo,
                         NationalityId = h.NationalityId,
                         BirthDate = h.BirthDate,
-                        MaritalStatus = h.MaritalStatus,
+                        MaritalStatusId = h.MaritalStatusId,
                         BloodType = h.BloodType,
-                        Gender = h.Gender,
-                        MedicalFileNumber = h.MedicalFileNumber,
-                        PhoneNumber = h.PhoneNumber,
+                        GenderId = h.GenderId,
                         PatientStatus = h.PatientStatus,
                         PatientTranslations = new List<PatientTranslation> { t }
-                        // IsDeleted = h.IsDeleted,
-                        //  Address = h.Address,
-                        // Ssn = h.Ssn,
-                        //NationalId = h.NationalId,
-                        //PatientStatus = h.PatientStatus,
-                        //PatientStatus = h.PatientStatus,
-                        // ClientGroupId = h.ClientGroupId,
-                        // ClientId = h.ClientId,
-                        //SsntypeId = h.SsntypeId,
                     };
 
         var totalCount = await query.CountAsync();

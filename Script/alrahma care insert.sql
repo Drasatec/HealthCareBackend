@@ -34,57 +34,62 @@ VALUES
     ('Sunday', 7, 'en'),
     ('الأحد', 7, 'ar');
 
-INSERT INTO Users
-(Id,FullName,Email,PhoneNumber,EmailConfirmed,PhoneNumberConfirmed, PasswordHash)
-     VALUES
-	 ('19322255-1692-4eeb-aaa0-c1a3e7dff0b9','mai 1',N'mai1@gmail.com','+201234567891',1,0,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
-     ('3e2fe885-5041-47ee-93cd-d4ff264450b3','mai 2',N'mai2@gmail.com','+201234567892',0,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
-     ('3f430285-c46e-4af0-8b34-7f2d6af64d59','mai 3',N'mai3@gmail.com','+201234567893',1,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
-     ('528b2b93-53c7-4f39-a2a1-056b92abad9d','mai 4',N'mai4@gmail.com','+201234567894',0,0,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
-     ('5a44d741-312a-4604-a8c4-f6a903de44d5','mai 5',N'mai5@gmail.com','+201234567895',1,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f');
+-- INSERT INTO Users
+-- (Id,FullName,Email,PhoneNumber,EmailConfirmed,PhoneNumberConfirmed, PasswordHash)
+--      VALUES
+-- 	 ('19322255-1692-4eeb-aaa0-c1a3e7dff0b9','mai 1',N'mai1@gmail.com','+201234567891',1,0,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
+--      ('3e2fe885-5041-47ee-93cd-d4ff264450b3','mai 2',N'mai2@gmail.com','+201234567892',0,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
+--      ('3f430285-c46e-4af0-8b34-7f2d6af64d59','mai 3',N'mai3@gmail.com','+201234567893',1,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
+--      ('528b2b93-53c7-4f39-a2a1-056b92abad9d','mai 4',N'mai4@gmail.com','+201234567894',0,0,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'),
+--      ('5a44d741-312a-4604-a8c4-f6a903de44d5','mai 5',N'mai5@gmail.com','+201234567895',1,1,'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f');
 -- GO
 --  Currencies
-INSERT INTO Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) 
-VALUES
-    ('AMD', '¥', 'Armenia', 44.6917527, 40.2367283, 'Dram'),
-    ('ARS', '£', 'Argentina', -60.61667, -26.73333, 'Peso'),
-    ('BOB', '€', 'Bolivia', -65.267799, -19.156561, 'Boliviano'),
-    ('BRL', '£', 'Brazil', -35.4551534, -7.8794782, 'Real'),
-    ('CAD', '¥', 'Canada', -63.0886099, 46.215926, 'Dollar'),
-    ('CNY', '€', 'China', 117.002933, 35.302488, 'Yuan Renminbi'),
-    ('COP', '$', 'Colombia', -77.3439283, 1.2296124, 'Peso'),
-    ('CUP', '€', 'Cuba', -75.9869609, 20.2218201, 'Peso'),
-    ('CZK', '£', 'Czech Republic', 15.4833007, 49.2908708, 'Koruna'),
-    ('DOP', '$', 'Dominican Republic', -71.0790048, 19.5403533, 'Peso'),
-    ('EGP', '£', 'Egypt', 30.734995, 28.4233602, 'Pound'),
-    ('EUR', '£', 'France', 5.8978018, 43.4945737, 'Euro'),
-    ('GMD', '£', 'Gambia', -14.769285, 13.449097, 'Dalasi'),
-    ('GTQ', '$', 'Guatemala', -91.4656296, 14.5802198, 'Quetzal'),
-    ('HRK', '¥', 'Croatia', 15.5854843, 45.1150317, 'Kuna'),
-    ('IDR', '$', 'Indonesia', 110.8171082, -6.4712737, 'Rupiah'),
-    ('JPY', '¥', 'Japan', 139.707963, 36.1219748, 'Yen'),
-    ('MGA', '£', 'Madagascar', 47.8402601, -22.3539973, 'Ariary'),
-    ('MKD', '$', 'Macedonia', 21.3421041, 41.9950451, 'Denar'),
-    ('MNT', '£', 'Mongolia', 106.9211984, 47.9195813, 'Tugrik'),
-    ('MXN', '£', 'Mexico', -100.9185477, 28.4943597, 'Peso'),
-    ('NAD', '¥', 'Namibia', 15.9523622, -21.4206681, 'Dollar'),
-    ('NGN', '€', 'Nigeria', 5.3102505, 9.2394244, 'Naira'),
-    ('NOK', '¥', 'Norway', 11.5610075, 60.8818611, 'Krone'),
-    ('NZD', '¥', 'New Zealand', 175.8087485, -38.9898711, 'Dollar'),
-    ('PHP', '¥', 'Philippines', 123.4675853, 9.8318931, 'Peso'),
-    ('PKR', '£', 'Pakistan', 72.4275483, 31.8917453, 'Rupee'),
-    ('PLN', '$', 'Poland', 18.3991666, 53.8514527, 'Zloty'),
-    ('RUB', '¥', 'Russia', 101.7805781, 56.3041802, 'Ruble'),
-    ('SEK', '$', 'Sweden', 17.9509504, 59.3245933, 'Krona'),
-    ('SOS', '£', 'Somalia', 49.8739267, 11.4720137, 'Shilling'),
-    ('THB', '$', 'Thailand', 100.3477801, 17.7116584, 'Baht'),
-    ('UAH', '$', 'Ukraine', 23.6611306, 49.7821352, 'Hryvnia'),
-    ('UGX', '¥', 'Uganda', 33.9303991, 1.1016277, 'Shilling'),
-    ('USD', '£', 'United States', -104.7099999, 40.42, 'Dollar'),
-    ('XAF', '$', 'Cameroon', 10.4284178, 5.4807517, 'Franc'),
-    ('XOF', '$', 'Burkina Faso', -4.3051542, 11.1649219, 'Franc'),
-    ('XPF', '¥', 'New Caledonia', 164.991636, -20.692675, 'Franc'),
-    ('ZAR', '$', 'South Africa', 30.18109, -29.56225, 'Rand');
+-- INSERT INTO Currencies (CurrencyCode, Symbol, country, Longitude, Latitude, CurrencyName) 
+-- VALUES
+--     ('AMD', '¥', 'Armenia', 44.6917527, 40.2367283, 'Dram'),
+--     ('ARS', '£', 'Argentina', -60.61667, -26.73333, 'Peso'),
+--     ('BOB', '€', 'Bolivia', -65.267799, -19.156561, 'Boliviano'),
+--     ('BRL', '£', 'Brazil', -35.4551534, -7.8794782, 'Real'),
+--     ('CAD', '¥', 'Canada', -63.0886099, 46.215926, 'Dollar'),
+--     ('CNY', '€', 'China', 117.002933, 35.302488, 'Yuan Renminbi'),
+--     ('COP', '$', 'Colombia', -77.3439283, 1.2296124, 'Peso'),
+--     ('CUP', '€', 'Cuba', -75.9869609, 20.2218201, 'Peso'),
+--     ('CZK', '£', 'Czech Republic', 15.4833007, 49.2908708, 'Koruna'),
+--     ('DOP', '$', 'Dominican Republic', -71.0790048, 19.5403533, 'Peso'),
+--     ('EGP', '£', 'Egypt', 30.734995, 28.4233602, 'Pound'),
+--     ('EUR', '£', 'France', 5.8978018, 43.4945737, 'Euro'),
+--     ('GMD', '£', 'Gambia', -14.769285, 13.449097, 'Dalasi'),
+--     ('GTQ', '$', 'Guatemala', -91.4656296, 14.5802198, 'Quetzal'),
+--     ('HRK', '¥', 'Croatia', 15.5854843, 45.1150317, 'Kuna'),
+--     ('IDR', '$', 'Indonesia', 110.8171082, -6.4712737, 'Rupiah'),
+--     ('JPY', '¥', 'Japan', 139.707963, 36.1219748, 'Yen'),
+--     ('MGA', '£', 'Madagascar', 47.8402601, -22.3539973, 'Ariary'),
+--     ('MKD', '$', 'Macedonia', 21.3421041, 41.9950451, 'Denar'),
+--     ('MNT', '£', 'Mongolia', 106.9211984, 47.9195813, 'Tugrik'),
+--     ('MXN', '£', 'Mexico', -100.9185477, 28.4943597, 'Peso'),
+--     ('NAD', '¥', 'Namibia', 15.9523622, -21.4206681, 'Dollar'),
+--     ('NGN', '€', 'Nigeria', 5.3102505, 9.2394244, 'Naira'),
+--     ('NOK', '¥', 'Norway', 11.5610075, 60.8818611, 'Krone'),
+--     ('NZD', '¥', 'New Zealand', 175.8087485, -38.9898711, 'Dollar'),
+--     ('PHP', '¥', 'Philippines', 123.4675853, 9.8318931, 'Peso'),
+--     ('PKR', '£', 'Pakistan', 72.4275483, 31.8917453, 'Rupee'),
+--     ('PLN', '$', 'Poland', 18.3991666, 53.8514527, 'Zloty'),
+--     ('RUB', '¥', 'Russia', 101.7805781, 56.3041802, 'Ruble'),
+--     ('SEK', '$', 'Sweden', 17.9509504, 59.3245933, 'Krona'),
+--     ('SOS', '£', 'Somalia', 49.8739267, 11.4720137, 'Shilling'),
+--     ('THB', '$', 'Thailand', 100.3477801, 17.7116584, 'Baht'),
+--     ('UAH', '$', 'Ukraine', 23.6611306, 49.7821352, 'Hryvnia'),
+--     ('UGX', '¥', 'Uganda', 33.9303991, 1.1016277, 'Shilling'),
+--     ('USD', '£', 'United States', -104.7099999, 40.42, 'Dollar'),
+--     ('XAF', '$', 'Cameroon', 10.4284178, 5.4807517, 'Franc'),
+--     ('XOF', '$', 'Burkina Faso', -4.3051542, 11.1649219, 'Franc'),
+--     ('XPF', '¥', 'New Caledonia', 164.991636, -20.692675, 'Franc'),
+--     ('ZAR', '$', 'South Africa', 30.18109, -29.56225, 'Rand');
+
+
+
+
+
 
 --select * from currencies
 GO
@@ -756,7 +761,7 @@ VALUES ('PC1', '$'),
 -- Assuming PriceCategoryId starts from 1 for the first row in PriceCategories table
 INSERT INTO PriceCategoryTranslations (Name, PriceCategoryId, Description, LangCode)
 VALUES
-('Gold', 1, 'Gold Currency', 'en'),
+('General', 1, 'Gold Currency', 'en'),
 ('الذهبية', 1, 'العملة الذهبية', 'ar'),
 ('Silver', 2, 'Silver Currency', 'en'),
 ('الفضية', 2, 'العملة الفضية', 'ar'),
@@ -897,7 +902,7 @@ VALUES
 
 GO
 -- ===========================================================================================================================================================
-INSERT INTO DoctorWorkPeriods (HospitalId, SpecialtyId, ClinicId, DoctorId, WorkingPeriodId, OnDay)
+INSERT INTO DoctorWorkPeriods (HospitalId, SpecialtyId, ClinicId, DoctorId, WorkingPeriodId, DayId)
 VALUES 
     (1,1, 1, 1, 1, 1),
     (2,1, 2, 2, 2, 2),

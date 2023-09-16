@@ -1,5 +1,6 @@
 ﻿using DomainModel.Entities.SettingsEntities;
 using DomainModel.Entities.TranslationModels;
+using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.DoctorEntities;
 
@@ -44,6 +45,7 @@ public partial class Doctor
 
     public virtual ICollection<DoctorsWorkHospital> DoctorsWorkHospitals { get; set; } = new List<DoctorsWorkHospital>();
 
+    //[JsonIgnore]
     public virtual ICollection<DoctorWorkPeriod> DoctorWorkPeriods { get; set; } = new List<DoctorWorkPeriod>();
 
 
