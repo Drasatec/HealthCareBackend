@@ -46,8 +46,8 @@ public partial class Clinic
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
-    [JsonIgnore]
-    public virtual ICollection<DoctorWorkPeriod> DoctorWorkPeriods { get; set; } = new List<DoctorWorkPeriod>();
+    //[JsonIgnore]
+    //public virtual ICollection<DoctorWorkPeriod> DoctorWorkPeriods { get; set; } = new List<DoctorWorkPeriod>();
 
     public virtual MedicalSpecialty Specialty { get; set; } = null!;
 }

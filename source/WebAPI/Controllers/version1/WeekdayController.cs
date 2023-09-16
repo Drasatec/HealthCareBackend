@@ -27,7 +27,7 @@ public class WeekdayController : ControllerBase
     {
         if (model.Id <= 0)
         {
-            model.Id = Convert.ToInt16(await Data.Generic.GenericCount<Weekday>() + 1);
+            model.Id = Convert.ToByte(await Data.Generic.GenericCount<Weekday>() + 1);
         }
 
         var res = await Data.Generic.GenericCreate(model);

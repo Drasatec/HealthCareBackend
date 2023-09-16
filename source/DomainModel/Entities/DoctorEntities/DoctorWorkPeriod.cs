@@ -21,20 +21,19 @@ public partial class DoctorWorkPeriod
     public byte DayId { get; set; }
 
     [JsonIgnore]
-    public virtual Weekday Day { get; set; } = null!;
+    public virtual Weekday? Day { get; set; } 
 
     //[JsonIgnore]
-    public virtual Clinic Clinic { get; set; } = null!;
+    public virtual Clinic? Clinic { get; set; } 
 
     [JsonIgnore]
-    public virtual Doctor Doctor { get; set; } = null!;
+    public virtual Doctor? Doctor { get; set; }
 
     [JsonIgnore]
-    public virtual Hospital Hospital { get; set; } = null!;
+    public virtual Hospital? Hospital { get; set; } 
+    [JsonIgnore]
+    public virtual MedicalSpecialty? Specialty { get; set; } 
 
     [JsonIgnore]
-    public virtual MedicalSpecialty Specialty { get; set; } = null!;
-
-    [JsonIgnore]
-    public virtual WorkingPeriod WorkingPeriod { get; set; } = null!;
+    public virtual WorkingPeriod? WorkingPeriod { get; set; }
 }

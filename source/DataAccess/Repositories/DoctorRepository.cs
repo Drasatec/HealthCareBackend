@@ -677,7 +677,9 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         IQueryable<Doctor> query = Context.Doctors;
         //IQueryable<DoctorWorkPeriodDto> result;
 
-        // addd status *
+        query = query.Include(d1 => d1.DoctorTranslations.Where(l => l.LangCode == lang));
+        query = query.Include(dwp => dwp.DoctorWorkPeriods);
+        //query = query.Include(dwp => dwp.DoctorsWorkHospitals).ThenInclude(x => x.Hospital.HospitalTranslations);
 
         var totalCount = 0;
 
@@ -717,10 +719,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             query = query.Where(d => d.Gender.Equals(gender));
         }
 
-        query = query.Include(d1 => d1.DoctorTranslations.Where(l => l.LangCode == lang));
 
-        query = query.Include(dwp => dwp.DoctorWorkPeriods);
-        //query = query.Include(dwp => dwp.DoctorsWorkHospitals).ThenInclude(x => x.Hospital.HospitalTranslations);
 
         query = query.OrderByDescending(o => o.Id);
 
@@ -737,8 +736,8 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                           Id = doct.Id,
                           Photo = doct.Photo,
                           DoctorTranslations = doct.DoctorTranslations,
-                          DoctorWorkPeriods = doct.DoctorWorkPeriods,
-                          DoctorsWorkHospitals = doct.DoctorsWorkHospitals,
+                         DoctorWorkPeriods = doct.DoctorWorkPeriods,
+                          //DoctorsWorkHospitals = doct.DoctorsWorkHospitals,
                       };
 
         var all = new PagedResponse<DoctorDtoV2>

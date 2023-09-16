@@ -21,7 +21,7 @@ public class DoctorDtoV2
 
     public ICollection<DoctorWorkPeriod> DoctorWorkPeriods { get; set; } = new List<DoctorWorkPeriod>();
 
-    public ICollection<DoctorsWorkHospital> DoctorsWorkHospitals { get; set; } = new List<DoctorsWorkHospital>();
+    //public ICollection<DoctorsWorkHospital> DoctorsWorkHospitals { get; set; } = new List<DoctorsWorkHospital>();
 
     //public ICollection<DoctorWorkPeriod>? DoctorWorkPeriods = new List<DoctorWorkPeriod>();
 }
