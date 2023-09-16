@@ -11,7 +11,7 @@ public partial class Patient
 
     public DateTime? BirthDate { get; set; }
 
-    public byte? NationalId { get; set; }
+    public short? NationalId { get; set; }
 
     public byte? Ssn { get; set; }
 
@@ -29,7 +29,7 @@ public partial class Patient
 
     public int? ClientGroupId { get; set; }
 
-    public int? NationalityId { get; set; }
+    public short? NationalityId { get; set; }
 
     public short? GenderId { get; set; }
 
@@ -47,7 +47,7 @@ public partial class Patient
 
     public virtual MaritalStatus? MaritalStatus { get; set; }
 
-    public virtual Nationality? Nationality { get; set; }
+    public virtual Country? Country { get; set; }
 
     public virtual ICollection<PatientTranslation> PatientTranslations { get; set; } = new List<PatientTranslation>();
 
@@ -55,5 +55,5 @@ public partial class Patient
 
     public virtual Ssntype? Ssntype { get; set; }
 
-    public virtual ICollection<UserAccount> UserAccounts { get; set; } = new List<UserAccount>();
+    public virtual UserAccount  UserAccount { get; set; } =null!;
 }

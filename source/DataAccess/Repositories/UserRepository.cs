@@ -1,4 +1,5 @@
 ﻿using DataAccess.Contexts;
+using DomainModel.Entities;
 using DomainModel.Entities.Users;
 using DomainModel.Helpers;
 using DomainModel.Interfaces;
@@ -63,72 +64,75 @@ public class UserRepository : GenericRepository, IUserRepository
         }
     }
 
+    public async Task<ResponseId> CreateWithNewPatientAsync(Patient entity, string password)
+    {
+        ResponseId result;
+        try
+        {
+            entity.PatientStatus = 1;
+            entity.UserAccount.PasswordHash = passwordHasher.HashPassword(password);
+            entity.UserAccount.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
 
-    //public async Task<bool> SendVerificaitonCodeToEmail(string email)
-    //{
-    //    var user = await FindByEmailAsync(email);
-    //    if (user != null)
-    //    {
-    //        var verificationCode = Helper.VerificationCode();
-    //        user.VerificationCode = verificationCode;
-    //        user.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
+            // plese set username of patinet , userName == MedicalFileNumber;
+            var entityEntry = await Context.Patients.AddAsync(entity);
+            if (entityEntry.State == EntityState.Added)
+            {
+                result = new ResponseId(true, "", entity.Id);
+                await Context.SaveChangesAsync();
+            }
+            else
+            {
+                return new ResponseId(false, entityEntry.State.ToString(), 0);
+            }
+            return result;
+        }
+        catch (Exception ex)
+        {
+            var exceptionMasseage = $"Message:{ex.Message} \n InnerException: {ex.InnerException?.Message}";
+            return new ResponseId(false, exceptionMasseage, 0);
+        }
+    }
 
-    //        await UpdateVerificationCode(user);
-    //        await mailingService.SendVerificationCodeAsync(email, verificationCode);
-    //    }
-    //    return true;
-    //}
+    public Task<bool> IsEmailExistAsync(string email) => Context.UserAccounts.AnyAsync(e => e.Email == email.ToLower());
 
-    public async Task<User?> FindById(string userId)
+    public Task<bool> IsPhoneExistAsync(string phone) => Context.UserAccounts.AnyAsync(e => e.PhoneNumber == phone.ToLower());
+
+    public async Task<UserAccount?> FindByEmailAsync(string email)
+    {
+        try
+        {
+            return await Context.UserAccounts.FirstOrDefaultAsync(x => x.Email == email.ToLower());
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public async Task<UserAccount?> FindByPhoneNumberAsync(string phone)
+    {
+        try
+        {
+            return await Context.UserAccounts.FirstOrDefaultAsync(x => x.PhoneNumber == phone.ToLower());
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public async Task<UserAccount?> FindById(int userId)
     {
         //return await GenericReadById<User>(u => u.Id == userId, null);
         try
         {
-            return await Context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            return await Context.UserAccounts.FirstOrDefaultAsync(x => x.Id == userId);
         }
         catch (Exception)
         {
             return null;
         }
     }
-    public async Task<User?> FindByEmailAsync(string email)
-    {
-        try
-        {
-            //return await Context.Users.Where(x => x.Email == email.ToLower()).FirstOrDefaultAsync();
-            return await Context.Users.FirstOrDefaultAsync(x => x.Email == email.ToLower());
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-    }
-    
-    public async Task<User?> FindByPhoneNumberAsync(string phone)
-    {
-        try
-        {
-            //return await Context.Users.Where(x => x.PhoneNumber == phone.ToLower()).FirstOrDefaultAsync();
-            return await Context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phone.ToLower());
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-    }
-
-    //public async Task<User?> FindByPhoneNumberAsync(string phone)
-    //{
-    //    try
-    //    {
-    //        return await Context.Users.Where(x => x.PhoneNumber == phone.ToLower()).FirstOrDefaultAsync();
-    //    }
-    //    catch (Exception)
-    //    {
-    //        return null;
-    //    }
-    //}
-
     public async Task<User?> ReadUserIdByEmailAsync(string email)
     {
         try
@@ -182,15 +186,38 @@ public class UserRepository : GenericRepository, IUserRepository
         return await Context.SaveChangesAsync() > 0 ? true : false;
     }
 
-
-
     public async Task<bool> CheckPassword(string password, string hashedPassword)
     {
         return await Task.FromResult(passwordHasher.VerifyPassword(password, hashedPassword));
     }
 
-    public Task<bool> IsEmailExistAsync(string email) => Context.Users.AnyAsync(e => e.Email == email.ToLower());
-    public Task<bool> IsPhoneExistAsync(string phone) => Context.Users.AnyAsync(e => e.PhoneNumber == phone.ToLower());
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //public async Task<bool> SendVerificaitonCodeToEmail(string email)
+    //{
+    //    var user = await FindByEmailAsync(email);
+    //    if (user != null)
+    //    {
+    //        var verificationCode = Helper.VerificationCode();
+    //        user.VerificationCode = verificationCode;
+    //        user.ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime;
+
+    //        await UpdateVerificationCode(user);
+    //        await mailingService.SendVerificationCodeAsync(email, verificationCode);
+    //    }
+    //    return true;
+    //}
 
     // private methods
 
@@ -209,6 +236,20 @@ public class UserRepository : GenericRepository, IUserRepository
     //{
 
     //}
+
+
+    //public async Task<User?> FindByPhoneNumberAsync(string phone)
+    //{
+    //    try
+    //    {
+    //        return await Context.Users.Where(x => x.PhoneNumber == phone.ToLower()).FirstOrDefaultAsync();
+    //    }
+    //    catch (Exception)
+    //    {
+    //        return null;
+    //    }
+    //}
+
 
 
     //public virtual async Task<IdentityResult> ChangeEmailAsync(TUser user, string newEmail, string token)

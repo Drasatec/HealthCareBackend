@@ -5,8 +5,10 @@ using DomainModel.Models;
 using DomainModel.Models.AppSettings;
 using DomainModel.Models.Patients;
 using DomainModel.Models.Users;
+using DomainModel.Models.UsersV2;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -81,71 +83,103 @@ public class AuthService : IAuthService
 
         return new AuthModel
         {
-            UserId = entity.Id,
-            Success = true,
-            Email = entity.Email,
-            Roles = new List<string> { "User" },
-            //Username = entity.UserName,
-            IsAuthenticated = false,
-            ExpiresOn = null,
-            Token = null,
+            //UserId = entity.Id,
+            //Success = true,
+            //Email = entity.Email,
+            //Roles = new List<string> { "User" },
+            ////Username = entity.UserName,
+            //IsAuthenticated = false,
+            //ExpiresOn = null,
+            //Token = null,
         };
     }
 
 
-    public async Task<AuthModel> LoginAsync(UserLoginDto userDto)
+    public async Task<AuthModel> RegisterNewPatinetAsync(PatientRegisterDto userDto, string verification)
     {
+        // Ensure that the email does not already exist
+        if (!string.IsNullOrEmpty(userDto.Email) && await userRepository.IsEmailExistAsync(userDto.Email))
+        {
+            return new AuthModel(false, "email is exist");
+        }
 
-        User? user;
+        // Ensure that the Phone Number does not already exist
+        if (!string.IsNullOrEmpty(userDto.PhoneNumber) && await userRepository.IsPhoneExistAsync(userDto.PhoneNumber))
+        {
+            return new AuthModel(false, "Phone Number is exist");
+        }
+
+        Patient entity = userDto;
+        UserAccount userAccount = new UserAccount()
+        {
+            UserName = "User"+ DateTime.Now.ToString("yyyyMMddHHmmss"),
+            PhoneNumber = userDto.PhoneNumber,
+            CallingCode = userDto.CallingCode,
+            Email = userDto.Email,
+        };
+
+        if (!string.IsNullOrEmpty(verification))
+        {
+            if (verification.Equals("email"))
+            {
+
+                userAccount.VerificationCode = Helper.VerificationCode();
+                _ = mailingService.SendVerificationCodeAsync(userAccount.Email!, userAccount.VerificationCode, userDto.FullName);
+            }
+            else if (verification.Equals("sms") && userAccount.PhoneNumber != null)
+            {
+
+                userAccount.VerificationCode = Helper.VerificationCode();
+                _ = smsService.SendVerificationCodeAsync(userAccount.PhoneNumber, userAccount.VerificationCode);
+            }
+        }
+        entity.UserAccount = userAccount;
+        // insert new user in database
+        var user = await userRepository.CreateWithNewPatientAsync(entity, userDto.Password);
+        if (!user.Success)
+        {
+            return new AuthModel(false, user?.Message);
+        }
+
+        return await CreateAuth(userAccount);
+    }
+
+    public async Task<AuthModel> UserLoginByEmailAsync(UserLoginByEmail userDto)
+    {
+        UserAccount? user;
         if (!string.IsNullOrEmpty(userDto.Email))
         {
             user = await userRepository.FindByEmailAsync(userDto.Email);
-        }
-        else if (!string.IsNullOrEmpty(userDto.PhoneNumber))
-        {
-            user = await userRepository.FindByPhoneNumberAsync(userDto.PhoneNumber);
-        }
-        else
-            user = null;
-
-
-
-        if (user is null || !await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
-        {
-            return new AuthModel()
+            if (user is not null && await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
             {
-                Message = "Email or Phone Number or Password is incorrect!",
-                Success = false,
-            };
+                return await CreateAuth(user);
+            }
         }
-
-        var auth = new AuthModel();
-
-        // IsCompletData?
-        var patient = await Data.Patients.FindPatientByUserId(user.Id);
-        if (patient is not null)
+        return new AuthModel()
         {
-            auth.IsCompletData = true;
-            auth.PatientId = patient.PatientId;
-        }
-
-        // isConfirmed? Email or phone
-        auth.EmailConfirmed = user.EmailConfirmed ? true : false;
-        auth.PhoneNumberConfirmed = user.PhoneNumberConfirmed ? true : false;
-
-        var jwtSecurityToken = await CreateJwtToken(user);
-
-        auth.UserId = user.Id;
-        auth.Email = user.Email;
-       // auth.Username = user.UserName;
-        auth.Success = true;
-        auth.IsAuthenticated = true;
-        auth.Roles = new List<string> { "User" };
-        auth.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        auth.ExpiresOn = jwtSecurityToken.ValidTo;
-        return auth;
+            Message = "Email or Password is incorrect!",
+            Success = false,
+        };
     }
 
+    public async Task<AuthModel> UserLoginByPhoneAsync(UserLoginByPhone userDto)
+    {
+        UserAccount? user;
+        if (!string.IsNullOrEmpty(userDto.PhoneNumber))
+        {
+            user = await userRepository.FindByPhoneNumberAsync(userDto.PhoneNumber);
+            if (user is not null && await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
+            {
+                return await CreateAuth(user);
+            }
+        }
+        return new AuthModel()
+        {
+            Message = "PhoneNumber or Password is incorrect!",
+            Success = false,
+        };
+
+    }
 
     public async Task<Response<PatientToLoginDto>> VerificationEmail(string email, string code)
     {
@@ -159,18 +193,18 @@ public class AuthService : IAuthService
             {
                 user.EmailConfirmed = true;
                 var result = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.EmailConfirmed);
-                if(result != null && result.Success)
+                if (result != null && result.Success)
                 {
                     return new Response<PatientToLoginDto>(true, null, new PatientToLoginDto { UserId = user.Id, PatientId = null });
 
                 }
                 else
-                   return  new Response<PatientToLoginDto>(false, result?.Message, null);
+                    return new Response<PatientToLoginDto>(false, result?.Message, null);
             }
             else
                 return new Response<PatientToLoginDto>(false, "Expired Time", null);
         }
-        return  new Response<PatientToLoginDto>(false, "user not found", null);
+        return new Response<PatientToLoginDto>(false, "user not found", null);
     }
 
 
@@ -193,7 +227,7 @@ public class AuthService : IAuthService
                     return new Response<PatientToLoginDto>(false, result?.Message, null);
             }
             else
-                return new Response<PatientToLoginDto>(false, "Expired Time",null);
+                return new Response<PatientToLoginDto>(false, "Expired Time", null);
         }
         return res = new Response<PatientToLoginDto>(false, "user not found", null);
     }
@@ -253,35 +287,59 @@ public class AuthService : IAuthService
     {
         Response res;
 
-        User? user;
-        if (!string.IsNullOrEmpty(dto.Email))
-        {
-            user = await userRepository.FindByEmailAsync(dto.Email);
-        }
-        else if (!string.IsNullOrEmpty(dto.UserId))
-        {
-            user = await userRepository.FindById(dto.UserId);
-        }
-        else
-            user = null;
+        //UserAccount? user;
+        //if (!string.IsNullOrEmpty(dto.Email))
+        //{
+        //    user = await userRepository.FindByEmailAsync(dto.Email);
+        //}
+        //else if (!string.IsNullOrEmpty(dto.UserId))
+        //{
+        //    user = await userRepository.FindById(dto.UserId);
+        //}
+        //else
+        //    user = null;
 
-        if (user != null)
-        {
-            var oldPass = passwordHasher.VerifyPassword(dto.OldPassword, user.PasswordHash);
-            if (oldPass)
-            {
-                user.PasswordHash = passwordHasher.HashPassword(dto.Password);
-                res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PasswordHash);
-                res.Message = null;
-                return res;
-            }
-            else
-                return new Response(false, "Old password is wrong.");
-        }
+        //if (user != null)
+        //{
+        //    var oldPass = passwordHasher.VerifyPassword(dto.OldPassword, user.PasswordHash);
+        //    if (oldPass)
+        //    {
+        //        user.PasswordHash = passwordHasher.HashPassword(dto.Password);
+        //        res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PasswordHash);
+        //        res.Message = null;
+        //        return res;
+        //    }
+        //    else
+        //        return new Response(false, "Old password is wrong.");
+        //}
         return res = new Response(false, "email or id is not founded");
     }
 
-    private async Task<JwtSecurityToken> CreateJwtToken(User user)
+
+    private async Task<AuthModel> CreateAuth(UserAccount user)
+    {
+        var auth = new AuthModel();
+        var userAccount = new UserAccountDto()
+        {
+            UserId = user.Id,
+            Email = user.Email,
+            UserName = user.UserName,
+            PhoneNumber = user.CallingCode + user.PhoneNumber,
+            UserType = UserType.Patient.ToString(),
+
+            EmailConfirmed = user.EmailConfirmed ? true : false,
+            PhoneNumberConfirmed = user.PhoneNumberConfirmed ? true : false,
+
+        };
+        auth.Success = true;
+        auth.UserAccount = userAccount;
+        var jwtSecurityToken = await CreateJwtToken(user);
+        auth.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        auth.ExpiresOn = jwtSecurityToken.ValidTo;
+        return auth;
+    }
+
+    private async Task<JwtSecurityToken> CreateJwtToken(UserAccount user)
     {
         // var userClaims = await _userManager.GetClaimsAsync(user);
         //var roles = await _userManager.GetRolesAsync(user);
@@ -292,11 +350,11 @@ public class AuthService : IAuthService
 
         var claims = new[]
         {
-            //new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+            new Claim("uid", user.Id.ToString()),
+            new Claim("roles", "patient"),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("uid", user.Id),
-            new Claim("roles", "User")
+            new Claim(JwtRegisteredClaimNames.Sub, user.UserName?? ""),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email??"")
         };
         //.Union(userClaims)
         //.Union(roleClaims);
@@ -313,4 +371,46 @@ public class AuthService : IAuthService
 
         return jwtSecurityToken;
     }
+
+
+    // =======================deleted
+
+    public async Task<AuthModel> LoginAsync(UserLoginDto userDto)
+    {
+
+        //User? user;
+        //if (!string.IsNullOrEmpty(userDto.Email))
+        //{
+        //    user = await userRepository.FindByEmailAsync(userDto.Email);
+        //}
+        //else if (!string.IsNullOrEmpty(userDto.PhoneNumber))
+        //{
+        //    user = await userRepository.FindByPhoneNumberAsync(userDto.PhoneNumber);
+        //}
+        //else
+        //    user = null;
+
+
+        //if (user is null || !await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
+        //{
+        //    return new AuthModel()
+        //    {
+        //        Message = "Email or Phone Number or Password is incorrect!",
+        //        Success = false,
+        //    };
+        //}
+
+        var auth = new AuthModel();
+        return auth;
+    }
+    //var claims = new Claim[4];
+    //claims[0] = new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString());
+    //claims[0] = new Claim("uid", user.Id.ToString());
+    //claims[0] = new Claim("roles", "Patient");
+
+    //    if (!string.IsNullOrEmpty(user.Email))
+    //        claims[0] = new Claim(JwtRegisteredClaimNames.Email, user.Email);
+    //    if (!string.IsNullOrEmpty(user.UserName))
+    //        claims[0] = new Claim(JwtRegisteredClaimNames.Sub, user.UserName);
+
 }

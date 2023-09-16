@@ -506,26 +506,26 @@ CREATE TABLE MedicalSpecialtyTranslations --MM
 );
 GO
 ----------------
-CREATE TABLE MedicalSpecialtiesHospitals --MM
-(
-    SpecialtyId INT,
-    HospitalId INT,
+-- CREATE TABLE MedicalSpecialtiesHospitals --MM
+-- (
+--     SpecialtyId INT,
+--     HospitalId INT,
 
-	CONSTRAINT PK_MedicalSpecialtiesHospitals PRIMARY KEY (SpecialtyId,HospitalId),
+-- 	CONSTRAINT PK_MedicalSpecialtiesHospitals PRIMARY KEY (SpecialtyId,HospitalId),
 
-	CONSTRAINT FK_MedicalSpecialtiesHospitals_SPSpecialtyId
-	FOREIGN KEY (SpecialtyId)
-		REFERENCES MedicalSpecialties(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
+-- 	CONSTRAINT FK_MedicalSpecialtiesHospitals_SPSpecialtyId
+-- 	FOREIGN KEY (SpecialtyId)
+-- 		REFERENCES MedicalSpecialties(Id)
+-- 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	CONSTRAINT FK_MedicalSpecialtiesHospitals_HospitalId
-	FOREIGN KEY (HospitalId)
-		REFERENCES HospitalS(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
+-- 	CONSTRAINT FK_MedicalSpecialtiesHospitals_HospitalId
+-- 	FOREIGN KEY (HospitalId)
+-- 		REFERENCES HospitalS(Id)
+-- 		ON DELETE NO ACtion ON UPDATE NO ACTION,
     
-    INDEX IX_MedicalSpecialtiesHospitals_HospitalId NONCLUSTERED (HospitalId)
-);
-GO
+--     INDEX IX_MedicalSpecialtiesHospitals_HospitalId NONCLUSTERED (HospitalId)
+-- );
+-- GO
 ----------------
 CREATE TABLE Clinics
 (
@@ -932,6 +932,47 @@ CREATE TABLE EmployeesStatusTranslations --MM
 );
 GO
 ----------------
+CREATE TABLE BookingStatuses
+(
+    Id SMALLINT IDENTITY (1,1),
+	CreateOn DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_BookingStatuses PRIMARY KEY (Id),
+);
+GO
+----------------
+CREATE TABLE BookingStatusesTranslations --MM
+(
+    Id INT IDENTITY (1,1),
+    StatusName NVARCHAR(50) NOT NULL,
+    BookingStatusId SMALLINT,
+    LangCode VARCHAR(6),
+
+	CONSTRAINT PK_BookingStatusesTranslations PRIMARY KEY (Id),
+    CONSTRAINT UK_BookingStatusesTranslations_LangCode_BookingStatusId UNIQUE (BookingStatusId, LangCode),
+
+	CONSTRAINT FK_BookingStatusesTranslations_BookingStatusId
+    FOREIGN KEY (BookingStatusId)
+      REFERENCES BookingStatuses(Id)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+	CONSTRAINT FK_BookingStatusesTranslations_LangCode
+    FOREIGN KEY (LangCode)
+      REFERENCES Languages(Code)
+		ON DELETE NO ACtion ON UPDATE NO ACTION,
+
+    INDEX IX_BookingStatusesTranslations_StatusName NONCLUSTERED (StatusName)
+);
+INSERT INTO BookingStatuses (CreateOn)
+VALUES (GETDATE()),(GETDATE()),(GETDATE()),(GETDATE()),(GETDATE());
+INSERT INTO BookingStatusesTranslations (StatusName, BookingStatusId, LangCode)
+VALUES
+('Pending', 1, 'en'),('قيد الانتظار', 1, 'ar'),
+('Confirmed', 2, 'en'),('تم التأكيد', 2, 'ar'),
+('Cancelled', 3, 'en'),('تم الإلغاء', 3, 'ar'),
+('Completed', 4, 'en'),('تم الانتهاء', 4, 'ar'),
+('In Progress', 5, 'en'),('جاري التنفيذ', 5, 'ar');
+GO
+----------------
 CREATE TABLE Promotions (
     Id INT IDENTITY(1,1),
     Photo VARCHAR(55),
@@ -963,6 +1004,7 @@ CREATE TABLE PromotionsTranslations --MM
       REFERENCES Languages(Code)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 );
+
 -- ================================================================================= DOCTOR =================================================================================
 -- ================================================================================= DOCTOR =================================================================================
 -- ================================================================================= DOCTOR =================================================================================
@@ -1233,7 +1275,7 @@ CREATE TABLE Patients
     IsDeleted BIT NOT NULL DEFAULT 0,
     ClientId INT NULL,
     ClientGroupId INT,
-    NationalityId INT,
+    NationalityId SMALLINT,
 
     GenderId SMALLINT,
     ReligionId SMALLINT,
@@ -1256,9 +1298,9 @@ CREATE TABLE Patients
       REFERENCES ClientGroups(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
-	CONSTRAINT FK_Patients_NationalityId
+	CONSTRAINT FK_Patients_CountryId
     FOREIGN KEY (NationalityId)
-      REFERENCES Nationalities(Id)
+      REFERENCES Countries(Id)
 		ON DELETE NO ACtion ON UPDATE NO ACTION,
 
     CONSTRAINT FK_Patients_GenderId
@@ -1283,11 +1325,8 @@ CREATE TABLE PatientTranslations --MM
 (
     Id INT IDENTITY (1,1),
     FullName NVARCHAR(60),
-    Address NVARCHAR(50),
     Occupation NVARCHAR(50),
-    Employer NVARCHAR(50),
-    RelationshipClient TINYINT, --(father / mother / husband / wife / son / daughter / brother / sister / other) 
-    
+    [Address] NVARCHAR(50),
     PatientId INT,
     LangCode VARCHAR(6),
 
@@ -1313,7 +1352,7 @@ CREATE TABLE UserAccount (
     UserName [nvarchar](36) NULL, -- MedicalFileNumber
     PhoneNumber VARCHAR(20),
     CallingCode VARCHAR(5), -- +20
-    Email NVARCHAR(255) NOT NULL,
+    Email NVARCHAR(255),
     EmailConfirmed BIT NOT NULL DEFAULT 0,
     PhoneNumberConfirmed BIT NOT NULL DEFAULT 0,
     VerificationCode VARCHAR(8),
@@ -1325,6 +1364,7 @@ CREATE TABLE UserAccount (
     CONSTRAINT PK_UserAccount PRIMARY KEY (Id),
     CONSTRAINT UK_UserAccount_PhoneNumber UNIQUE (PhoneNumber),
     CONSTRAINT UK_UserAccount_Email UNIQUE (Email),
+    CONSTRAINT UK_UserAccount_UserReferenceID_UserType UNIQUE (UserReferenceID,UserType),
 
 	CONSTRAINT FK_UserAccount_UserReferenceID
     FOREIGN KEY (UserReferenceID)
@@ -1334,47 +1374,6 @@ CREATE TABLE UserAccount (
 	INDEX IX_UserAccount_UserName NONCLUSTERED (UserName),
 	INDEX IX_UserAccount_PhoneNumber NONCLUSTERED (PhoneNumber)
 );
-GO
-----------------
-CREATE TABLE BookingStatuses
-(
-    Id SMALLINT IDENTITY (1,1),
-	CreateOn DATETIME DEFAULT GETDATE(),
-    CONSTRAINT PK_BookingStatuses PRIMARY KEY (Id),
-);
-GO
-----------------
-CREATE TABLE BookingStatusesTranslations --MM
-(
-    Id INT IDENTITY (1,1),
-    StatusName NVARCHAR(50) NOT NULL,
-    BookingStatusId SMALLINT,
-    LangCode VARCHAR(6),
-
-	CONSTRAINT PK_BookingStatusesTranslations PRIMARY KEY (Id),
-    CONSTRAINT UK_BookingStatusesTranslations_LangCode_BookingStatusId UNIQUE (BookingStatusId, LangCode),
-
-	CONSTRAINT FK_BookingStatusesTranslations_BookingStatusId
-    FOREIGN KEY (BookingStatusId)
-      REFERENCES BookingStatuses(Id)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-	CONSTRAINT FK_BookingStatusesTranslations_LangCode
-    FOREIGN KEY (LangCode)
-      REFERENCES Languages(Code)
-		ON DELETE NO ACtion ON UPDATE NO ACTION,
-
-    INDEX IX_BookingStatusesTranslations_StatusName NONCLUSTERED (StatusName)
-);
-INSERT INTO BookingStatuses (CreateOn)
-VALUES (GETDATE()),(GETDATE()),(GETDATE()),(GETDATE()),(GETDATE());
-INSERT INTO BookingStatusesTranslations (StatusName, BookingStatusId, LangCode)
-VALUES
-('Pending', 1, 'en'),('قيد الانتظار', 1, 'ar'),
-('Confirmed', 2, 'en'),('تم التأكيد', 2, 'ar'),
-('Cancelled', 3, 'en'),('تم الإلغاء', 3, 'ar'),
-('Completed', 4, 'en'),('تم الانتهاء', 4, 'ar'),
-('In Progress', 5, 'en'),('جاري التنفيذ', 5, 'ar');
 GO
 ----------------
 CREATE TABLE Booking

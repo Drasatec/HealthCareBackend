@@ -10,7 +10,7 @@ public class UserAccount
 
     public string? CallingCode { get; set; }
 
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; } 
 
     public bool EmailConfirmed { get; set; }
 

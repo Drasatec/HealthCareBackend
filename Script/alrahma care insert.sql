@@ -910,6 +910,53 @@ VALUES
     (2,2, 4, 4, 4, 4),
     (1,2, 5, 5, 5, 5);
 
+
+-- Insert data into Countries table
+INSERT INTO Countries (CallingCode, NumberOfDigits, CountryCode, CurrencyCode, CurrencySymbol, NationalFlag, Longitude, Latitude)
+VALUES
+    ('+20', 10, 'EG', 'EGP', 'Le', 'egypt_flag.jpg', 31.23, 30.04)
+
+
+-- Insert data into MaritalStatus table
+INSERT INTO MaritalStatus (Id)
+VALUES
+    (1), -- Single
+    (2), -- Married
+    (3), -- Divorced
+    (4); -- Widower
+
+-- Insert data into MaritalStatusTranslations table (English and Arabic translations)
+INSERT INTO MaritalStatusTranslations (Name, MaritalId, LangCode)
+VALUES
+    (N'Single', 1, 'en'),
+    (N'متزوج', 1, 'ar'),
+
+    (N'Married', 2, 'en'),
+    (N'متزوج', 2, 'ar'),
+
+    (N'Divorced', 3, 'en'),
+    (N'مطلق', 3, 'ar'),
+
+    (N'Widower', 4, 'en'),
+    (N'أرمل', 4, 'ar');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 GO
 -- ===========================================================================================================================================================
 -- Insert data into the Patients table

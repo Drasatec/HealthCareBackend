@@ -9,13 +9,9 @@ public partial class PatientTranslation
 
     public string? FullName { get; set; }
 
-    public string? Address { get; set; }
-
     public string? Occupation { get; set; }
 
-    public string? Employer { get; set; }
-
-    public byte? RelationshipClient { get; set; }
+    public string? Address { get; set; }
 
     public int? PatientId { get; set; }
 

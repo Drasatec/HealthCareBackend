@@ -27,7 +27,7 @@ public class PatientDto
 
     public int? ClientGroupId { get; set; }
 
-    public int? NationalityId { get; set; }
+    public short? NationalityId { get; set; }
 
     public short? GenderId { get; set; }
 

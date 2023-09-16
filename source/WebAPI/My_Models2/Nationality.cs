@@ -12,6 +12,4 @@ public partial class Nationality
     public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
 
     public virtual ICollection<NationalitiesTranslation> NationalitiesTranslations { get; set; } = new List<NationalitiesTranslation>();
-
-    public virtual ICollection<Patient> Patients { get; set; } = new List<Patient>();
 }

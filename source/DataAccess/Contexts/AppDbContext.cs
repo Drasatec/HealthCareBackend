@@ -159,6 +159,37 @@ public class AppDbContext : DbContext
     {
         modelBuilder.UseCollation("Arabic_100_CI_AS_KS_WS_SC_UTF8");
 
+        modelBuilder.Entity<UserAccount>(entity =>
+        {
+            entity.ToTable("UserAccount");
+
+            entity.HasIndex(e => e.PhoneNumber, "IX_UserAccount_PhoneNumber");
+
+            entity.HasIndex(e => e.UserName, "IX_UserAccount_UserName");
+
+            entity.HasIndex(e => e.Email, "UK_UserAccount_Email").IsUnique();
+
+            entity.HasIndex(e => e.PhoneNumber, "UK_UserAccount_PhoneNumber").IsUnique();
+
+            entity.Property(e => e.CallingCode)
+                .HasMaxLength(5)
+                .IsUnicode(false);
+            entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.UserName).HasMaxLength(36);
+            entity.Property(e => e.UserReferenceId).HasColumnName("UserReferenceID");
+            entity.Property(e => e.VerificationCode)
+                .HasMaxLength(8)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.UserReference).WithOne(p => p.UserAccount)
+                           .HasForeignKey<UserAccount>(d => d.UserReferenceId)
+                           .OnDelete(DeleteBehavior.ClientSetNull)
+                           .HasConstraintName("FK_UserAccount_UserReferenceID");
+        });
 
         modelBuilder.Entity<EmployeeAccount>(entity =>
         {
@@ -186,7 +217,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.VisitingDate).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.BookingReason).HasMaxLength(500);
             entity.Property(e => e.StatusReason).HasMaxLength(500);
-            
+
 
             entity.HasOne(d => d.Clinic).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.ClinicId)
@@ -778,6 +809,10 @@ public class AppDbContext : DbContext
                 .HasForeignKey(d => d.ClientId)
                 .HasConstraintName("FK_Patients_ClientId");
 
+            entity.HasOne(d => d.Country).WithMany(p => p.Patients)
+                .HasForeignKey(d => d.NationalityId)
+                .HasConstraintName("FK_Patients_CountryId");
+
             //entity.HasOne(d => d.Gender).WithMany(p => p.Patients)
             //    .HasForeignKey(d => d.GenderId)
             //    .HasConstraintName("FK_Patients_GenderId");
@@ -808,7 +843,7 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => new { e.HospitalId, e.ClinicId, e.DayId }, "IX_DoctorWorkPeriods_Hospital_Clinic_DayId");
 
             entity.HasIndex(e => new { e.HospitalId, e.SpecialtyId, e.DoctorId, e.ClinicId, e.WorkingPeriodId, e.DayId }, "UK_DoctorWorkPeriods_AllProperty").IsUnique();
-            
+
             //entity.HasOne(d => d.Clinic).WithMany(p => p.DoctorWorkPeriods)
             //    .HasForeignKey(d => d.ClinicId)
             //    .OnDelete(DeleteBehavior.ClientSetNull)
@@ -1157,7 +1192,6 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => new { e.PatientId, e.LangCode }, "UK_PatientTranslations_LangCode_PatientId").IsUnique();
 
             entity.Property(e => e.Address).HasMaxLength(50);
-            entity.Property(e => e.Employer).HasMaxLength(50);
             entity.Property(e => e.FullName).HasMaxLength(60);
             entity.Property(e => e.LangCode)
                 .HasMaxLength(6)

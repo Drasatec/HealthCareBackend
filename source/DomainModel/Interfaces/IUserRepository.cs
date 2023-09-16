@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities.Users;
+﻿using DomainModel.Entities;
+using DomainModel.Entities.Users;
 using DomainModel.Models;
 
 namespace DomainModel.Interfaces;
@@ -6,14 +7,16 @@ namespace DomainModel.Interfaces;
 public interface IUserRepository: IGenericRepository
 {
     Task<Response> CreateAsync(User entity, string password);
-        /// <summary>
+    Task<ResponseId> CreateWithNewPatientAsync(Patient entity, string password);
+
+    /// <summary>
     /// this method return all property in user by email
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
-    Task<User?> FindByEmailAsync(string email);
-    Task<User?> FindById(string userId);
-    Task<User?> FindByPhoneNumberAsync(string phone);
+    Task<UserAccount?> FindByEmailAsync(string email);
+    Task<UserAccount?> FindById(int userId);
+    Task<UserAccount?> FindByPhoneNumberAsync(string phone);
 
     //Task<User?> FindByPhoneNumberAsync(string email);
     Task<bool> IsEmailExistAsync(string email);

@@ -1038,7 +1038,7 @@ public partial class AlrahmaCareDbContext : DbContext
 
             entity.HasOne(d => d.Nationality).WithMany(p => p.Patients)
                 .HasForeignKey(d => d.NationalityId)
-                .HasConstraintName("FK_Patients_NationalityId");
+                .HasConstraintName("FK_Patients_CountryId");
 
             entity.HasOne(d => d.Religion).WithMany(p => p.Patients)
                 .HasForeignKey(d => d.ReligionId)
@@ -1056,7 +1056,6 @@ public partial class AlrahmaCareDbContext : DbContext
             entity.HasIndex(e => new { e.PatientId, e.LangCode }, "UK_PatientTranslations_LangCode_PatientId").IsUnique();
 
             entity.Property(e => e.Address).HasMaxLength(50);
-            entity.Property(e => e.Employer).HasMaxLength(50);
             entity.Property(e => e.FullName).HasMaxLength(60);
             entity.Property(e => e.LangCode)
                 .HasMaxLength(6)
@@ -1299,6 +1298,8 @@ public partial class AlrahmaCareDbContext : DbContext
             entity.HasIndex(e => e.Email, "UK_UserAccount_Email").IsUnique();
 
             entity.HasIndex(e => e.PhoneNumber, "UK_UserAccount_PhoneNumber").IsUnique();
+
+            entity.HasIndex(e => new { e.UserReferenceId, e.UserType }, "UK_UserAccount_UserReferenceID_UserType").IsUnique();
 
             entity.Property(e => e.CallingCode)
                 .HasMaxLength(5)
