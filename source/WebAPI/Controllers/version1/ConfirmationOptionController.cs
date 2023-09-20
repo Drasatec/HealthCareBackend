@@ -48,6 +48,12 @@ public class ConfirmationOptionController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("option-chosen", Order = 0801)]
+    public async Task<IActionResult> OptionChosen([FromQuery] string? code)
+    {
+        return Ok(await Data.Generic.GenericReadSingle<ConfirmationOption, string>(x => x.Chosen == true, (c) => c.Code));
+    }
+
 
     [HttpGet("all", Order = 0812)]
     public async Task<IActionResult> GetAll([FromQuery] string? code, int? pageSize, int? page)
@@ -77,7 +83,7 @@ public class ConfirmationOptionController : ControllerBase
     {
         Response response;
 
-        response = await Data.Generic.GenericUpdate(model, cp1 => cp1.Code,cp2=>cp2.Chosen);
+        response = await Data.Generic.GenericUpdate(model, cp1 => cp1.Code, cp2 => cp2.Chosen);
 
         if (!response.Success)
             return BadRequest(response);
@@ -101,9 +107,9 @@ public class ConfirmationOptionController : ControllerBase
 
         ConfirmationOption entity = new() { Code = code, Chosen = true };
         var res = await Data.Doctors.GenericUpdateSinglePropertyById(0, entity, p => p.Chosen);
-        if (res!= null && res.Success)
+        if (res != null && res.Success)
         {
-            res.Message= $"Update on entity with code: {code}";
+            res.Message = $"Update on entity with code: {code}";
             return Ok(res);
         }
         return BadRequest(res);

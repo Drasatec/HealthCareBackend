@@ -20,7 +20,7 @@ public static class DataAccessImageService
         {
             var imageName = Helper.GenerateImageName();
             _ = SaveSingleImage(image, imageName);
-            return imageName;
+            return await Task.FromResult(imageName);
         }
         return null;
     }

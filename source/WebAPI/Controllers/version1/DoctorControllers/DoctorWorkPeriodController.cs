@@ -42,10 +42,10 @@ public class DoctorWorkPeriodController : ControllerBase
 
 
     [HttpGet(Order = 0812)]
-    public async Task<IActionResult> GetAll([FromQuery] int? id, int? docId, int? hosId, int? clinicId, int? periodId, byte? day, string? lang, int? pageSize, int? page)
+    public async Task<IActionResult> GetAll([FromQuery] int? id, int? docId, int? hosId, int? specialtyId, int? periodId, byte? day, string? lang, int? pageSize, int? page)
     {
 
-        var result = await Data.Doctors.ReadDoctorWorkPeriod(id, docId, hosId, clinicId, periodId, day, lang);
+        var result = await Data.Doctors.ReadDoctorWorkPeriod(id, docId, hosId, specialtyId, periodId, day, lang);
 
         if (result == null)
         {

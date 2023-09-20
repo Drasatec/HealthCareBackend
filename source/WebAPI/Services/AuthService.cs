@@ -1,4 +1,5 @@
-﻿using DomainModel.Entities.Users;
+﻿using DomainModel.Entities.SettingsEntities;
+using DomainModel.Entities.Users;
 using DomainModel.Helpers;
 using DomainModel.Interfaces.Services;
 using DomainModel.Models;
@@ -12,6 +13,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace WebAPI.Services;
 
@@ -39,6 +41,365 @@ public class AuthService : IAuthService
         return userRepository.Test() + Jwt.Audience;
     }
 
+    public async Task<AuthModel> RegisterNewPatinetAsync(PatientRegisterDto userDto)
+    {
+        // Ensure that the email does not already exist
+        if (!string.IsNullOrEmpty(userDto.Email) && await userRepository.IsEmailExistAsync(userDto.Email))
+        {
+            return new AuthModel(false, "email is exist");
+        }
+
+        // Ensure that the Phone Number does not already exist
+        if (!string.IsNullOrEmpty(userDto.PhoneNumber) && await userRepository.IsPhoneExistAsync(userDto.PhoneNumber))
+        {
+            return new AuthModel(false, "Phone Number is exist");
+        }
+
+        var confirmationWith = await Data.Generic.GenericReadSingle<ConfirmationOption, string>(x => x.Chosen == true, (c) => c.Code);
+
+        Patient entity = userDto;
+        var userAccount = new UserAccount()
+        {
+            UserName = "User" + DateTime.Now.ToString("yyyyMMddHHmmss"),
+            PhoneNumber = userDto.PhoneNumber,
+            CallingCode = userDto.CallingCode,
+            Email = userDto.Email,
+            PhoneNumberConfirmed = userDto.PhoneNumberConfirmed,
+            EmailConfirmed = userDto.EmailConfirmed,
+        };
+
+        entity.UserAccount = userAccount;
+
+        var user = await userRepository.CreateWithNewPatientAsync(entity, userDto.Password);
+        if (!user.Success)
+        {
+            return new AuthModel(false, user?.Message);
+        }
+
+        if (!string.IsNullOrEmpty(confirmationWith))
+        {
+            if (confirmationWith.Equals("email"))
+            {
+
+                userAccount.VerificationCode = Helper.VerificationCode();
+                _ = mailingService.SendVerificationCodeAsync(userAccount.Email!, userAccount.VerificationCode, userDto.FullName);
+            }
+            else if (confirmationWith.Equals("sms") && userAccount.PhoneNumber != null)
+            {
+
+                userAccount.VerificationCode = Helper.VerificationCode();
+                _ = smsService.SendVerificationCodeAsync(userAccount.PhoneNumber, userAccount.VerificationCode);
+            }
+            else
+            {
+                return await CreateAuth(userAccount, true);
+            }
+        }
+        return await CreateAuth(userAccount, false);
+    }
+
+    public async Task<AuthModel> UserLoginByEmailAsync(UserLoginByEmail userDto)
+    {
+        UserAccount? user;
+        if (!string.IsNullOrEmpty(userDto.Email))
+        {
+            user = await userRepository.FindByEmailAsync(userDto.Email);
+            if (user is not null && await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
+            {
+                return await CreateAuth(user);
+            }
+        }
+        return new AuthModel()
+        {
+            Message = "Email or Password is incorrect!",
+            Success = false,
+        };
+    }
+
+    public async Task<AuthModel> UserLoginByPhoneAsync(UserLoginByPhone userDto)
+    {
+        UserAccount? user;
+        if (!string.IsNullOrEmpty(userDto.PhoneNumber))
+        {
+            user = await userRepository.FindByPhoneNumberAsync(userDto.PhoneNumber);
+            if (user is not null && await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
+            {
+                return await CreateAuth(user);
+            }
+        }
+        return new AuthModel()
+        {
+            Message = "PhoneNumber or Password is incorrect!",
+            Success = false,
+        };
+
+    }
+
+    public async Task<Response<object>> DoesEmailExist(string email)
+    {
+        try
+        {
+            if (await userRepository.IsEmailExistAsync(email))
+            {
+                return new Response<object>(true, "email is exist", new { IsExist = true });
+            }
+            else
+            {
+                return new Response<object>(true, "email is not exist", new { IsExist = false });
+            }
+        }
+        catch (Exception ex)
+        {
+            return new Response<object>(false, ex.Message, null);
+        }
+    }
+    
+    public async Task<Response<object>> DoesPhoneExist(string email)
+    {
+        try
+        {
+            if (await userRepository.IsPhoneExistAsync(email))
+            {
+                return new Response<object>(true, "phone is exist", new { IsExist = true });
+            }
+            else
+            {
+                return new Response<object>(true, "phone is not exist", new { IsExist = false });
+            }
+        }
+        catch (Exception ex)
+        {
+            return new Response<object>(false, ex.Message, null);
+        }
+    }
+
+    public async Task<Response<VerificationCodeModel>> SentVerificationCodeToEmail(string email)
+    {
+        //Response<VerificationCodeModel> res;
+        try
+        {
+            var code = Helper.VerificationCode();
+            _ = mailingService.SendVerificationCodeAsync(email, code);
+            var verificationCodeModel = new VerificationCodeModel()
+            {
+                VerificationBy = "email",
+                VerificationCode = code,
+                ExpirationTime = DateTimeOffset.Now.AddMinutes(Constants.VerificationCodeMinutesExpires).UtcDateTime
+            };
+
+            return await Task.FromResult(new Response<VerificationCodeModel>(true, "", verificationCodeModel));
+        }
+        catch (Exception ex)
+        {
+            return new Response<VerificationCodeModel>(false, ex.Message);
+        }
+    }
+
+
+    public async Task<Response> RenewSmsVerificationCode(string phone)
+    {
+        Response res;
+        var user = await userRepository.ReadUserIdByPhoneAsync(phone);
+        if (user != null)
+        {
+            user.VerificationCode = Helper.VerificationCode();
+            await smsService.SendVerificationCodeAsync(phone, user.VerificationCode);
+
+            var isUpdated = await userRepository.UpdateVerificationCode(user);
+            if (isUpdated)
+                res = new Response(true, null);
+            else
+                res = new Response(false, "Something went wrong with the database");
+        }
+        else
+            res = new Response(false, "pnone number is not found not found");
+
+        return res;
+    }
+
+    public async Task<Response<PatientToLoginDto>> VerificationEmail(string email, string code)
+    {
+        //Response<PatientToLoginDto> res;
+        var user = await userRepository.ReadUserIdByEmailAsync(email);
+        // if expierd?
+
+        if (user != null)
+        {
+            if (user.ExpirationTime >= DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
+            {
+                user.EmailConfirmed = true;
+                var result = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.EmailConfirmed);
+                if (result != null && result.Success)
+                {
+                    return new Response<PatientToLoginDto>(true, null, new PatientToLoginDto { UserId = user.Id, PatientId = null });
+
+                }
+                else
+                    return new Response<PatientToLoginDto>(false, result?.Message, null);
+            }
+            else
+                return new Response<PatientToLoginDto>(false, "Expired Time", null);
+        }
+        return new Response<PatientToLoginDto>(false, "user not found", null);
+    }
+
+    public async Task<Response<PatientToLoginDto>> VerificationPhone(string phoneNumber, string code)
+    {
+        Response<PatientToLoginDto> res;
+        var user = await userRepository.ReadUserIdByPhoneAsync(phoneNumber);
+
+        if (user != null)
+        {
+            if (user.ExpirationTime >= DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
+            {
+                user.PhoneNumberConfirmed = true;
+                var result = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PhoneNumberConfirmed);
+                if (result != null && result.Success)
+                {
+                    return new Response<PatientToLoginDto>(true, null, new PatientToLoginDto { UserId = user.Id, PatientId = null });
+                }
+                else
+                    return new Response<PatientToLoginDto>(false, result?.Message, null);
+            }
+            else
+                return new Response<PatientToLoginDto>(false, "Expired Time", null);
+        }
+        return res = new Response<PatientToLoginDto>(false, "user not found", null);
+    }
+
+
+    public async Task<Response> ChangePassword(UserChangePassDto dto)
+    {
+        Response res;
+
+        //UserAccount? user;
+        //if (!string.IsNullOrEmpty(dto.Email))
+        //{
+        //    user = await userRepository.FindByEmailAsync(dto.Email);
+        //}
+        //else if (!string.IsNullOrEmpty(dto.UserId))
+        //{
+        //    user = await userRepository.FindById(dto.UserId);
+        //}
+        //else
+        //    user = null;
+
+        //if (user != null)
+        //{
+        //    var oldPass = passwordHasher.VerifyPassword(dto.OldPassword, user.PasswordHash);
+        //    if (oldPass)
+        //    {
+        //        user.PasswordHash = passwordHasher.HashPassword(dto.Password);
+        //        res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PasswordHash);
+        //        res.Message = null;
+        //        return res;
+        //    }
+        //    else
+        //        return new Response(false, "Old password is wrong.");
+        //}
+        return res = new Response(false, "email or id is not founded");
+    }
+
+
+    private async Task<AuthModel> CreateAuth(UserAccount user, bool IsAuthenticated = true)
+    {
+        var auth = new AuthModel();
+        var userAccount = new UserAccountDto()
+        {
+            UserId = user.Id,
+            Email = user.Email,
+            UserName = user.UserName,
+            PhoneNumber = user.CallingCode + user.PhoneNumber,
+            UserType = UserType.Patient.ToString(),
+
+            EmailConfirmed = user.EmailConfirmed ? true : false,
+            PhoneNumberConfirmed = user.PhoneNumberConfirmed ? true : false,
+
+        };
+        auth.Success = true;
+        auth.UserAccount = userAccount;
+        if (IsAuthenticated)
+        {
+            auth.IsAuthenticated = true;
+            var jwtSecurityToken = await CreateJwtToken(user);
+            auth.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            auth.ExpiresOn = jwtSecurityToken.ValidTo;
+        }
+        return auth;
+    }
+
+    private async Task<JwtSecurityToken> CreateJwtToken(UserAccount user)
+    {
+        // var userClaims = await _userManager.GetClaimsAsync(user);
+        //var roles = await _userManager.GetRolesAsync(user);
+        var roleClaims = new List<Claim>();
+
+        //foreach (var role in roles)
+        //    roleClaims.Add(new Claim("roles", role));
+
+        var claims = new[]
+        {
+            new Claim("uid", user.Id.ToString()),
+            new Claim("roles", "patient"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.UserName?? ""),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email??"")
+        };
+        //.Union(userClaims)
+        //.Union(roleClaims);
+
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.Key));
+        var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+
+        var jwtSecurityToken = new JwtSecurityToken(
+            issuer: Jwt.Issuer,
+            audience: Jwt.Audience,
+            claims: claims,
+            expires: DateTime.Now.AddDays(Jwt.DurationInDays),
+            signingCredentials: signingCredentials);
+
+        return jwtSecurityToken;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // =======================deleted
+    public async Task<Response> RenewEmailVerificationCode(string email)
+    {
+        Response res;
+        try
+        {
+            var user = await userRepository.ReadUserIdByEmailAsync(email);
+            if (user != null)
+            {
+                user.VerificationCode = Helper.VerificationCode();
+                await mailingService.SendVerificationCodeAsync(email, user.VerificationCode, user.FullName);
+                var isUpdated = await userRepository.UpdateVerificationCode(user);
+                if (isUpdated)
+                    res = new Response(true, null);
+                else
+                    res = new Response(false, "Something went wrong with the database");
+            }
+            else
+                res = new Response(false, "email not found");
+            return res;
+        }
+        catch (Exception ex)
+        {
+            return new Response(false, ex.Message);
+        }
+    }
     public async Task<AuthModel> RegisterAsync(UserRegisterDto userDto, string verification)
     {
 
@@ -93,287 +454,6 @@ public class AuthService : IAuthService
             //Token = null,
         };
     }
-
-
-    public async Task<AuthModel> RegisterNewPatinetAsync(PatientRegisterDto userDto, string verification)
-    {
-        // Ensure that the email does not already exist
-        if (!string.IsNullOrEmpty(userDto.Email) && await userRepository.IsEmailExistAsync(userDto.Email))
-        {
-            return new AuthModel(false, "email is exist");
-        }
-
-        // Ensure that the Phone Number does not already exist
-        if (!string.IsNullOrEmpty(userDto.PhoneNumber) && await userRepository.IsPhoneExistAsync(userDto.PhoneNumber))
-        {
-            return new AuthModel(false, "Phone Number is exist");
-        }
-
-        Patient entity = userDto;
-        UserAccount userAccount = new UserAccount()
-        {
-            UserName = "User"+ DateTime.Now.ToString("yyyyMMddHHmmss"),
-            PhoneNumber = userDto.PhoneNumber,
-            CallingCode = userDto.CallingCode,
-            Email = userDto.Email,
-        };
-
-        if (!string.IsNullOrEmpty(verification))
-        {
-            if (verification.Equals("email"))
-            {
-
-                userAccount.VerificationCode = Helper.VerificationCode();
-                _ = mailingService.SendVerificationCodeAsync(userAccount.Email!, userAccount.VerificationCode, userDto.FullName);
-            }
-            else if (verification.Equals("sms") && userAccount.PhoneNumber != null)
-            {
-
-                userAccount.VerificationCode = Helper.VerificationCode();
-                _ = smsService.SendVerificationCodeAsync(userAccount.PhoneNumber, userAccount.VerificationCode);
-            }
-        }
-        entity.UserAccount = userAccount;
-        // insert new user in database
-        var user = await userRepository.CreateWithNewPatientAsync(entity, userDto.Password);
-        if (!user.Success)
-        {
-            return new AuthModel(false, user?.Message);
-        }
-
-        return await CreateAuth(userAccount);
-    }
-
-    public async Task<AuthModel> UserLoginByEmailAsync(UserLoginByEmail userDto)
-    {
-        UserAccount? user;
-        if (!string.IsNullOrEmpty(userDto.Email))
-        {
-            user = await userRepository.FindByEmailAsync(userDto.Email);
-            if (user is not null && await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
-            {
-                return await CreateAuth(user);
-            }
-        }
-        return new AuthModel()
-        {
-            Message = "Email or Password is incorrect!",
-            Success = false,
-        };
-    }
-
-    public async Task<AuthModel> UserLoginByPhoneAsync(UserLoginByPhone userDto)
-    {
-        UserAccount? user;
-        if (!string.IsNullOrEmpty(userDto.PhoneNumber))
-        {
-            user = await userRepository.FindByPhoneNumberAsync(userDto.PhoneNumber);
-            if (user is not null && await passwordHasher.VerifyPasswordAsync(userDto.Password, user.PasswordHash))
-            {
-                return await CreateAuth(user);
-            }
-        }
-        return new AuthModel()
-        {
-            Message = "PhoneNumber or Password is incorrect!",
-            Success = false,
-        };
-
-    }
-
-    public async Task<Response<PatientToLoginDto>> VerificationEmail(string email, string code)
-    {
-        //Response<PatientToLoginDto> res;
-        var user = await userRepository.ReadUserIdByEmailAsync(email);
-        // if expierd?
-
-        if (user != null)
-        {
-            if (user.ExpirationTime >= DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
-            {
-                user.EmailConfirmed = true;
-                var result = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.EmailConfirmed);
-                if (result != null && result.Success)
-                {
-                    return new Response<PatientToLoginDto>(true, null, new PatientToLoginDto { UserId = user.Id, PatientId = null });
-
-                }
-                else
-                    return new Response<PatientToLoginDto>(false, result?.Message, null);
-            }
-            else
-                return new Response<PatientToLoginDto>(false, "Expired Time", null);
-        }
-        return new Response<PatientToLoginDto>(false, "user not found", null);
-    }
-
-
-    public async Task<Response<PatientToLoginDto>> VerificationPhone(string phoneNumber, string code)
-    {
-        Response<PatientToLoginDto> res;
-        var user = await userRepository.ReadUserIdByPhoneAsync(phoneNumber);
-
-        if (user != null)
-        {
-            if (user.ExpirationTime >= DateTimeOffset.UtcNow && user.VerificationCode.Equals(code))
-            {
-                user.PhoneNumberConfirmed = true;
-                var result = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PhoneNumberConfirmed);
-                if (result != null && result.Success)
-                {
-                    return new Response<PatientToLoginDto>(true, null, new PatientToLoginDto { UserId = user.Id, PatientId = null });
-                }
-                else
-                    return new Response<PatientToLoginDto>(false, result?.Message, null);
-            }
-            else
-                return new Response<PatientToLoginDto>(false, "Expired Time", null);
-        }
-        return res = new Response<PatientToLoginDto>(false, "user not found", null);
-    }
-
-
-
-    public async Task<Response> RenewEmailVerificationCode(string email)
-    {
-        Response res;
-        try
-        {
-            var user = await userRepository.ReadUserIdByEmailAsync(email);
-            if (user != null)
-            {
-                user.VerificationCode = Helper.VerificationCode();
-                await mailingService.SendVerificationCodeAsync(email, user.VerificationCode, user.FullName);
-                var isUpdated = await userRepository.UpdateVerificationCode(user);
-                if (isUpdated)
-                    res = new Response(true, null);
-                else
-                    res = new Response(false, "Something went wrong with the database");
-            }
-            else
-                res = new Response(false, "email not found");
-            return res;
-        }
-        catch (Exception ex)
-        {
-            return new Response(false, ex.Message);
-        }
-    }
-
-
-    public async Task<Response> RenewSmsVerificationCode(string phone)
-    {
-        Response res;
-        var user = await userRepository.ReadUserIdByPhoneAsync(phone);
-        if (user != null)
-        {
-            user.VerificationCode = Helper.VerificationCode();
-            await smsService.SendVerificationCodeAsync(phone, user.VerificationCode);
-
-            var isUpdated = await userRepository.UpdateVerificationCode(user);
-            if (isUpdated)
-                res = new Response(true, null);
-            else
-                res = new Response(false, "Something went wrong with the database");
-        }
-        else
-            res = new Response(false, "pnone number is not found not found");
-
-        return res;
-    }
-
-
-    public async Task<Response> ChangePassword(UserChangePassDto dto)
-    {
-        Response res;
-
-        //UserAccount? user;
-        //if (!string.IsNullOrEmpty(dto.Email))
-        //{
-        //    user = await userRepository.FindByEmailAsync(dto.Email);
-        //}
-        //else if (!string.IsNullOrEmpty(dto.UserId))
-        //{
-        //    user = await userRepository.FindById(dto.UserId);
-        //}
-        //else
-        //    user = null;
-
-        //if (user != null)
-        //{
-        //    var oldPass = passwordHasher.VerifyPassword(dto.OldPassword, user.PasswordHash);
-        //    if (oldPass)
-        //    {
-        //        user.PasswordHash = passwordHasher.HashPassword(dto.Password);
-        //        res = await userRepository.GenericUpdateSinglePropertyById(0, user, p => p.PasswordHash);
-        //        res.Message = null;
-        //        return res;
-        //    }
-        //    else
-        //        return new Response(false, "Old password is wrong.");
-        //}
-        return res = new Response(false, "email or id is not founded");
-    }
-
-
-    private async Task<AuthModel> CreateAuth(UserAccount user)
-    {
-        var auth = new AuthModel();
-        var userAccount = new UserAccountDto()
-        {
-            UserId = user.Id,
-            Email = user.Email,
-            UserName = user.UserName,
-            PhoneNumber = user.CallingCode + user.PhoneNumber,
-            UserType = UserType.Patient.ToString(),
-
-            EmailConfirmed = user.EmailConfirmed ? true : false,
-            PhoneNumberConfirmed = user.PhoneNumberConfirmed ? true : false,
-
-        };
-        auth.Success = true;
-        auth.UserAccount = userAccount;
-        var jwtSecurityToken = await CreateJwtToken(user);
-        auth.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        auth.ExpiresOn = jwtSecurityToken.ValidTo;
-        return auth;
-    }
-
-    private async Task<JwtSecurityToken> CreateJwtToken(UserAccount user)
-    {
-        // var userClaims = await _userManager.GetClaimsAsync(user);
-        //var roles = await _userManager.GetRolesAsync(user);
-        var roleClaims = new List<Claim>();
-
-        //foreach (var role in roles)
-        //    roleClaims.Add(new Claim("roles", role));
-
-        var claims = new[]
-        {
-            new Claim("uid", user.Id.ToString()),
-            new Claim("roles", "patient"),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName?? ""),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email??"")
-        };
-        //.Union(userClaims)
-        //.Union(roleClaims);
-
-        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.Key));
-        var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
-
-        var jwtSecurityToken = new JwtSecurityToken(
-            issuer: Jwt.Issuer,
-            audience: Jwt.Audience,
-            claims: claims,
-            expires: DateTime.Now.AddDays(Jwt.DurationInDays),
-            signingCredentials: signingCredentials);
-
-        return jwtSecurityToken;
-    }
-
-
-    // =======================deleted
 
     public async Task<AuthModel> LoginAsync(UserLoginDto userDto)
     {

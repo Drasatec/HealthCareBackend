@@ -12,8 +12,8 @@ public partial class DoctorsWorkHospital
     public DateTime? CreateOn { get; set; }
     
     [JsonIgnore]
-    public virtual Doctor Doctor { get; set; } = null!;
+    public virtual Doctor? Doctor { get; set; } 
 
     //[JsonIgnore]
-    public virtual Hospital Hospital { get; set; } = null!;
+    public virtual Hospital? Hospital { get; set; } 
 }

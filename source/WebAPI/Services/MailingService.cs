@@ -46,39 +46,39 @@ public class MailingService : IMailingService
 
 
         string htmlBody = $@"<html>
-<head>
-    <style>
-        p {{
-            font-size: 16px; 
-        }}
-        .verification-code {{
-            font-size: 25px;
-            font-weight: bold;
-        }}
-    </style>
-</head>
-<body>
-    <p>Dear {userFullName},</p>
+                                <head>
+                                    <style>
+                                        p {{
+                                            font-size: 16px; 
+                                        }}
+                                        .verification-code {{
+                                            font-size: 25px;
+                                            font-weight: bold;
+                                        }}
+                                    </style>
+                                </head>
+                                <body>
+                                    <p>Dear {userFullName},</p>
 
-    <p>Thank you for registering with our service! To complete your account registration and ensure the security of your account, we require you to verify your email address.</p>
+                                    <p>Thank you for registering with our service! To complete your account registration and ensure the security of your account, we require you to verify your email address.</p>
 
-    <p><strong>Verification Code: <span class='verification-code'>{verificationCode}</span></strong></p>
+                                    <p><strong>Verification Code: <span class='verification-code'>{verificationCode}</span></strong></p>
 
-    <p>To verify your email address, please follow these steps:</p>
-    <ol>
-        <li>Open our website/app and log in to your account.</li>
-        <li>Go to the verification page or click on the verification link provided.</li>
-        <li>Enter the above verification code when prompted.</li>
-    </ol>
+                                    <p>To verify your email address, please follow these steps:</p>
+                                    <ol>
+                                        <li>Open our website/app and log in to your account.</li>
+                                        <li>Go to the verification page or click on the verification link provided.</li>
+                                        <li>Enter the above verification code when prompted.</li>
+                                    </ol>
 
-    <p>If you did not initiate this registration, please disregard this email.</p>
+                                    <p>If you did not initiate this registration, please disregard this email.</p>
 
-    <p>Thank you for being a part of our community!</p>
+                                    <p>Thank you for being a part of our community!</p>
 
-    <p>Best regards,</p>
-    <p>Drasat Team</p>
-</body>
-</html>";
+                                    <p>Best regards,</p>
+                                    <p>Drasat Team</p>
+                                </body>
+                                </html>";
 
         string body = $@"Dear {userFullName},
 

@@ -31,6 +31,11 @@ public class PatientRegisterDto
 
     public string Password { get; set; } = null!;
 
+    public bool EmailConfirmed { get; set; }
+
+    public bool PhoneNumberConfirmed { get; set; }
+
+
     public static implicit operator Patient(PatientRegisterDto dto)
     {
         return new Patient()
@@ -47,6 +52,7 @@ public class PatientRegisterDto
                     FullName = dto.FullName,
                     LangCode = dto.LangCode,
                     Address = dto.Address,
+                    
                 }
             } 
             //UserAccount = new UserAccount()

@@ -6,6 +6,8 @@ public class AuthModel
 {
     public bool Success { get; set; }
 
+    public bool IsAuthenticated { get; set; }
+
     public string? Message { get; set; } = string.Empty;
 
     public UserAccountDto? UserAccount { get; set; }

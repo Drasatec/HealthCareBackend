@@ -369,7 +369,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
     }
 
 
-    public async Task<List<PeriodWorkDoctorClinicDto>> ReadDoctorWorkPeriod(int? id, int? docId, int? hosId, int? clinicId, int? periodId, byte? day, string? lang)
+    public async Task<List<PeriodWorkDoctorClinicDto>> ReadDoctorWorkPeriod(int? id, int? docId, int? hosId, int? specialtyId, int? periodId, byte? day, string? lang)
     {
         IQueryable<PeriodWorkDoctorClinicDto> query;
         if (lang == null)
@@ -434,9 +434,9 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
                 query = query.Where(pc => pc.HospitalId.Equals(hosId));
             }
 
-            if (clinicId.HasValue)
+            if (specialtyId.HasValue)
             {
-                query = query.Where(t => t.ClinicId.Equals(clinicId));
+                query = query.Where(t => t.SpecialtyId.Equals(specialtyId));
             }
 
             if (periodId.HasValue)

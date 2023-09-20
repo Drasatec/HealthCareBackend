@@ -25,9 +25,9 @@ public class PatientAuthController : ControllerBase
     }
 
     [HttpPost("reqister")]
-    public async Task<IActionResult> Register(PatientRegisterDto model, [FromQuery] string verification = "email")
+    public async Task<IActionResult> Register(PatientRegisterDto model)
     {
-        var result = await authService.RegisterNewPatinetAsync(model, verification);
+        var result = await authService.RegisterNewPatinetAsync(model);
 
         if (!result.Success)
         {
@@ -64,7 +64,45 @@ public class PatientAuthController : ControllerBase
     }
 
 
+    [HttpPost("does-email-exist")]
+    public async Task<IActionResult> DoesEmailExist([FromQuery] string email)
+    {
+        var result = await authService.DoesEmailExist(email);
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+        return Ok(result);
+    }
+    
+    [HttpPost("does-phone-exist")]
+    public async Task<IActionResult> DoesPhoneExist([FromQuery] string phone)
+    {
+        var result = await authService.DoesPhoneExist(phone);
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+        return Ok(result);
+    }
+    
+    [HttpPost("send-verificationCode-email")]
+    public async Task<IActionResult> SendVerificationCodeToEmail([FromQuery] string email)
+    {
+        var result = await authService.SentVerificationCodeToEmail(email);
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+        return Ok(result);
+    }
+
+
     //Email
+    [Authorize(Roles = "patient,admin")]
     [HttpPost("verification-email")]
     public async Task<IActionResult> VerificationEmail(UserVerificationEmailModel model)
     {
@@ -82,8 +120,8 @@ public class PatientAuthController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("send-verificationCode-email")]
-    public async Task<IActionResult> SendVerificationCodeToEmail(UserVerificationEmailModel model)
+    [HttpPost("send-verificationCode-email-old")]
+    public async Task<IActionResult> SendVerificationCodeToEmail_old(UserVerificationEmailModel model)
     {
         var result = await authService.RenewEmailVerificationCode(model.Email);
 
@@ -128,9 +166,6 @@ public class PatientAuthController : ControllerBase
 
         return Ok(result);
     }
-
-
-
 
     [Authorize(Roles = "User")]
     [HttpPost("ChangePassword")]

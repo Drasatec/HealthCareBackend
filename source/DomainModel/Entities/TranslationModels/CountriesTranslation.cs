@@ -7,7 +7,7 @@ public partial class CountriesTranslation
 {
     public short Id { get; set; }
 
-    public string? CountryName { get; set; }
+    public string CountryName { get; set; } = string.Empty;
 
     public string? CurrencyName { get; set; }
 
@@ -15,7 +15,7 @@ public partial class CountriesTranslation
 
     public short? CountryId { get; set; }
 
-    public string? LangCode { get; set; }
+    public string LangCode { get; set; } = null!;
     
     [JsonIgnore]
     public virtual Country? Country { get; set; }

@@ -1,4 +1,5 @@
 ﻿using DomainModel.Entities.TranslationModels;
+using System.Text.Json.Serialization;
 
 namespace DomainModel.Entities.SettingsEntities;
 public partial class Country
@@ -22,6 +23,6 @@ public partial class Country
     public decimal? Latitude { get; set; }
 
     public virtual ICollection<CountriesTranslation> CountriesTranslations { get; set; } = new List<CountriesTranslation>();
-
+    [JsonIgnore]
     public virtual ICollection<Patient> Patients { get; set; } = new List<Patient>();
 }

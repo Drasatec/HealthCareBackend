@@ -15,7 +15,7 @@ public interface IDoctorRepository : IGenericRepository
 
 
     Task<List<DoctorVisitPriceDto?>> ReadDoctorVisitPrices(int? id, int? docId, int? priceCategoryId, int? typeVisitId, int? price, string lang);
-    Task<List<PeriodWorkDoctorClinicDto>> ReadDoctorWorkPeriod(int? id, int? docId, int? hosId, int? clinicId, int? periodId, byte? day, string? lang);
+    Task<List<PeriodWorkDoctorClinicDto>> ReadDoctorWorkPeriod(int? id, int? docId, int? hosId, int? specialtyId, int? periodId, byte? day, string? lang);
     Task<Response<DoctorDto?>> UpdateAttachment(DoctorAttachment docAttachmnet, string ext, Stream? file = null);
     Task<PagedResponse<DoctorWorkPeriodDto>?> FindDoctor(int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? dender, int? page, int? pageSize, string? lang);
     Task<List<DoctorTranslation>> ReadDoctorsNames(int? hosId, int? specialtyId, string lang, int? page, int? pageSize);
