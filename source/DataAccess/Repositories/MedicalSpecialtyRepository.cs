@@ -148,10 +148,10 @@ public class MedicalSpecialtyRepository : GenericRepository, IMedicalSpecialtyRe
                 query = query.Where(h => !h.Appearance);
         }
 
-        if (baseid.HasValue)
-        {
-            query = query.Where(s => s.Hospitals.Any(h => h.Id == baseid));
-        }
+        //if (baseid.HasValue)
+        //{
+        //    query = query.Where(s => s.Hospitals.Any(h => h.Id == baseid));
+        //}
 
         query = query.OrderByDescending(o => o.Id);
 

@@ -14,25 +14,25 @@ VALUES
 
 -- Insert into Weekdays table
 INSERT INTO Weekdays (Id)
-VALUES (1), (2), (3), (4), (5), (6), (7);
+VALUES (0), (1), (2), (3), (4), (5), (6);
 
 -- Insert into WeekdaysTranslations table
 INSERT INTO WeekdaysTranslations (Name, WeekdayId, LangCode)
 VALUES
-    ('Monday', 1, 'en'),
-    ('الإثنين', 1, 'ar'),
+    ('Sunday', 0, 'en'),
+	('Monday', 1 , 'en'),
     ('Tuesday', 2, 'en'),
-    ('الثلاثاء', 2, 'ar'),
     ('Wednesday', 3, 'en'),
-    ('الأربعاء', 3, 'ar'),
     ('Thursday', 4, 'en'),
-    ('الخميس', 4, 'ar'),
     ('Friday', 5, 'en'),
-    ('الجمعة', 5, 'ar'),
     ('Saturday', 6, 'en'),
-    ('السبت', 6, 'ar'),
-    ('Sunday', 7, 'en'),
-    ('الأحد', 7, 'ar');
+    ('الأحد', 0, 'ar'),
+    ('الإثنين', 1, 'ar'),
+    ('الثلاثاء', 2, 'ar'),
+    ('الأربعاء', 3, 'ar'),
+    ('الخميس', 4, 'ar'),
+    ('الجمعة', 5, 'ar'),
+    ('السبت', 6, 'ar');
 
 -- INSERT INTO Users
 -- (Id,FullName,Email,PhoneNumber,EmailConfirmed,PhoneNumberConfirmed, PasswordHash)
@@ -929,7 +929,7 @@ VALUES
 INSERT INTO MaritalStatusTranslations (Name, MaritalId, LangCode)
 VALUES
     (N'Single', 1, 'en'),
-    (N'متزوج', 1, 'ar'),
+    (N'أعذب', 1, 'ar'),
 
     (N'Married', 2, 'en'),
     (N'متزوج', 2, 'ar'),

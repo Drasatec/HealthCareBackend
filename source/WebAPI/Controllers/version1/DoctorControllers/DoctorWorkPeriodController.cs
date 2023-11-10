@@ -2,6 +2,7 @@
 using DomainModel.Entities.DoctorEntities;
 using DomainModel.Entities.TranslationModels;
 using DomainModel.Models;
+using DomainModel.Models.Doctors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
@@ -32,6 +33,36 @@ public class DoctorWorkPeriodController : ControllerBase
         if (res.Success && res.Value is not null)
         {
             var response = new ResponseId(res.Success, res.Message, res.Value.Id);
+            return Created("", response);
+        }
+        return BadRequest(res);
+    }
+
+    [HttpPost("add-muli", Order = 0801)]
+    public async Task<IActionResult> AddMuli([FromForm] DoctorWorkPeriod model, [FromForm] params short[] Days)
+    {
+
+        var list = new List<DoctorWorkPeriod>();
+
+        foreach (var item in Days)
+        {
+            var dwp = new DoctorWorkPeriod()
+            {
+                HospitalId = model.HospitalId,
+                SpecialtyId = model.SpecialtyId,
+                ClinicId = model.ClinicId,
+                DoctorId = model.DoctorId,
+                WorkingPeriodId = model.WorkingPeriodId,
+                DayId = (byte)item
+            };
+            list.Add(dwp);
+        }
+
+        var res = await Data.Generic.GenericCreateRange(list);
+
+        if (res.Success)
+        {
+            var response = new Response(res.Success, res.Message);
             return Created("", response);
         }
         return BadRequest(res);

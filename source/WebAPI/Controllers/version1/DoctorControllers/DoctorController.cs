@@ -81,17 +81,15 @@ public class DoctorController : ControllerBase
 
 
     [HttpGet("all", Order = 0912)]
-    public async Task<IActionResult> GetAll(int? hosId, int? specialtyId, [FromQuery] bool? appearanceOnSite, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
+    public async Task<IActionResult> GetAll([FromQuery] int? hosId, int? specialtyId, byte? dayId, byte? genderId, short? degreeId, bool? appearanceOnSite, string? status, int? pageSize, int? page, string? lang)
     {
-        var resutl = await Data.Doctors.ReadAll(hosId, specialtyId, appearanceOnSite, status, lang, pageSize, page);
+        var resutl = await Data.Doctors.ReadAll(hosId, specialtyId, dayId, genderId, degreeId, appearanceOnSite, status, lang, pageSize, page);
         if (resutl is null)
         {
             return Ok(new Response(true, "no content"));
         }
         return Ok(resutl);
     }
-
-
 
     [HttpGet("search", Order = 0914)]
     public async Task<IActionResult> Search([FromQuery(Name = "specialtyId")] int? parentId, [FromQuery] string? searchTerm, [FromQuery] string? name, bool? active, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? lang)
@@ -103,7 +101,7 @@ public class DoctorController : ControllerBase
                 ho => ho.Doctor != null && ho.Doctor.SpecialtiesDoctors.Any(s => s.MedicalSpecialtyId.Equals(parentId)),
                 page, pageSize));
         }
-        else if (!string.IsNullOrEmpty(searchTerm) && lang != null)
+        else if (!string.IsNullOrEmpty(searchTerm))
             return Ok(await Data.Doctors.SearchByNameOrCode(active, searchTerm, lang, page, pageSize));
 
         return BadRequest(new Error("400", "name or searchTerm with lang is required"));
@@ -120,7 +118,7 @@ public class DoctorController : ControllerBase
         }
         return Ok(resutl);
     }
-    
+
     [HttpGet("find-doctor_update", Order = 0914)]
     public async Task<IActionResult> FindDoctor2([FromQuery] int? hosId, int? specialtyId, int? docId, int? workingPeriodId, byte? day, short? doctorsDegreeId, byte? gender, int? page, int? pageSize, string? lang)
     {

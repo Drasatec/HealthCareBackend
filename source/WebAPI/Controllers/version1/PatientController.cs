@@ -91,26 +91,12 @@ public class PatientController : ControllerBase
 
 
     [HttpGet("names", Order = 0911)]
-    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, int? hosId, int? specialtyId, int? page, int? pageSize)
+    public async Task<IActionResult> GetAllNames([FromQuery] string? lang, int? patientId, int? page, int? pageSize)
     {
         Expression<Func<PatientTranslation, bool>> filterExpression;
-        if (specialtyId.HasValue && hosId.HasValue)
+        if (patientId.HasValue)
         {
-            filterExpression = f =>
-            f.LangCode == lang && f.Patient != null;
-        }
-
-        else if (specialtyId.HasValue)
-        {
-            filterExpression = f =>
-            f.LangCode == lang && f.Patient != null;
-        }
-
-        else if (hosId.HasValue)
-        {
-            filterExpression = f =>
-            f.LangCode == lang && f.Patient != null;
-
+            filterExpression = f => f.PatientId== patientId && f.LangCode == lang;
         }
         else
             filterExpression = f => f.LangCode == lang;
@@ -118,7 +104,6 @@ public class PatientController : ControllerBase
         var result = await Data.Patients.GenericReadAll(filterExpression, null!, page, pageSize);
         return Ok(result);
     }
-
 
     [HttpGet("all", Order = 0912)]
     public async Task<IActionResult> GetAll([FromQuery(Name = "specialtyId")] int? parentId, bool? appearance, byte? patientStatus, int? pageSize, int? page, string? lang)

@@ -79,7 +79,7 @@ public class MedicalSpecialtyController : ControllerBase
 
 
     [HttpGet("all", Order = 0812)]
-    public async Task<IActionResult> GetAll([FromQuery(Name = "hosid")] int? parentId, [FromQuery] bool? appearance, [FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? page, [FromQuery] string? lang)
+    public async Task<IActionResult> GetAll([FromQuery(Name = "hosid")] int? parentId, bool? appearance, string? status, int? pageSize, int? page, string? lang)
     {
         var resutl = await Data.MedicalSpecialteis.ReadAll(parentId, appearance, status, lang, pageSize, page);
         if (resutl == null)

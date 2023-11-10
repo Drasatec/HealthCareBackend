@@ -184,7 +184,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         return await query.ToListAsync();
     }
 
-    public async Task<PagedResponse<DoctorDto>?> ReadAll(int? hosId, int? specialtyId, bool? appearance, string? status, string? lang, int? pageSize, int? page)
+    public async Task<PagedResponse<DoctorDto>?> ReadAll(int? hosId, int? specialtyId, byte? dayId, byte? genderId, short? degreeId, bool? appearance, string? status, string? lang, int? pageSize, int? page)
     {
 
         IQueryable<Doctor> query = Context.Doctors;
@@ -221,6 +221,21 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
         {
             query = query.Where(s => s.DoctorsWorkHospitals.Any(i => i.HospitalId == hosId));
         }
+        
+        if (dayId.HasValue)
+        {
+            query = query.Where(s => s.DoctorWorkPeriods.Any(i => i.DayId == dayId));
+        }
+        
+        if (genderId.HasValue)
+        {
+            query = query.Where(s => s.Gender  == genderId);
+        }
+        
+        if (degreeId.HasValue)
+        {
+            query = query.Where(s => s.DoctorsDegreeId  == degreeId);
+        }
 
         query = query.OrderByDescending(o => o.Id);
 
@@ -229,7 +244,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
             return null;
 
         // page size
-        GenericPagination(ref query, ref pageSize, ref page, totalCount);
+        //GenericPagination(ref query, ref pageSize, ref page, totalCount);
 
         // lang
         if (lang is not null)
@@ -256,12 +271,11 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
     }
 
 
-    public async Task<PagedResponse<DoctorDto>?> SearchByNameOrCode(bool? isActive, string searchTerm, string lang, int? page, int? pageSize)
+    public async Task<PagedResponse<DoctorDto>?> SearchByNameOrCode(bool? isActive, string searchTerm, string? lang, int? page, int? pageSize)
     {
         var query = from h in Context.Doctors
                     join t in Context.DoctorTranslations on h.Id equals t.DoctorId
                     where (h.CodeNumber.Contains(searchTerm) || t.FullName.Contains(searchTerm))
-                          && t.LangCode == lang
                     select new DoctorDto
                     {
                         Id = h.Id,
@@ -295,7 +309,7 @@ public class DoctorRepository : GenericRepository, IDoctorRepository
 
         var totalCount = await query.CountAsync();
 
-        GenericPagination(ref query, ref pageSize, ref page, totalCount);
+        //GenericPagination(ref query, ref pageSize, ref page, totalCount);
 
         var listDto = await query.OrderByDescending(h => h.Id)
                                  .ToListAsync();

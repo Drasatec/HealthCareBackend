@@ -18,7 +18,7 @@ public partial class DoctorWorkPeriod
 
     public int WorkingPeriodId { get; set; }
 
-    public byte DayId { get; set; }
+    public byte? DayId { get; set; }
 
     [JsonIgnore]
     public virtual Weekday? Day { get; set; } 

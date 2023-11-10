@@ -81,7 +81,7 @@
 ----------------
 CREATE TABLE EmployeeAccounts(
 	[Id] [nvarchar](450) NOT NULL, --*
-	[FullName] [nvarchar](100) NOT NULL, --*
+	[FullName] [nvarchar](200) NOT NULL, --*
 	[UserName] [nvarchar](256) NULL,
 	[PhoneNumber] [nvarchar](max) NULL,
 	[Email] [nvarchar](256) NULL,
@@ -92,8 +92,8 @@ CREATE TABLE EmployeeAccounts(
 -- GO
 ----------------
 CREATE TABLE ConfirmationOptions(
-	[Id] [varchar](450) NOT NULL,
-	[OptionName] [nvarchar](112) NULL,
+	[Id] [varchar](36) NOT NULL,
+	[OptionName] [nvarchar](36) NULL,
 	[Chosen] [BIT] NOT NULL DEFAULT 0,
 
 	CONSTRAINT PK_ConfirmationOptions PRIMARY KEY (Id),
@@ -105,7 +105,7 @@ GO
 CREATE TABLE Languages
 (
     [Code] VARCHAR(6),
-    [LanguageName] NVARCHAR(20),
+    [LanguageName] NVARCHAR(40),
     [IsDefault] BIT NOT NULL DEFAULT 0,
 	CONSTRAINT PK_Language PRIMARY KEY (Code)
 );
@@ -132,9 +132,9 @@ GO
 CREATE TABLE CountriesTranslations --MM
 (
     Id SMALLINT IDENTITY (1,1),
-    CountryName NVARCHAR(70), --Egypt
-    CurrencyName NVARCHAR(70), -- Egyptian pound
-    CapitalName NVARCHAR(50), -- Cairo
+    CountryName NVARCHAR(150), --Egypt
+    CurrencyName NVARCHAR(150), -- Egyptian pound
+    CapitalName NVARCHAR(150), -- Cairo
     CountryId SMALLINT,
     LangCode VARCHAR(6),
 
@@ -159,7 +159,7 @@ CREATE TABLE Hospitals
 (
     Id INT IDENTITY (1,1),
     Photo VARCHAR(55),
-	CodeNumber VARCHAR(16),
+	CodeNumber VARCHAR(25),
     Email VARCHAR(40),
     WhatsAppNumber VARCHAR(15) ,
 	CreateOn DATETIME DEFAULT GETDATE(),
@@ -172,7 +172,7 @@ GO
 CREATE TABLE HospitalPhoneNumbers
 (
 	Id INT IDENTITY (1,1),
-	TelephoneNumber VARCHAR(15) ,
+	TelephoneNumber VARCHAR(25) ,
 	HospitalId INT,
 	CONSTRAINT PK_HospitalsPhoneNumbers PRIMARY KEY (Id),
 	CONSTRAINT FK_HospitalsPhoneNumbers_HospitalId
@@ -186,9 +186,9 @@ GO
 CREATE TABLE HospitalTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(50),
-    Address NVARCHAR(50),
-    Description NVARCHAR(300),
+    Name NVARCHAR(200),
+    Address NVARCHAR(200),
+    Description NVARCHAR(MAX),
     HospitalId INT,
     LangCode VARCHAR(6),
 
@@ -210,9 +210,9 @@ CREATE TABLE HospitalTranslations --MM
 GO
 CREATE TABLE ContactForm (
     Id INT IDENTITY (1, 1),
-    SenderName NVARCHAR(100) NOT NULL,
-    Email NVARCHAR(100) NOT NULL,
-    Subject NVARCHAR(200) NOT NULL,
+    SenderName NVARCHAR(200) NOT NULL,
+    Email NVARCHAR(200) NOT NULL,
+    Subject NVARCHAR(500) NOT NULL,
     Message NVARCHAR(MAX) NOT NULL,
     ContactDate DATETIME DEFAULT GETDATE(),
     HospitalId INT,
@@ -242,8 +242,8 @@ CREATE TABLE HospitalFeatures
 CREATE TABLE HospitalFeatureTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(100),
-    Description NVARCHAR(500),
+    Name NVARCHAR(200),
+    Description NVARCHAR(MAX),
     FeatureId INT,
     LangCode VARCHAR(6),
 
@@ -286,7 +286,7 @@ GO
 CREATE TABLE HosBuildings
 (
     Id INT IDENTITY (1,1),
-	CodeNumber VARCHAR(16),
+	CodeNumber VARCHAR(25),
 	Photo VARCHAR(55),
 	CreateOn DATETIME DEFAULT GETDATE(),
 	IsDeleted BIT NOT NULL DEFAULT 0,
@@ -304,8 +304,8 @@ GO
 CREATE TABLE BuildingTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
-	Description NVARCHAR(100),
+    Name NVARCHAR(200),
+	Description NVARCHAR(500),
     BuildeingId INT,
     LangCode VARCHAR(6),
 
@@ -329,7 +329,7 @@ GO
 CREATE TABLE HosFloors
 (
     Id INT IDENTITY (1,1),
-	CodeNumber VARCHAR(16),
+	CodeNumber VARCHAR(25),
     Photo VARCHAR(55),
 	CreateOn DATETIME DEFAULT GETDATE(),
 	IsDeleted BIT NOT NULL DEFAULT 0,
@@ -354,8 +354,8 @@ GO
 CREATE TABLE FloorTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
-	Description NVARCHAR(100),
+    Name NVARCHAR(200),
+	Description NVARCHAR(500),
     FloorId INT,
     LangCode VARCHAR(6),
 
@@ -377,7 +377,7 @@ GO
 CREATE TABLE RoomTypes
 (
     Id INT IDENTITY (1,1),
-	CodeNumber VARCHAR(16),
+	CodeNumber VARCHAR(25),
 	CreateOn DATETIME DEFAULT GETDATE(),
 	IsDeleted BIT NOT NULL DEFAULT 0,
 	CONSTRAINT PK_RoomTypes PRIMARY KEY (Id),
@@ -386,7 +386,7 @@ GO
 CREATE TABLE RoomTypeTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     RoomTypeId INT,
     LangCode VARCHAR(6),
 
@@ -409,7 +409,7 @@ CREATE TABLE HosRooms
 (
     Id INT IDENTITY (1,1),  
     Photo VARCHAR(55),
-	CodeNumber VARCHAR(16),
+	CodeNumber VARCHAR(25),
     Kind VARCHAR(16), -- ==Type  --(Clinic - inpatient - operations - laboratory - x-rays - pharmacy - office)
     IsActive BIT NOT NULL DEFAULT 1,  -- (Active, inactive) -- update1
 	IsDeleted BIT NOT NULL DEFAULT 0,
@@ -446,8 +446,8 @@ GO
 CREATE TABLE RoomTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
-	Description NVARCHAR(100),
+    Name NVARCHAR(200),
+	Description NVARCHAR(500),
     RoomId INT,
     LangCode VARCHAR(6),
 
@@ -469,7 +469,7 @@ GO
 CREATE TABLE MedicalSpecialties
 (
     Id INT IDENTITY (1,1),
-	CodeNumber VARCHAR(16),
+	CodeNumber VARCHAR(25),
     IsActive BIT NOT NULL DEFAULT 1,  -- (Active, inactive) -- update1
     IsDeleted BIT NOT NULL DEFAULT 0,
 	Reason NVARCHAR(60),
@@ -483,8 +483,8 @@ GO
 CREATE TABLE MedicalSpecialtyTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
-	Description NVARCHAR(100),
+    Name NVARCHAR(200),
+	Description NVARCHAR(500),
     MedicalSpecialtyId INT,
     LangCode VARCHAR(6),
 
@@ -530,7 +530,7 @@ GO
 CREATE TABLE Clinics
 (
     Id INT IDENTITY (1,1),
-    CodeNumber VARCHAR(16),
+    CodeNumber VARCHAR(25),
     Photo VARCHAR(55),
     IsActive BIT NOT NULL DEFAULT 1,  -- (Active, inactive) -- update1
     IsDeleted BIT NOT NULL DEFAULT 0,
@@ -579,8 +579,8 @@ GO
 CREATE TABLE ClinicTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
-	Description NVARCHAR(100),
+    Name NVARCHAR(200),
+	Description NVARCHAR(500),
     ClinicId INT,
     LangCode VARCHAR(6),
 
@@ -605,14 +605,14 @@ GO
 CREATE TABLE SSNTypes
 (
     Id INT IDENTITY (1,1),
-    CodeNumber VARCHAR(16),
+    CodeNumber VARCHAR(25),
     CONSTRAINT PK_SSNTypes PRIMARY KEY (Id),
 );
 GO
 CREATE TABLE SSNTypesTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     SSNTypeId INT,
     LangCode VARCHAR(6),
 
@@ -634,7 +634,7 @@ GO
 CREATE TABLE WorkingPeriod
 (
     Id INT IDENTITY (1,1),
-    CodeNumber VARCHAR(16), 
+    CodeNumber VARCHAR(25), 
     StartTime TIME(0),
     EndTime TIME(0),
 	CONSTRAINT PK_WorkingPeriod PRIMARY KEY (Id),
@@ -643,7 +643,7 @@ GO
 CREATE TABLE WorkingPeriodTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     WorkingPeriodId INT,
     LangCode VARCHAR(6),
 
@@ -665,7 +665,7 @@ GO
 CREATE TABLE PriceCategories
 (
     Id INT IDENTITY (1,1),
-    CodeNumber VARCHAR(16), 
+    CodeNumber VARCHAR(25), 
     CreateOn DATETIME DEFAULT GETDATE(),
     Symbol VARCHAR (16),
 	CONSTRAINT PK_PriceCategories PRIMARY KEY (Id),
@@ -674,9 +674,9 @@ GO
 CREATE TABLE PriceCategoryTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     PriceCategoryId INT,
-	Description NVARCHAR(100),
+	Description NVARCHAR(500),
     LangCode VARCHAR(6),
 
 	CONSTRAINT PK_PriceCategoryTranslations PRIMARY KEY (Id),
@@ -698,7 +698,7 @@ GO
 CREATE TABLE TypesVisit 
 (
     Id INT IDENTITY (1,1),
-	CodeNumber VARCHAR(16),
+	CodeNumber VARCHAR(25),
 	CreateOn DATETIME DEFAULT GETDATE(),
 	IsDeleted BIT NOT NULL DEFAULT 0,
 	CONSTRAINT PK_TypesVisit PRIMARY KEY (Id),
@@ -706,7 +706,7 @@ CREATE TABLE TypesVisit
 CREATE TABLE TypesVisitTranslations --  1M
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
 	TypeVisitId INT,
     LangCode VARCHAR(6),
 
@@ -736,7 +736,7 @@ GO
 CREATE TABLE NationalitiesTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     NationalityId INT,
     LangCode VARCHAR(6),
 
@@ -766,7 +766,7 @@ GO
 CREATE TABLE DoctorsDegreesTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    DegreeName NVARCHAR(20), --(general - specialist - consultant - university professor)
+    DegreeName NVARCHAR(150), --(general - specialist - consultant - university professor)
     DoctorDegreeId SMALLINT,
     LangCode VARCHAR(6),
 
@@ -796,7 +796,7 @@ GO
 CREATE TABLE ReligionsTranslations --MM
 (
     Id SMALLINT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     ReligionId SMALLINT,
     LangCode VARCHAR(6),
 
@@ -824,7 +824,7 @@ GO
 CREATE TABLE MaritalStatusTranslations --MM
 (
     Id SMALLINT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     MaritalId SMALLINT,
     LangCode VARCHAR(6),
 
@@ -853,7 +853,7 @@ GO
 CREATE TABLE GendersTranslations --MM
 (
     Id SMALLINT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     GenderId SMALLINT,
     LangCode VARCHAR(6),
 
@@ -881,7 +881,7 @@ GO
 CREATE TABLE WeekdaysTranslations --MM
 (
     Id SMALLINT IDENTITY (1,1),
-    Name NVARCHAR(30),
+    Name NVARCHAR(200),
     WeekdayId TINYINT,
     LangCode VARCHAR(6),
 
@@ -911,7 +911,7 @@ GO
 CREATE TABLE EmployeesStatusTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    StatusName NVARCHAR(20),
+    StatusName NVARCHAR(100),
     EmployeeStatusId SMALLINT,
     LangCode VARCHAR(6),
 
@@ -943,7 +943,7 @@ GO
 CREATE TABLE BookingStatusesTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    StatusName NVARCHAR(50) NOT NULL,
+    StatusName NVARCHAR(100) NOT NULL,
     BookingStatusId SMALLINT,
     LangCode VARCHAR(6),
 
@@ -1015,7 +1015,7 @@ GO
 CREATE TABLE Doctors
 (
     Id INT IDENTITY (1,1),
-    CodeNumber VARCHAR(16), 
+    CodeNumber VARCHAR(25), 
 	gender TINYINT,
     Photo VARCHAR(55),
     WorkingHours TINYINT,
@@ -1047,9 +1047,9 @@ GO
 CREATE TABLE DoctorTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    FullName NVARCHAR(100),
-    Headline NVARCHAR(100),
-    About NVARCHAR(300),
+    FullName NVARCHAR(300),
+    Headline NVARCHAR(300),
+    About NVARCHAR(MAX),
     DoctorId INT,
     LangCode VARCHAR(6),
 
@@ -1201,8 +1201,8 @@ GO
 CREATE TABLE DoctorAttachments
 (
     Id INT IDENTITY (1,1),
-    AttachFileName VARCHAR(60),
-    Title VARCHAR(100),
+    AttachFileName VARCHAR(100),
+    Title VARCHAR(200),
     DateProduced DATE,
     CreateOn DATETIME DEFAULT GETDATE(),
 
@@ -1221,7 +1221,7 @@ GO
 CREATE TABLE HosClients
 (
     Id INT IDENTITY (1,1),
-    CodeNumber VARCHAR(16), 
+    CodeNumber VARCHAR(25), 
     NameEn NVARCHAR(50),
     NameOriginalLang NVARCHAR(50),
     Address NVARCHAR(50),  
@@ -1324,9 +1324,9 @@ GO
 CREATE TABLE PatientTranslations --MM
 (
     Id INT IDENTITY (1,1),
-    FullName NVARCHAR(60),
-    Occupation NVARCHAR(50),
-    [Address] NVARCHAR(50),
+    FullName NVARCHAR(150),
+    Occupation NVARCHAR(100),
+    [Address] NVARCHAR(300),
     PatientId INT,
     LangCode VARCHAR(6),
 
@@ -1350,7 +1350,7 @@ GO
 CREATE TABLE UserAccount (
     Id INT IDENTITY (1,1),
     UserName [nvarchar](36) NULL, -- MedicalFileNumber
-    PhoneNumber VARCHAR(20),
+    PhoneNumber VARCHAR(25),
     CallingCode VARCHAR(5), -- +20
     Email NVARCHAR(255),
     EmailConfirmed BIT NOT NULL DEFAULT 0,
@@ -1395,7 +1395,7 @@ CREATE TABLE Booking
 	VisitingDate DATETIMEOFFSET(7),
     CreateOn DATETIMEOFFSET(7) DEFAULT GETUTCDATE(),
     BookingReason NVARCHAR(500),
-	StatusReason NVARCHAR(500),
+	StatusReason NVARCHAR(300),
 
 	CONSTRAINT PK_Booking PRIMARY KEY (Id),
     CONSTRAINT UK_Booking_BookingNumber UNIQUE (BookingNumber),

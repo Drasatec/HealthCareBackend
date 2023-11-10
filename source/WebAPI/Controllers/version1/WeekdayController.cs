@@ -25,10 +25,10 @@ public class WeekdayController : ControllerBase
     [HttpPost("add", Order = 0801)]
     public async Task<IActionResult> AddSingle([FromForm] Weekday model)
     {
-        if (model.Id <= 0)
-        {
-            model.Id = Convert.ToByte(await Data.Generic.GenericCount<Weekday>() + 1);
-        }
+        //if (model.Id <= 0)
+        //{
+        //    model.Id = Convert.ToByte(await Data.Generic.GenericCount<Weekday>() + 1);
+        //}
 
         var res = await Data.Generic.GenericCreate(model);
         int id = 0;
@@ -47,7 +47,7 @@ public class WeekdayController : ControllerBase
     [HttpGet(Order = 0801)]
     public async Task<IActionResult> GetById([FromQuery] short id, string? lang)
     {
-        if (id < 1) return BadRequest(new Error("400", "can not assign 0"));
+        //if (id < 1) return BadRequest(new Error("400", "can not assign 0"));
 
         Expression<Func<Weekday, object>>? filterExpression;
         if (lang != null)

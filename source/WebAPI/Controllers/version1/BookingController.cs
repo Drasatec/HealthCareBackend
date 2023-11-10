@@ -48,9 +48,33 @@ public class BookingController : ControllerBase
 
         return BadRequest(res);
     }
+    
+
+    [HttpPost("add-body", Order = 0801)]
+    public async Task<IActionResult> AddSingleFromBody([FromBody] BookingRequestDto model)
+    {
+        var res = await Data.Appointments.CreateAppointments(model);
+        if (res != null && res.Success)
+        {
+            return Ok(res);
+        }
+        return BadRequest(res);
+    }
 
     // ============================= get ============================= 
 
+    [HttpGet("get-id")]
+    public async Task<IActionResult> GetByid([FromQuery] int Id, string? lang)
+    {
+        //return Ok(filterOptions);
+        var res = await Data.Appointments.ReadAppointmentById(Id, lang);
+        if(res == null)
+        {
+            return BadRequest(new Response(false, "pleas check you inputs"));
+        }
+        return Ok(res);
+    }
+    
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] AppointmentFilterOptions filterOptions, [FromQuery] PaginationOptions pageOptions, string? lang)
     {

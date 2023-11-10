@@ -13,7 +13,6 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
 {
     public AppointmentRepository(AppDbContext context) : base(context) { }
 
-
     public async Task<ResponseLongId?> CreateAppointments(BookingRequestDto dto)
     {
         var entity = (Booking)dto;
@@ -51,6 +50,103 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
         }
     }
 
+    public async Task<BookingResponseDto?> ReadAppointmentById(int Id, string? lang)
+    {
+        try
+        {
+            IQueryable<Booking> query = Context.Bookings;
+            IQueryable<BookingResponseDto> result;
+
+            query = query.Where(i => i.Id.Equals(Id));
+
+            if (lang != null)
+                result = (from h in query
+
+                          join hos in Context.HospitalTranslations on h.HospitalId equals hos.HospitalId
+                          where hos.LangCode == lang
+
+                          join spec in Context.MedicalSpecialtyTranslations on h.SpecialtyId equals spec.MedicalSpecialtyId
+                          where spec.LangCode == lang
+
+                          join cli in Context.ClinicTranslations on h.ClinicId equals cli.ClinicId
+                          where cli.LangCode == lang
+
+                          join doc in Context.DoctorTranslations on h.DoctorId equals doc.DoctorId
+                          where doc.LangCode == lang
+
+                          join tv in Context.TypesVisitTranslations on h.TypeVisitId equals tv.TypeVisitId
+                          where tv.LangCode == lang
+
+                          join wp in Context.WorkingPeriodTranslations on h.WorkingPeriodId equals wp.WorkingPeriodId
+                          where wp.LangCode == lang
+
+                          join bstat in Context.BookingStatusesTranslations on h.BookingStatusId equals bstat.BookingStatusId
+                          where bstat.LangCode == lang
+
+                          select new BookingResponseDto
+                          {
+                              Id = h.Id,
+                              BookingNumber = h.BookingNumber,
+                              DoctorId = h.DoctorId,
+                              WorkingPeriodId = h.WorkingPeriodId,
+                              PatientId = h.PatientId,
+                              ClinicId = h.ClinicId,
+                              HospitalId = h.HospitalId,
+                              TypeVisitId = h.TypeVisitId,
+                              VisitingDate = h.VisitingDate,
+                              SpecialtyId = h.SpecialtyId,
+                              CurrencyCode = h.CurrencyCode,
+                              BookingStatusId = h.BookingStatusId,
+                              Price = h.Price,
+                              PriceCategoryId = h.PriceCategoryId,
+                              DayNumber = h.DayNumber,
+                              BookingReason = h.BookingReason,
+                              StatusReason = h.StatusReason,
+
+                              Hospital = hos.Name,
+                              Specialty = spec.Name,
+                              Clinic = cli.Name,
+                              Doctor = doc.FullName,
+                              TypeVisit = tv.Name,
+                              WorkingPeriod = wp.Name,
+                              BookingStatus = bstat.StatusName,
+                              Patient = (from pt in Context.PatientTranslations
+                                         where pt.PatientId == h.PatientId
+                                         where pt.LangCode == lang || pt.LangCode != lang && pt.LangCode == Constants.BaseLang
+                                         select pt.FullName).FirstOrDefault(),
+                              CreateOn = h.CreateOn,
+                          });
+            else
+                result = (from h in query
+                          select new BookingResponseDto
+                          {
+                              Id = h.Id,
+                              DoctorId = h.DoctorId,
+                              WorkingPeriodId = h.WorkingPeriodId,
+                              PatientId = h.PatientId,
+                              ClinicId = h.ClinicId,
+                              HospitalId = h.HospitalId,
+                              TypeVisitId = h.TypeVisitId,
+                              SpecialtyId = h.SpecialtyId,
+                              CurrencyCode = h.CurrencyCode,
+                              BookingStatusId = h.BookingStatusId,
+                              PriceCategoryId = h.PriceCategoryId,
+                              Price = h.Price,
+                              VisitingDate = h.VisitingDate,
+                              BookingNumber = h.BookingNumber,
+                              BookingReason = h.BookingReason,
+                              StatusReason = h.StatusReason,
+                          });
+
+
+            return await result.FirstOrDefaultAsync();
+        }
+        catch (Exception)
+        {
+
+            return null;
+        }
+    }
 
     public async Task<PagedResponse<BookingResponseDto>?> ReadAllAppointments(AppointmentFilterOptions filterOptions, PaginationOptions pageOptions, string? lang)
     {
@@ -193,8 +289,8 @@ public class AppointmentRepository : GenericRepository, IAppointmentRepository
                               WorkingPeriod = wp.Name,
                               BookingStatus = bstat.StatusName,
                               Patient = (from pt in Context.PatientTranslations
-                                       where pt.PatientId == h.PatientId
-                                       where pt.LangCode == lang || pt.LangCode != lang && pt.LangCode == Constants.BaseLang
+                                         where pt.PatientId == h.PatientId
+                                         where pt.LangCode == lang || pt.LangCode != lang && pt.LangCode == Constants.BaseLang
                                          select pt.FullName).FirstOrDefault(),
                               CreateOn = h.CreateOn,
                           });

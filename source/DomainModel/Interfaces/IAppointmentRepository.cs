@@ -8,4 +8,5 @@ public interface IAppointmentRepository : IGenericRepository
 {
     Task<ResponseLongId?> CreateAppointments(BookingRequestDto dto);
     Task<PagedResponse<BookingResponseDto>?> ReadAllAppointments(AppointmentFilterOptions filterOptions, PaginationOptions pageOptions, string? lang);
+    Task<BookingResponseDto?> ReadAppointmentById(int Id, string? lang);
 }
